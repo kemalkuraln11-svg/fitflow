@@ -7,6 +7,7 @@ import { Users, Calendar, LogOut, Clock } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import UserHeader from "@/components/UserHeader";
 import ExpiredMembershipModal from "@/components/ExpiredMembershipModal";
 import ReservationsBottomSheet from "@/components/ReservationsBottomSheet";
 
@@ -72,6 +73,7 @@ export default function Profile() {
 
   return (
     <>
+    <UserHeader />
     <ExpiredMembershipModal />
     <div className="max-w-[1400px] mx-auto px-8 pt-8 pb-24">
       <h1 className="text-4xl font-bold tracking-tight mb-12">Profil</h1>

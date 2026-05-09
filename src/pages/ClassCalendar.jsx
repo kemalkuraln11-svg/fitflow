@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import PullToRefresh from "@/components/PullToRefresh";
+import UserHeader from "@/components/UserHeader";
 import ExpiredMembershipModal from "@/components/ExpiredMembershipModal";
 import { format, addDays, startOfWeek, isSameDay, parseISO, isSameWeek } from "date-fns";
 import { tr } from "date-fns/locale";
@@ -81,6 +82,7 @@ export default function ClassCalendar() {
   return (
     <>
     <ExpiredMembershipModal />
+    <UserHeader />
     <PullToRefresh onRefresh={handleRefresh}>
     <div className="max-w-[1400px] mx-auto px-8 pt-8 pb-24">
       <h1 className="text-4xl font-bold tracking-tight mb-8">Sınıf Takvimi</h1>

@@ -3,6 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { useMemberAuth } from "@/lib/MemberAuthContext";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import PullToRefresh from "@/components/PullToRefresh";
+import UserHeader from "@/components/UserHeader";
 import ExpiredMembershipModal from "@/components/ExpiredMembershipModal";
 import { format, isToday, isTomorrow, parseISO, differenceInDays, parse, isBefore } from "date-fns";
 import { tr } from "date-fns/locale";
@@ -87,6 +88,7 @@ export default function Home() {
   return (
     <>
     <ExpiredMembershipModal />
+    <UserHeader />
     <PullToRefresh onRefresh={handleRefresh}>
     <div className="max-w-[1400px] mx-auto px-8 pt-8 pb-24">
       {/* Header */}
