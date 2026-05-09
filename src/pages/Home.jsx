@@ -4,7 +4,7 @@ import { useMemberAuth } from "@/lib/MemberAuthContext";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import PullToRefresh from "@/components/PullToRefresh";
 import ExpiredMembershipModal from "@/components/ExpiredMembershipModal";
-import { format, isToday, isTomorrow, parseISO } from "date-fns";
+import { format, isToday, isTomorrow, parseISO, differenceInDays } from "date-fns";
 import { tr } from "date-fns/locale";
 import { Calendar, Clock, Users, ChevronRight } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -57,7 +57,7 @@ export default function Home() {
   });
 
   const daysLeft = membership
-    ? Math.max(0, Math.ceil((new Date(membership.end_date) - new Date()) / (1000 * 60 * 60 * 24)))
+    ? Math.max(0, differenceInDays(parseISO(membership.end_date), new Date()))
     : 0;
 
   const handleRefresh = async () => {

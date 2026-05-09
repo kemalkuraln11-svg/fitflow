@@ -30,7 +30,7 @@ export default function Profile() {
     ? differenceInDays(parseISO(membership.end_date), parseISO(membership.start_date))
     : 0;
   const daysLeft = membership
-    ? Math.max(0, Math.ceil((new Date(membership.end_date) - new Date()) / (1000 * 60 * 60 * 24)))
+    ? Math.max(0, differenceInDays(parseISO(membership.end_date), new Date()))
     : 0;
   const progress = totalDays > 0 ? ((totalDays - daysLeft) / totalDays) * 100 : 0;
 
