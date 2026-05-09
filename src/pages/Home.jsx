@@ -3,6 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { useMemberAuth } from "@/lib/MemberAuthContext";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import PullToRefresh from "@/components/PullToRefresh";
+import ExpiredMembershipModal from "@/components/ExpiredMembershipModal";
 import { format, isToday, isTomorrow, parseISO } from "date-fns";
 import { tr } from "date-fns/locale";
 import { Calendar, Clock, Users, ChevronRight } from "lucide-react";
@@ -63,6 +64,8 @@ export default function Home() {
   };
 
   return (
+    <>
+    <ExpiredMembershipModal />
     <PullToRefresh onRefresh={handleRefresh}>
     <div className="px-4 pt-6">
       {/* Header */}
@@ -161,5 +164,6 @@ export default function Home() {
       )}
     </div>
     </PullToRefresh>
+    </>
   );
 }

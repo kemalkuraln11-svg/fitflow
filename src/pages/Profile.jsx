@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useMemberAuth } from "@/lib/MemberAuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { format, parseISO, differenceInDays } from "date-fns";
 import { tr } from "date-fns/locale";
-import { User, Calendar, LogOut, Clock } from "lucide-react";
+import { User, Calendar, LogOut, Clock, AlertTriangle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -25,6 +25,14 @@ export default function Profile() {
     enabled: !!member?.user_email,
   });
 
+  // Auto-logout if expired
+  useEffect(() => {
+    if (membership !== undefined && daysLeft === 0 && membership) {
+      const timer = setTimeout(() => logout(), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [daysLeft, membership]);
+
   const totalDays = membership
     ? differenceInDays(parseISO(membership.end_date), parseISO(membership.start_date))
     : 0;
@@ -35,6 +43,15 @@ export default function Profile() {
 
   return (
     <div className="px-4 pt-6">
+      {daysLeft === 0 && membership && (
+        <div className="mb-4 p-4 rounded-xl bg-destructive/10 border border-destructive/30 flex items-center gap-3 text-destructive">
+          <AlertTriangle className="w-5 h-5 shrink-0" />
+          <div>
+            <p className="font-semibold text-sm">Üyeliğinizin süresi dolmuştur.</p>
+            <p className="text-xs opacity-80">Birkaç saniye içinde çıkış yapılacak...</p>
+          </div>
+        </div>
+      )}
       <h1 className="text-2xl font-bold tracking-tight mb-6">Profil</h1>
 
       {/* User Info */}
@@ -106,13 +123,6 @@ export default function Profile() {
           </div>
         </div>
       </Card>
-
-      {/* Expired warning */}
-      {daysLeft === 0 && membership && (
-        <div className="mb-3 p-4 rounded-xl bg-destructive/10 border border-destructive/30 text-destructive text-sm font-semibold text-center">
-          Üyeliğinizin süresi dolmuştur. Lütfen üyeliğinizi yenileyin.
-        </div>
-      )}
 
       {/* Actions */}
       <div className="space-y-3">

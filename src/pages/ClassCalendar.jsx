@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import PullToRefresh from "@/components/PullToRefresh";
+import ExpiredMembershipModal from "@/components/ExpiredMembershipModal";
 import { format, addDays, startOfWeek, isSameDay, parseISO } from "date-fns";
 import { tr } from "date-fns/locale";
 import { Clock, Users, ChevronLeft, ChevronRight } from "lucide-react";
@@ -35,6 +36,8 @@ export default function ClassCalendar() {
   };
 
   return (
+    <>
+    <ExpiredMembershipModal />
     <PullToRefresh onRefresh={handleRefresh}>
     <div className="px-4 pt-6">
       <h1 className="text-2xl font-bold tracking-tight mb-5">Takvim</h1>
@@ -156,5 +159,6 @@ export default function ClassCalendar() {
       )}
     </div>
     </PullToRefresh>
+    </>
   );
 }
