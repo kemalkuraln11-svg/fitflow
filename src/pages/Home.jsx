@@ -4,7 +4,7 @@ import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { format, isToday, isTomorrow, parseISO } from "date-fns";
 import { tr } from "date-fns/locale";
-import { Calendar, Clock, Users, ChevronRight, Shield } from "lucide-react";
+import { Calendar, Clock, Users, ChevronRight } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
@@ -57,14 +57,7 @@ export default function Home() {
           <p className="text-muted-foreground text-sm">Merhaba,</p>
           <h1 className="text-2xl font-bold tracking-tight">{user?.full_name || "Hoş Geldin"}</h1>
         </div>
-        {user?.role === "admin" && (
-          <Link
-            to="/admin"
-            className="p-2.5 bg-primary/10 rounded-xl text-primary hover:bg-primary/20 transition-colors"
-          >
-            <Shield className="w-5 h-5" />
-          </Link>
-        )}
+
       </div>
 
       {/* Membership Card */}

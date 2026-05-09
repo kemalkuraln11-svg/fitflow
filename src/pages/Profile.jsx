@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { format, parseISO, differenceInDays } from "date-fns";
 import { tr } from "date-fns/locale";
-import { User, Calendar, LogOut, Shield, Clock } from "lucide-react";
+import { User, Calendar, LogOut, Clock } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -113,14 +113,6 @@ export default function Profile() {
 
       {/* Actions */}
       <div className="space-y-3">
-        {user?.role === "admin" && (
-          <Link to="/admin">
-            <Button variant="outline" className="w-full justify-start gap-3 h-12">
-              <Shield className="w-5 h-5" />
-              Admin Paneli
-            </Button>
-          </Link>
-        )}
         <Button
           variant="outline"
           className="w-full justify-start gap-3 h-12 text-destructive hover:text-destructive"
