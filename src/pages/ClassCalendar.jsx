@@ -123,17 +123,21 @@ export default function ClassCalendar() {
 
       {/* Week strip */}
       <div 
-        className="flex gap-1.5 mb-6 overflow-x-auto pb-1"
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
+       className="flex gap-1.5 mb-6 overflow-x-auto pb-1"
+       onTouchStart={handleTouchStart}
+       onTouchEnd={handleTouchEnd}
       >
-        {weekDays.map((day) => {
-          const isSelected = isSameDay(day, selectedDate);
-          const isToday = isSameDay(day, new Date());
-          return (
-            <button
-              key={day.toISOString()}
-              onClick={() => setSelectedDate(day)}
+       {weekDays.map((day) => {
+         const isSelected = isSameDay(day, selectedDate);
+         const isToday = isSameDay(day, new Date());
+         return (
+           <button
+             key={day.toISOString()}
+             onClick={() => {
+               setSelectedDate(day);
+               const newWeekStart = startOfWeek(day, { weekStartsOn: 1 });
+               setWeekStart(newWeekStart);
+             }}
               className={cn(
                 "flex flex-col items-center flex-1 min-w-[44px] py-2.5 rounded-xl transition-all",
                 isSelected
