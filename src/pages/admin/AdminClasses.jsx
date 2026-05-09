@@ -3,7 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
-import { Plus, Trash2, Users, Eye } from "lucide-react";
+import { Plus, Trash2, Users, Eye, Edit2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,9 +25,10 @@ export default function AdminClasses() {
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [viewAttendeesFor, setViewAttendeesFor] = useState(null);
+  const [editingClass, setEditingClass] = useState(null);
   const [form, setForm] = useState({
     title: "", instructor: "", date: format(new Date(), "yyyy-MM-dd"),
-    start_time: "09:00", end_time: "10:00", capacity: 20, description: "", category: "fitness",
+    start_time: "09:00", end_time: "10:00", capacity: 20, description: "", category: "fitness", cancellation_deadline_minutes: 30,
   });
 
   const { data: classes = [], isLoading } = useQuery({
@@ -40,8 +41,18 @@ export default function AdminClasses() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["adminClasses"] });
       setShowForm(false);
-      setForm({ title: "", instructor: "", date: format(new Date(), "yyyy-MM-dd"), start_time: "09:00", end_time: "10:00", capacity: 20, description: "", category: "fitness" });
+      setForm({ title: "", instructor: "", date: format(new Date(), "yyyy-MM-dd"), start_time: "09:00", end_time: "10:00", capacity: 20, description: "", category: "fitness", cancellation_deadline_minutes: 30 });
       toast.success("Ders oluşturuldu");
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: (data) => base44.entities.ClassSchedule.update(editingClass.id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["adminClasses"] });
+      setEditingClass(null);
+      setForm({ title: "", instructor: "", date: format(new Date(), "yyyy-MM-dd"), start_time: "09:00", end_time: "10:00", capacity: 20, description: "", category: "fitness", cancellation_deadline_minutes: 30 });
+      toast.success("Ders güncellendi");
     },
   });
 
@@ -56,18 +67,21 @@ export default function AdminClasses() {
   return (
     <div>
       <div className="flex items-center justify-between mb-5">
-        <h2 className="text-xl font-bold">Dersler</h2>
-        <Dialog open={showForm} onOpenChange={setShowForm}>
-          <DialogTrigger asChild>
-            <Button size="sm" className="gap-2">
-              <Plus className="w-4 h-4" />
-              Yeni Ders
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Yeni Ders Ekle</DialogTitle>
-            </DialogHeader>
+         <h2 className="text-xl font-bold">Dersler</h2>
+         <Dialog open={showForm} onOpenChange={(open) => {
+           setShowForm(open);
+           if (!open) setEditingClass(null);
+         }}>
+           <DialogTrigger asChild>
+             <Button size="sm" className="gap-2">
+               <Plus className="w-4 h-4" />
+               Yeni Ders
+             </Button>
+           </DialogTrigger>
+           <DialogContent className="max-h-[90vh] overflow-y-auto">
+             <DialogHeader>
+               <DialogTitle>{editingClass ? "Dersi Düzenle" : "Yeni Ders Ekle"}</DialogTitle>
+             </DialogHeader>
             <div className="space-y-4 mt-2">
               <div>
                 <Label>Ders Adı</Label>
@@ -110,12 +124,27 @@ export default function AdminClasses() {
                 <Label>Açıklama</Label>
                 <Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Ders hakkında bilgi..." />
               </div>
+              <div>
+                <Label>İptal Deadline (dakika)</Label>
+                <Input 
+                  type="number" 
+                  value={form.cancellation_deadline_minutes} 
+                  onChange={(e) => setForm({ ...form, cancellation_deadline_minutes: parseInt(e.target.value) || 30 })}
+                  placeholder="Ders başlangıcına kaç dakika kala iptal edemez"
+                />
+              </div>
               <Button
                 className="w-full"
-                onClick={() => createMutation.mutate(form)}
-                disabled={!form.title || createMutation.isPending}
+                onClick={() => {
+                  if (editingClass) {
+                    updateMutation.mutate(form);
+                  } else {
+                    createMutation.mutate(form);
+                  }
+                }}
+                disabled={!form.title || (editingClass ? updateMutation.isPending : createMutation.isPending)}
               >
-                {createMutation.isPending ? "Oluşturuluyor..." : "Ders Oluştur"}
+                {editingClass ? (updateMutation.isPending ? "Güncelleniyor..." : "Ders Güncelle") : (createMutation.isPending ? "Oluşturuluyor..." : "Ders Oluştur")}
               </Button>
             </div>
           </DialogContent>
@@ -151,26 +180,38 @@ export default function AdminClasses() {
                   {cls.instructor && <p className="text-xs text-muted-foreground mt-0.5">{cls.instructor}</p>}
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8"
-                    onClick={() => setViewAttendeesFor(cls)}
-                  >
-                    <Eye className="w-4 h-4" />
-                  </Button>
-                  <span className="text-sm font-medium text-muted-foreground mx-1">
-                    {cls.current_count || 0}/{cls.capacity}
-                  </span>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-destructive"
-                    onClick={() => deleteMutation.mutate(cls.id)}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
+                   <Button
+                     variant="ghost"
+                     size="icon"
+                     className="h-8 w-8"
+                     onClick={() => setViewAttendeesFor(cls)}
+                   >
+                     <Eye className="w-4 h-4" />
+                   </Button>
+                   <span className="text-sm font-medium text-muted-foreground mx-1">
+                     {cls.current_count || 0}/{cls.capacity}
+                   </span>
+                   <Button
+                     variant="ghost"
+                     size="icon"
+                     className="h-8 w-8"
+                     onClick={() => {
+                       setEditingClass(cls);
+                       setForm(cls);
+                       setShowForm(true);
+                     }}
+                   >
+                     <Edit2 className="w-4 h-4" />
+                   </Button>
+                   <Button
+                     variant="ghost"
+                     size="icon"
+                     className="h-8 w-8 text-destructive"
+                     onClick={() => deleteMutation.mutate(cls.id)}
+                   >
+                     <Trash2 className="w-4 h-4" />
+                   </Button>
+                 </div>
               </div>
             </Card>
           ))}
