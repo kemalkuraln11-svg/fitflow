@@ -72,7 +72,14 @@ export default function Home() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <p className="text-muted-foreground text-sm">Merhaba,</p>
-          <h1 className="text-2xl font-bold tracking-tight">{member?.user_name || "Hoş Geldin"}</h1>
+          <h1 className="text-2xl font-bold tracking-tight">{member?.user_name
+    ? member.user_name
+        .split(" ")
+        .map(
+          w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()
+        )
+        .join(" ")
+    : "Hoş Geldin"}</h1>
         </div>
 
       </div>
