@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useMemberAuth } from "@/lib/MemberAuthContext";
 import { useQuery } from "@tanstack/react-query";
@@ -9,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import ExpiredMembershipModal from "@/components/ExpiredMembershipModal";
+import ReservationsBottomSheet from "@/components/ReservationsBottomSheet";
 
 
 export default function Profile() {
@@ -30,7 +30,7 @@ export default function Profile() {
     ? differenceInDays(parseISO(membership.end_date), parseISO(membership.start_date))
     : 0;
   const daysLeft = membership
-    ? Math.max(0, Math.ceil((new Date(membership.end_date) - new Date()) / (1000 * 60 * 60 * 24)))
+    ? Math.max(0, differenceInDays(parseISO(membership.end_date), new Date()))
     : 0;
   const progress = totalDays > 0 ? ((totalDays - daysLeft) / totalDays) * 100 : 0;
 
@@ -104,7 +104,7 @@ export default function Profile() {
       {/* Stats */}
       <Card className="p-5 mb-5">
         <h3 className="font-semibold mb-3">İstatistikler</h3>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-4 mb-4">
           <div className="text-center p-3 bg-primary/5 rounded-xl">
             <p className="text-2xl font-bold text-primary">{reservations.length}</p>
             <p className="text-xs text-muted-foreground mt-0.5">Aktif Rezervasyon</p>
@@ -114,6 +114,7 @@ export default function Profile() {
             <p className="text-xs text-muted-foreground mt-0.5">Kalan Gün</p>
           </div>
         </div>
+        <ReservationsBottomSheet reservations={reservations} />
       </Card>
 
       {/* Actions */}
