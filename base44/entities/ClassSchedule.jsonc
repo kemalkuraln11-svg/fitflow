@@ -55,6 +55,11 @@
       "type": "boolean",
       "default": false,
       "description": "Is this a recurring class"
+    },
+    "cancellation_deadline_minutes": {
+      "type": "number",
+      "default": 30,
+      "description": "Minutes before class start when cancellation is no longer allowed"
     }
   },
   "required": [
