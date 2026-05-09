@@ -10,8 +10,7 @@ import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 
 const categoryEmojis = {
-  yoga: "🧘", pilates: "💪", fitness: "🏋️", dance: "💃",
-  boxing: "🥊", swimming: "🏊", other: "⭐",
+  hyrox: "🏃", crossfit: "🔥", fitness: "🏋️", other: "⭐",
 };
 
 export default function ClassDetail() {
