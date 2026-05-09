@@ -49,7 +49,11 @@ export default function Profile() {
             <User className="w-7 h-7 text-primary" />
           </div>
           <div>
-            <h2 className="font-bold text-lg">{member?.user_name || "Kullanıcı"}</h2>
+            <h2 className="font-bold text-lg">
+              {member?.user_name
+                ? member.user_name.split(" ").map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(" ")
+                : "Kullanıcı"}
+            </h2>
             <p className="text-sm text-muted-foreground">@{member?.username}</p>
           </div>
         </div>
