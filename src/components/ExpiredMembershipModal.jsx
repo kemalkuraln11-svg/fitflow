@@ -13,7 +13,7 @@ export default function ExpiredMembershipModal() {
     today.setHours(0, 0, 0, 0);
     const end = new Date(member.end_date);
     end.setHours(0, 0, 0, 0);
-    if (end < today || member.status === "expired" || member.status === "frozen") {
+    if (end <= today || member.status === "expired" || member.status === "frozen") {
       setShow(true);
     }
   }, [member]);
