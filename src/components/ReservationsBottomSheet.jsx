@@ -1,13 +1,39 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { format, isToday, isTomorrow, parseISO } from "date-fns";
 import { tr } from "date-fns/locale";
 import { ChevronUp, X, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { base44 } from "@/api/base44Client";
 
 export default function ReservationsBottomSheet({ reservations = [] }) {
   const [open, setOpen] = useState(false);
+  const [classesData, setClassesData] = useState({});
+
+  useEffect(() => {
+    if (reservations.length === 0) return;
+    
+    const fetchClasses = async () => {
+      const classIds = [...new Set(reservations.map((r) => r.class_id))];
+      const data = {};
+      
+      for (const id of classIds) {
+        try {
+          const classes = await base44.entities.ClassSchedule.filter({ id });
+          if (classes.length > 0) {
+            data[id] = classes[0];
+          }
+        } catch (err) {
+          console.error(`Failed to fetch class ${id}:`, err);
+        }
+      }
+      
+      setClassesData(data);
+    };
+    
+    fetchClasses();
+  }, [reservations]);
 
   if (reservations.length === 0) return null;
 
@@ -62,6 +88,8 @@ export default function ReservationsBottomSheet({ reservations = [] }) {
         {/* List */}
         <div className="overflow-y-auto px-4 py-4 space-y-2" style={{ maxHeight: "calc(60vh - 100px)" }}>
           {reservations.map((res) => {
+            const classData = classesData[res.class_id];
+            const displayTime = classData?.start_time || res.class_time;
             const dateLabel = isToday(parseISO(res.class_date))
               ? "Bugün"
               : isTomorrow(parseISO(res.class_date))
@@ -75,7 +103,7 @@ export default function ReservationsBottomSheet({ reservations = [] }) {
                     {dateLabel}
                   </Badge>
                   <p className="text-sm font-medium truncate flex-1">{res.class_title}</p>
-                  <span className="text-xs text-muted-foreground shrink-0">{res.class_time}</span>
+                  <span className="text-xs text-muted-foreground shrink-0">{displayTime}</span>
                 </Card>
               </Link>
             );
