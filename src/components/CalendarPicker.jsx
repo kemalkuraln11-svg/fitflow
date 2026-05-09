@@ -82,7 +82,7 @@ export default function CalendarPicker({ minDate = new Date(), onDateSelect }) {
                     ? "text-muted-foreground opacity-30 cursor-not-allowed"
                     : isToday
                     ? "bg-primary/10 text-primary font-bold"
-                    : "bg-card hover:bg-secondary text-foreground"
+                    : "bg-card hover:bg-muted text-foreground"
                 )}
               >
                 {format(day, "d")}
