@@ -90,13 +90,13 @@ export default function Home() {
     <PullToRefresh onRefresh={handleRefresh}>
     <div className="px-6 pt-6 pb-24">
       {/* Header */}
-      <div className="mb-8 flex items-center gap-3">
-        <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-3xl flex-shrink-0">
+      <div className="mb-8 flex items-start gap-4">
+        <div className="w-20 h-20 rounded-3xl bg-primary/10 flex items-center justify-center text-5xl flex-shrink-0">
           {member?.gender === "female" ? "👩" : "👨"}
         </div>
-        <div>
-          <p className="text-muted-foreground text-sm">Merhaba,</p>
-          <h1 className="text-2xl font-bold">{member?.user_name
+        <div className="flex-1 pt-1">
+          <p className="text-muted-foreground text-base">Merhaba,</p>
+          <h1 className="text-3xl font-bold">{member?.user_name
     ? member.user_name
         .split(" ")
         .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
