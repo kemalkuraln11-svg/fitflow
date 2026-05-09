@@ -4,6 +4,8 @@ import { queryClientInstance } from '@/lib/query-client'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
+import { useEffect } from 'react';
+import { base44 } from '@/api/base44Client';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import UserLayout from './components/layout/UserLayout';
 import AdminLayout from './components/layout/AdminLayout';
@@ -17,6 +19,30 @@ import AdminMembers from './pages/admin/AdminMembers';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
+
+  // Initialize default admin user on first app load
+  useEffect(() => {
+    const initializeAdmin = async () => {
+      try {
+        const user = await base44.auth.me();
+        if (user?.role === 'admin') {
+          // Check if kemalkural already exists
+          const existingUsers = await base44.entities.User.list();
+          const kKuralExists = existingUsers.some(u => u.email === 'kemalkural@fitkafa.com');
+          
+          if (!kKuralExists) {
+            await base44.users.inviteUser('kemalkural@fitkafa.com', 'admin');
+          }
+        }
+      } catch (err) {
+        console.log('Admin initialization completed or not needed');
+      }
+    };
+
+    if (!isLoadingAuth && !isLoadingPublicSettings) {
+      initializeAdmin();
+    }
+  }, [isLoadingAuth, isLoadingPublicSettings]);
 
   // Show loading spinner while checking app public settings or auth
   if (isLoadingPublicSettings || isLoadingAuth) {
