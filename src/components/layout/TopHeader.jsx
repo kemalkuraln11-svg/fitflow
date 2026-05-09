@@ -15,7 +15,7 @@ export default function TopHeader() {
           <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
             <span className="text-primary-foreground font-bold text-xs">F</span>
           </div>
-          <span className="font-bold text-lg tracking-tight">FitFlow</span>
+          <span className="font-bold text-lg tracking-tight">FitKafa-Hyrox</span>
         </button>
       ) : (
         <button
