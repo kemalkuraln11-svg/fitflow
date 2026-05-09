@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import { base44 } from '@/api/base44Client';
 
 const MemberAuthContext = createContext();
@@ -77,6 +77,47 @@ export const MemberAuthProvider = ({ children }) => {
     sessionStorage.removeItem(SESSION_KEY);
     setMember(null);
   };
+
+  // Real-time sync: admin panelde üye verisi değişince oturumu güncelle
+  useEffect(() => {
+    if (!member?.id) return;
+
+    const unsubscribe = base44.entities.Membership.subscribe((event) => {
+      if (event.id !== member.id) return;
+
+      if (event.type === 'delete') {
+        logout();
+        return;
+      }
+
+      if (event.type === 'update' && event.data) {
+        const updated = event.data;
+
+        // Askıya alındıysa çıkış yap
+        if (updated.status === 'suspended') {
+          logout();
+          return;
+        }
+
+        const newSession = {
+          id: updated.id,
+          user_name: updated.user_name,
+          username: updated.username,
+          user_email: updated.user_email,
+          plan_name: updated.plan_name,
+          start_date: updated.start_date,
+          end_date: updated.end_date,
+          status: updated.status,
+          frozen_at: updated.frozen_at || null,
+        };
+
+        sessionStorage.setItem(SESSION_KEY, JSON.stringify(newSession));
+        setMember(newSession);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [member?.id]);
 
   return (
     <MemberAuthContext.Provider value={{ member, isLoading, login, logout }}>
