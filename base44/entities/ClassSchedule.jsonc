@@ -39,6 +39,8 @@
     "category": {
       "type": "string",
       "enum": [
+        "hyrox",
+        "crossfit",
         "yoga",
         "pilates",
         "fitness",

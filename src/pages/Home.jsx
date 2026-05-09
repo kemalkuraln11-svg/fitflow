@@ -9,6 +9,8 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 const categoryEmojis = {
+  hyrox: "🏃",
+  crossfit: "🔥",
   yoga: "🧘",
   pilates: "💪",
   fitness: "🏋️",
