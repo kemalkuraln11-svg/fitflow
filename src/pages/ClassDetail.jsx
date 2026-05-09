@@ -3,9 +3,9 @@ import { base44 } from "@/api/base44Client";
 import { useMemberAuth } from "@/lib/MemberAuthContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import ExpiredMembershipModal from "@/components/ExpiredMembershipModal";
-import { format, parseISO, differenceInDays, parse, isBefore, addMinutes } from "date-fns";
+import { format, parseISO, parse, isBefore, addMinutes } from "date-fns";
 import { tr } from "date-fns/locale";
-import { ArrowLeft, Clock, Users, MapPin, User } from "lucide-react";
+import { Clock, Users, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
@@ -106,13 +106,13 @@ export default function ClassDetail() {
   return (
     <>
     <ExpiredMembershipModal />
-    <div className="px-6 pt-6 pb-24">
+    <div className="px-4 pt-4 pb-24">
       {/* Hero */}
-       <div className="text-center mb-10">
-         <div className="w-28 h-28 rounded-2xl bg-primary/10 flex items-center justify-center text-6xl mx-auto mb-6">
+       <div className="text-center mb-6">
+         <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center text-5xl mx-auto mb-4">
            {categoryEmojis[cls.category] || "⭐"}
          </div>
-         <h1 className="text-4xl font-bold">{cls.title}</h1>
+         <h1 className="text-3xl font-bold">{cls.title}</h1>
         {cls.instructor && (
           <p className="text-muted-foreground mt-2 flex items-center justify-center gap-1.5">
             <User className="w-4 h-4" />
@@ -122,26 +122,26 @@ export default function ClassDetail() {
       </div>
 
       {/* Info cards */}
-      <div className="grid grid-cols-2 gap-6 mb-10">
-        <Card className="p-5 text-center">
-          <Clock className="w-6 h-6 mx-auto mb-2 text-primary" />
-          <p className="font-semibold">{cls.start_time} - {cls.end_time}</p>
-          <p className="text-sm text-muted-foreground mt-1">
-            {format(parseISO(cls.date), "d MMMM", { locale: tr })}
+      <div className="grid grid-cols-2 gap-3 mb-6">
+        <Card className="p-3 text-center">
+          <Clock className="w-5 h-5 mx-auto mb-1.5 text-primary" />
+          <p className="font-semibold text-sm">{cls.start_time} - {cls.end_time}</p>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            {format(parseISO(cls.date), "d MMM", { locale: tr })}
           </p>
         </Card>
-        <Card className="p-5 text-center">
-          <Users className="w-6 h-6 mx-auto mb-2 text-accent" />
-          <p className="font-semibold">{cls.current_count || 0} / {cls.capacity}</p>
-          <p className="text-sm text-muted-foreground mt-1">Katılımcı</p>
+        <Card className="p-3 text-center">
+          <Users className="w-5 h-5 mx-auto mb-1.5 text-accent" />
+          <p className="font-semibold text-sm">{cls.current_count || 0} / {cls.capacity}</p>
+          <p className="text-xs text-muted-foreground mt-0.5">Katılımcı</p>
         </Card>
       </div>
 
       {/* Description */}
       {cls.description && (
-        <Card className="p-6 mb-10">
-          <h3 className="font-bold text-lg mb-3">Ders Hakkında</h3>
-          <p className="text-muted-foreground leading-relaxed">{cls.description}</p>
+        <Card className="p-4 mb-6">
+          <h3 className="font-bold text-base mb-2">Ders Hakkında</h3>
+          <p className="text-sm text-muted-foreground leading-relaxed">{cls.description}</p>
         </Card>
       )}
 

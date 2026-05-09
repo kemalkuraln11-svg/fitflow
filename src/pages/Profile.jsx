@@ -3,7 +3,7 @@ import { useMemberAuth } from "@/lib/MemberAuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { format, parseISO, differenceInDays, parse, isBefore } from "date-fns";
 import { tr } from "date-fns/locale";
-import { Users, Calendar, LogOut, Clock } from "lucide-react";
+import { Calendar, LogOut, Clock } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -73,8 +73,8 @@ export default function Profile() {
   return (
     <>
     <ExpiredMembershipModal />
-    <div className="px-6 pt-6 pb-24">
-      <h1 className="text-2xl font-bold tracking-tight mb-8">Profil</h1>
+    <div className="px-4 pt-4 pb-24">
+      <h1 className="text-2xl font-bold tracking-tight mb-6">Profil</h1>
 
       <div className="space-y-6">
         {/* User Info */}
