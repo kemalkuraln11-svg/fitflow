@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import ExpiredMembershipModal from "@/components/ExpiredMembershipModal";
 import ReservationsBottomSheet from "@/components/ReservationsBottomSheet";
-import AccountDeleteDialog from "@/components/AccountDeleteDialog";
 
 
 export default function Profile() {
@@ -162,7 +161,6 @@ export default function Profile() {
           <LogOut className="w-5 h-5" />
           <span className="font-medium">Çıkış Yap</span>
         </Button>
-        <AccountDeleteDialog onDeleted={() => window.location.href = '/'} />
       </div>
     </div>
     </>
