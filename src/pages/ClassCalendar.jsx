@@ -183,8 +183,8 @@ export default function ClassCalendar() {
           <p className="text-sm">Bu tarihte ders bulunmuyor</p>
         </Card>
       ) : (
-        <div className="space-y-3">
-          {classes.map((cls) => {
+        <div className="space-y-4">
+           {classes.map((cls) => {
             const isFull = (cls.current_count || 0) >= cls.capacity;
             return (
               <Link key={cls.id} to={`/class/${cls.id}`}>
