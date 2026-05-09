@@ -162,7 +162,7 @@ export default function ClassCalendar() {
        </div>
 
       {/* Classes for selected date */}
-      <div className="sticky top-0 z-10 bg-background pb-4 mb-5 pt-2">
+      <div className="sticky top-0 z-10 bg-background pb-2 mb-2 pt-2">
         <h2 className="text-lg font-bold">
           {format(selectedDate, "d MMMM EEEE", { locale: tr })}
         </h2>
