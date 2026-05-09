@@ -2,7 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useMemberAuth } from "@/lib/MemberAuthContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { format, parseISO } from "date-fns";
+import { format, parseISO, differenceInDays } from "date-fns";
 import { tr } from "date-fns/locale";
 import { ArrowLeft, Clock, Users, MapPin, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -90,6 +90,12 @@ export default function ClassDetail() {
   const isFull = (cls.current_count || 0) >= cls.capacity;
   const hasReservation = !!myReservation;
 
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const memberEndDate = user?.end_date ? new Date(user.end_date) : null;
+  if (memberEndDate) memberEndDate.setHours(0, 0, 0, 0);
+  const membershipExpired = memberEndDate ? memberEndDate < today : false;
+
   return (
     <div className="px-4 pt-6 pb-8">
       {/* Hero */}
@@ -131,7 +137,11 @@ export default function ClassDetail() {
       )}
 
       {/* Action Button */}
-      {hasReservation ? (
+      {membershipExpired ? (
+        <div className="w-full h-14 flex items-center justify-center rounded-xl bg-destructive/10 border border-destructive/30 text-destructive font-semibold text-sm text-center px-4">
+          Üyeliğinizin süresi dolmuştur. Lütfen üyeliğinizi yenileyin.
+        </div>
+      ) : hasReservation ? (
         <Button
           variant="outline"
           className="w-full h-14 text-base font-semibold border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground"

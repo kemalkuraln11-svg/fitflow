@@ -14,8 +14,12 @@ export const MemberAuthProvider = ({ children }) => {
     const saved = sessionStorage.getItem(SESSION_KEY);
     if (saved) {
       const parsed = JSON.parse(saved);
-      // Üyelik süresi dolmuşsa oturumu kapat
-      if (parsed.end_date && new Date(parsed.end_date) < new Date()) {
+      // Üyelik süresi dolmuşsa veya dondurulmuşsa oturumu kapat
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const endDate = new Date(parsed.end_date);
+      endDate.setHours(0, 0, 0, 0);
+      if (parsed.status === 'frozen' || endDate < today) {
         sessionStorage.removeItem(SESSION_KEY);
       } else {
         setMember(parsed);
@@ -36,8 +40,21 @@ export const MemberAuthProvider = ({ children }) => {
 
     const m = results[0];
     if (m.status === 'suspended') throw new Error('Üyeliğiniz askıya alınmıştır. Lütfen iletişime geçin.');
-    if (m.status === 'expired') throw new Error('Üyeliğinizin süresi dolmuştur.');
     if (m.status === 'frozen') throw new Error('Üyeliğiniz dondurulmuştur. Lütfen iletişime geçin.');
+
+    // Bitiş tarihi bugünden önceyse giriş yapılamaz
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const endDate = new Date(m.end_date);
+    endDate.setHours(0, 0, 0, 0);
+    if (endDate < today) {
+      // Eğer status hâlâ active ise expired'a çek
+      if (m.status === 'active') {
+        await base44.entities.Membership.update(m.id, { status: 'expired' });
+      }
+      throw new Error('Üyeliğinizin süresi dolmuştur. Lütfen üyeliğinizi yenileyin.');
+    }
+    if (m.status === 'expired') throw new Error('Üyeliğinizin süresi dolmuştur. Lütfen üyeliğinizi yenileyin.');
 
     const sessionData = {
       id: m.id,
@@ -48,6 +65,7 @@ export const MemberAuthProvider = ({ children }) => {
       start_date: m.start_date,
       end_date: m.end_date,
       status: m.status,
+      frozen_at: m.frozen_at || null,
     };
 
     sessionStorage.setItem(SESSION_KEY, JSON.stringify(sessionData));
