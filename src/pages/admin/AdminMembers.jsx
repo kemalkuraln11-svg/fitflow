@@ -56,7 +56,7 @@ export default function AdminMembers() {
   const [editingMember, setEditingMember] = useState(null);
 
   const emptyForm = {
-    user_name: "", password: "",
+    user_name: "", password: "", gender: "male",
     start_date: format(new Date(), "yyyy-MM-dd"),
     end_date: format(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), "yyyy-MM-dd"),
     plan_name: "Aylık", status: "active",
@@ -112,6 +112,7 @@ export default function AdminMembers() {
       user_name: member.user_name,
       username: member.username,
       password: member.password,
+      gender: member.gender || "male",
       start_date: member.start_date,
       end_date: member.end_date,
       plan_name: member.plan_name || "Aylık",
@@ -169,8 +170,18 @@ export default function AdminMembers() {
               <div>
                 <Label>Ad Soyad</Label>
                 <Input value={form.user_name} onChange={(e) => setForm({ ...form, user_name: e.target.value })} placeholder="Ahmet Yılmaz" />
-              </div>
-              {autoUsername && (
+                </div>
+                <div>
+                  <Label>Cinsiyet</Label>
+                  <Select value={form.gender} onValueChange={(v) => setForm({ ...form, gender: v })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="male">Erkek</SelectItem>
+                      <SelectItem value="female">Kadın</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                {autoUsername && (
                 <div className="bg-secondary/60 rounded-xl p-3 text-sm space-y-1">
                   <p className="text-muted-foreground text-xs font-medium">Otomatik oluşturulan kullanıcı adı:</p>
                   <p className="font-bold text-primary text-base">{autoUsername}</p>
@@ -260,9 +271,19 @@ export default function AdminMembers() {
               <div>
                 <Label>Ad Soyad</Label>
                 <Input value={editForm.user_name} onChange={(e) => setEditForm({ ...editForm, user_name: e.target.value })} />
-              </div>
-              <div>
-                <Label>Kullanıcı Adı</Label>
+                </div>
+                <div>
+                  <Label>Cinsiyet</Label>
+                  <Select value={editForm.gender} onValueChange={(v) => setEditForm({ ...editForm, gender: v })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="male">Erkek</SelectItem>
+                      <SelectItem value="female">Kadın</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Kullanıcı Adı</Label>
                 <Input value={editForm.username} onChange={(e) => setEditForm({ ...editForm, username: e.target.value })} />
               </div>
               <div>

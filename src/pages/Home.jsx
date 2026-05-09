@@ -92,7 +92,7 @@ export default function Home() {
       {/* Header */}
       <div className="flex items-center gap-4 mb-6">
         <div className="w-14 h-14 rounded-lg bg-primary/10 flex items-center justify-center text-3xl font-bold text-primary">
-          🏃
+          {member?.gender === "female" ? "🏃‍♀️" : "🏃"}
         </div>
         <div>
           <p className="text-muted-foreground text-sm">Merhaba,</p>

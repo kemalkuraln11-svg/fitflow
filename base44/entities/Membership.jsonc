@@ -18,6 +18,14 @@
       "type": "string",
       "description": "Password set by admin"
     },
+    "gender": {
+      "type": "string",
+      "enum": [
+        "male",
+        "female"
+      ],
+      "description": "Member gender"
+    },
     "start_date": {
       "type": "string",
       "format": "date",

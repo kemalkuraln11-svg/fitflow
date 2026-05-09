@@ -3,7 +3,7 @@ import { useMemberAuth } from "@/lib/MemberAuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { format, parseISO, differenceInDays, parse, isBefore } from "date-fns";
 import { tr } from "date-fns/locale";
-import { User, Calendar, LogOut, Clock } from "lucide-react";
+import { Users, Calendar, LogOut, Clock } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -79,8 +79,8 @@ export default function Profile() {
       {/* User Info */}
       <Card className="p-5 mb-5">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
-            <User className="w-7 h-7 text-primary" />
+          <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-3xl">
+            {member?.gender === "female" ? "👩" : "👨"}
           </div>
           <div>
             <h2 className="font-bold text-lg">
