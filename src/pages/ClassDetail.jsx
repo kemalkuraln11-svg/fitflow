@@ -100,6 +100,7 @@ export default function ClassDetail() {
   const classDateTime = parse(`${cls.date} ${cls.start_time}`, "yyyy-MM-dd HH:mm", new Date());
   const cancellationDeadline = addMinutes(classDateTime, -(cls.cancellation_deadline_minutes || 30));
   const canCancelReservation = isBefore(new Date(), cancellationDeadline);
+  const classStarted = isBefore(classDateTime, new Date());
 
   return (
     <div className="px-4 pt-6 pb-8">
@@ -161,6 +162,10 @@ export default function ClassDetail() {
             Dersin başlangıcına {cls.cancellation_deadline_minutes || 30} dakikadan az kala iptal edilemez
           </div>
         )
+        ) : classStarted ? (
+        <div className="w-full h-14 flex items-center justify-center rounded-xl bg-destructive/10 border border-destructive/30 text-destructive font-semibold text-sm text-center px-4">
+          Ders başladı. Rezervasyon yapılamazsınız.
+        </div>
         ) : (
         <Button
           className="w-full h-14 text-base font-semibold shadow-lg shadow-primary/25"
