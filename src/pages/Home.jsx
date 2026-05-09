@@ -109,24 +109,26 @@ export default function Home() {
         {/* Left Column - Membership */}
         {membership && (
           <div className="lg:col-span-1">
-            <div className="sticky top-20 relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-primary/70 p-5 text-primary-foreground">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-10 translate-x-10" />
-              <div className="absolute bottom-0 left-0 w-20 h-20 bg-white/5 rounded-full translate-y-8 -translate-x-8" />
-              <p className="text-xs opacity-80 font-medium">{membership.plan_name || "Üyelik"}</p>
-              <p className="text-4xl font-bold mt-2">{daysLeft}</p>
-              <p className="text-xs opacity-70">gün kalan</p>
-              <div className="mt-4 pt-4 border-t border-white/20 flex items-center gap-2 text-xs opacity-70">
-                <Calendar className="w-3.5 h-3.5" />
-                <span>{format(parseISO(membership.end_date), "d MMM", { locale: tr })}</span>
+            <div className="sticky top-20 relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-primary/70 p-5 text-primary-foreground h-fit">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-8 translate-x-8" />
+              <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/5 rounded-full translate-y-4 -translate-x-4" />
+              <div className="relative z-10">
+                <p className="text-xs opacity-80 font-medium">{membership.plan_name || "Üyelik"}</p>
+                <p className="text-3xl font-bold mt-3">{daysLeft}</p>
+                <p className="text-xs opacity-70 mt-0.5">gün kalan</p>
+                <div className="mt-4 pt-4 border-t border-white/20 flex items-center gap-2 text-xs opacity-70">
+                  <Calendar className="w-3 h-3 flex-shrink-0" />
+                  <span>{format(parseISO(membership.end_date), "d MMM", { locale: tr })}</span>
+                </div>
               </div>
             </div>
           </div>
         )}
 
         {/* Right Column - Classes & Reservations */}
-        <div className={membership ? "lg:col-span-2" : "lg:col-span-3"}>
+        <div className={membership ? "lg:col-span-2 space-y-6" : "lg:col-span-3 space-y-6"}>
           {/* Today's Classes */}
-          <div className="mb-6">
+          <div>
             <div className="flex items-center justify-between mb-3">
               <h2 className="font-semibold text-lg">Bugünkü Dersler</h2>
               <Link to="/calendar" className="text-primary text-sm font-medium flex items-center gap-0.5">
@@ -169,7 +171,7 @@ export default function Home() {
           </div>
 
           {/* My Upcoming Reservations */}
-          <div className="mt-6">
+          <div>
             <ReservationsBottomSheet reservations={myReservations} />
           </div>
         </div>

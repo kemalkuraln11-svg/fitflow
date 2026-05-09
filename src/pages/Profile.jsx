@@ -73,99 +73,95 @@ export default function Profile() {
   return (
     <>
     <ExpiredMembershipModal />
-    <div className="max-w-4xl mx-auto px-4 pt-6 pb-6">
+    <div className="max-w-6xl mx-auto px-4 pt-6 pb-20">
       <h1 className="text-2xl font-bold tracking-tight mb-6">Profil</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-1">
-      {/* User Info */}
-      <Card className="p-5 mb-5">
-        <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-3xl">
-            {member?.gender === "female" ? "👩" : "👨"}
-          </div>
-          <div>
-            <h2 className="font-bold text-lg">
-              {member?.user_name
-                ? member.user_name.split(" ").map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(" ")
-                : "Kullanıcı"}
-            </h2>
-            <p className="text-sm text-muted-foreground">@{member?.username}</p>
-          </div>
-        </div>
-      </Card>
-
-        {/* Membership Status */}
-        <Card className="p-5 mb-5">
-        <div className="flex items-center gap-2 mb-4">
-          <Calendar className="w-5 h-5 text-primary" />
-          <h3 className="font-semibold">Üyelik Durumu</h3>
-        </div>
-
-        {membership ? (
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">Plan</span>
-              <span className="font-medium">{membership.plan_name || "Standart"}</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">Başlangıç</span>
-              <span className="font-medium">
-                {format(parseISO(membership.start_date), "d MMMM yyyy", { locale: tr })}
-              </span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">Bitiş</span>
-              <span className="font-medium">
-                {format(parseISO(membership.end_date), "d MMMM yyyy", { locale: tr })}
-              </span>
-            </div>
-
-            <div className="pt-2">
-              <div className="flex justify-between text-sm mb-2">
-                <span className="text-muted-foreground">Kalan süre</span>
-                <span className="font-bold text-primary">{daysLeft} gün</span>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left Column */}
+        <div className="lg:col-span-1 space-y-5">
+          {/* User Info */}
+          <Card className="p-5">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-2xl flex-shrink-0">
+                {member?.gender === "female" ? "👩" : "👨"}
               </div>
-              <Progress value={progress} className="h-2" />
+              <div className="min-w-0">
+                <h2 className="font-bold text-base truncate">
+                  {member?.user_name
+                    ? member.user_name.split(" ").map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(" ")
+                    : "Kullanıcı"}
+                </h2>
+                <p className="text-xs text-muted-foreground truncate">@{member?.username}</p>
+              </div>
             </div>
-          </div>
-        ) : (
-          <div className="text-center py-4 text-muted-foreground">
-            <Clock className="w-8 h-8 mx-auto mb-2 opacity-40" />
-            <p className="text-sm">Aktif üyelik bulunamadı</p>
-          </div>
-        )}
-      </Card>
+          </Card>
+
+          {/* Membership Status */}
+          <Card className="p-5">
+            <div className="flex items-center gap-2 mb-4">
+              <Calendar className="w-4 h-4 text-primary flex-shrink-0" />
+              <h3 className="font-semibold text-sm">Üyelik Durumu</h3>
+            </div>
+
+            {membership ? (
+              <div className="space-y-3 text-sm">
+                <div>
+                  <span className="text-xs text-muted-foreground block">Plan</span>
+                  <span className="font-medium">{membership.plan_name || "Standart"}</span>
+                </div>
+                <div>
+                  <span className="text-xs text-muted-foreground block">Başlangıç</span>
+                  <span className="font-medium text-xs">{format(parseISO(membership.start_date), "d MMM yyyy", { locale: tr })}</span>
+                </div>
+                <div>
+                  <span className="text-xs text-muted-foreground block">Bitiş</span>
+                  <span className="font-medium text-xs">{format(parseISO(membership.end_date), "d MMM yyyy", { locale: tr })}</span>
+                </div>
+
+                <div className="pt-2 border-t">
+                  <div className="flex justify-between text-xs mb-2">
+                    <span className="text-muted-foreground">Kalan süre</span>
+                    <span className="font-bold text-primary">{daysLeft} gün</span>
+                  </div>
+                  <Progress value={progress} className="h-1.5" />
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-3 text-muted-foreground">
+                <Clock className="w-6 h-6 mx-auto mb-2 opacity-40" />
+                <p className="text-xs">Aktif üyelik yok</p>
+              </div>
+            )}
+          </Card>
         </div>
 
-        <div className="md:col-span-2">
-      {/* Stats */}
-      <Card className="p-5 mb-5">
-        <h3 className="font-semibold mb-3">İstatistikler</h3>
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <div className="text-center p-3 bg-primary/5 rounded-xl">
-            <p className="text-2xl font-bold text-primary">{reservations.length}</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Aktif Rezervasyon</p>
-          </div>
-          <div className="text-center p-3 bg-accent/10 rounded-xl">
-            <p className="text-2xl font-bold text-accent">{daysLeft}</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Kalan Gün</p>
-          </div>
-        </div>
-        <ReservationsBottomSheet reservations={reservations} />
-      </Card>
+        {/* Right Column */}
+        <div className="lg:col-span-2 space-y-5">
+          {/* Stats */}
+          <Card className="p-5">
+            <h3 className="font-semibold text-sm mb-4">İstatistikler</h3>
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              <div className="text-center p-4 bg-primary/5 rounded-lg">
+                <p className="text-3xl font-bold text-primary">{reservations.length}</p>
+                <p className="text-xs text-muted-foreground mt-1">Aktif Rezervasyon</p>
+              </div>
+              <div className="text-center p-4 bg-accent/10 rounded-lg">
+                <p className="text-3xl font-bold text-accent">{daysLeft}</p>
+                <p className="text-xs text-muted-foreground mt-1">Kalan Gün</p>
+              </div>
+            </div>
+            <ReservationsBottomSheet reservations={reservations} />
+          </Card>
 
-      {/* Actions */}
-      <div className="space-y-3">
-        <Button
-          variant="outline"
-          className="w-full justify-start gap-3 h-12 text-destructive hover:text-destructive hover:bg-destructive/5"
-          onClick={logout}
-        >
-          <LogOut className="w-5 h-5" />
-          <span className="font-medium">Çıkış Yap</span>
-        </Button>
-      </div>
+          {/* Actions */}
+          <Button
+            variant="outline"
+            className="w-full justify-center gap-2 h-11 text-destructive hover:text-destructive hover:bg-destructive/5"
+            onClick={logout}
+          >
+            <LogOut className="w-4 h-4" />
+            <span className="font-medium">Çıkış Yap</span>
+          </Button>
         </div>
       </div>
     </div>
