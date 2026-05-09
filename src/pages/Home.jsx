@@ -91,7 +91,7 @@ export default function Home() {
     <div className="px-4 pt-6">
       {/* Header */}
       <div className="flex items-center gap-4 mb-6">
-        <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-3xl font-bold text-primary">
+        <div className="w-14 h-14 rounded-lg bg-primary/10 flex items-center justify-center text-3xl font-bold text-primary">
           🏃
         </div>
         <div>
