@@ -196,7 +196,7 @@ export default function ClassCalendar() {
 
             return (
               <>
-              <Link key={cls.id} to={`/class/${cls.id}`}>
+              <Link key={cls.id} to={`/class/${cls.id}`} onClick={() => setExpandedClasses(false)}>
                 <Card className={cn(
                   "p-4 flex items-center gap-4 transition-all active:scale-[0.98]",
                   isFull ? "opacity-60" : "hover:shadow-md"
