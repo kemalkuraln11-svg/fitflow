@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useMemberAuth } from "@/lib/MemberAuthContext";
-import { Dumbbell, Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -31,9 +31,11 @@ export default function MemberLoginScreen() {
     <div className="min-h-[100dvh] bg-background flex flex-col items-center justify-center px-6 max-w-md mx-auto">
       {/* Logo */}
       <div className="flex flex-col items-center mb-10">
-        <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center mb-4 shadow-lg shadow-primary/30">
-          <Dumbbell className="w-8 h-8 text-primary-foreground" />
-        </div>
+        <img
+          src="https://media.base44.com/images/public/69ff298a8db8d1511d286b61/2bf5548a7_ChatGPTImage9May202623_29_58.png"
+          alt="FitKafa Hyrox"
+          className="w-32 h-32 rounded-full object-cover mb-4 shadow-lg"
+        />
         <h1 className="text-2xl font-bold tracking-tight">Hoş Geldiniz</h1>
         <p className="text-muted-foreground text-sm mt-1">Hesabınıza giriş yapın</p>
       </div>
