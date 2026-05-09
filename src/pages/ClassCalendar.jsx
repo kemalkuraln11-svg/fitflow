@@ -48,7 +48,11 @@ export default function ClassCalendar() {
           variant="ghost"
           size="icon"
           className="h-8 w-8"
-          onClick={() => setWeekStart(addDays(weekStart, -7))}
+          onClick={() => {
+            const newWeekStart = addDays(weekStart, -7);
+            setWeekStart(newWeekStart);
+            setSelectedDate(addDays(selectedDate, -7));
+          }}
         >
           <ChevronLeft className="w-4 h-4" />
         </Button>
@@ -59,7 +63,11 @@ export default function ClassCalendar() {
           variant="ghost"
           size="icon"
           className="h-8 w-8"
-          onClick={() => setWeekStart(addDays(weekStart, 7))}
+          onClick={() => {
+            const newWeekStart = addDays(weekStart, 7);
+            setWeekStart(newWeekStart);
+            setSelectedDate(addDays(selectedDate, 7));
+          }}
         >
           <ChevronRight className="w-4 h-4" />
         </Button>
