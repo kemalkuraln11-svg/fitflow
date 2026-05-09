@@ -194,16 +194,16 @@ export default function AdminMembers() {
               <div>
                 <Label>Plan</Label>
                 <Select value={form.plan_name} onValueChange={(v) => {
-                    const months = getPlanDuration(v);
-                    const startDate = new Date();
-                    const endDate = addDays(startDate, months * 30);
-                    setForm({
-                      ...form,
-                      plan_name: v,
-                      start_date: format(startDate, "yyyy-MM-dd"),
-                      end_date: format(endDate, "yyyy-MM-dd"),
-                    });
-                  }}>
+                  const months = getPlanDuration(v);
+                  const startDate = new Date();
+                  const endDate = addDays(startDate, months * 30 + 1);
+                  setForm({
+                    ...form,
+                    plan_name: v,
+                    start_date: format(startDate, "yyyy-MM-dd"),
+                    end_date: format(endDate, "yyyy-MM-dd"),
+                  });
+                }}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Aylık">Aylık</SelectItem>
@@ -219,7 +219,7 @@ export default function AdminMembers() {
                   <Input type="date" value={form.start_date} onChange={(e) => {
                     const newStart = e.target.value;
                     const months = getPlanDuration(form.plan_name);
-                    const newEnd = format(addDays(parseISO(newStart), months * 30), "yyyy-MM-dd");
+                    const newEnd = format(addDays(parseISO(newStart), months * 30 + 1), "yyyy-MM-dd");
                     setForm({ ...form, start_date: newStart, end_date: newEnd });
                   }} />
                 </div>
@@ -299,7 +299,7 @@ export default function AdminMembers() {
                 <Label>Plan</Label>
                 <Select value={editForm.plan_name} onValueChange={(v) => {
                   const months = getPlanDuration(v);
-                  const newEnd = format(addDays(parseISO(editForm.start_date), months * 30), "yyyy-MM-dd");
+                  const newEnd = format(addDays(parseISO(editForm.start_date), months * 30 + 1), "yyyy-MM-dd");
                   setEditForm({ ...editForm, plan_name: v, end_date: newEnd });
                 }}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
@@ -317,7 +317,7 @@ export default function AdminMembers() {
                   <Input type="date" value={editForm.start_date} onChange={(e) => {
                     const newStart = e.target.value;
                     const months = getPlanDuration(editForm.plan_name);
-                    const newEnd = format(addDays(parseISO(newStart), months * 30), "yyyy-MM-dd");
+                    const newEnd = format(addDays(parseISO(newStart), months * 30 + 1), "yyyy-MM-dd");
                     setEditForm({ ...editForm, start_date: newStart, end_date: newEnd });
                   }} />
                 </div>
