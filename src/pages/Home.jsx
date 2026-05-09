@@ -87,10 +87,10 @@ export default function Home() {
 
   return (
     <>
-    <ExpiredMembershipModal />
     <UserHeader />
+    <ExpiredMembershipModal />
     <PullToRefresh onRefresh={handleRefresh}>
-    <div className="max-w-[1400px] mx-auto px-8 pt-8 pb-24">
+    <div className="max-w-[1400px] mx-auto px-6 pt-6 pb-24">
       {/* Header */}
       <div className="mb-12">
         <h1 className="text-4xl font-bold">Hoş geldiniz, {member?.user_name
