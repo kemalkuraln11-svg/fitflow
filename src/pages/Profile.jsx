@@ -155,11 +155,11 @@ export default function Profile() {
       <div className="space-y-3">
         <Button
           variant="outline"
-          className="w-full justify-start gap-3 h-12 text-destructive hover:text-destructive"
+          className="w-full justify-start gap-3 h-12 text-destructive hover:text-destructive hover:bg-destructive/5"
           onClick={logout}
         >
           <LogOut className="w-5 h-5" />
-          Çıkış Yap
+          <span className="font-medium">Çıkış Yap</span>
         </Button>
       </div>
     </div>
