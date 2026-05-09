@@ -12,9 +12,11 @@ export default function TopHeader() {
     <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-md border-b border-border flex items-center h-14 px-4 shrink-0">
       {isTab ? (
         <button onClick={() => navigate("/")} className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
-            <span className="text-primary-foreground font-bold text-xs">F</span>
-          </div>
+          <img
+            src="https://media.base44.com/images/public/69ff298a8db8d1511d286b61/2bf5548a7_ChatGPTImage9May202623_29_58.png"
+            alt="FitKafa"
+            className="w-7 h-7 rounded-full object-cover"
+          />
           <span className="font-bold text-lg tracking-tight">FitKafa-Hyrox</span>
         </button>
       ) : (
