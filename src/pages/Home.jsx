@@ -88,31 +88,24 @@ export default function Home() {
     <>
     <ExpiredMembershipModal />
     <PullToRefresh onRefresh={handleRefresh}>
-    <div className="w-full px-4 pt-6 pb-20">
+    <div className="max-w-[1400px] mx-auto px-8 pt-8 pb-24">
       {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-lg bg-primary/10 flex items-center justify-center text-3xl">
-            {member?.gender === "female" ? "🏃‍♀️" : "🏃"}
-          </div>
-          <div>
-            <p className="text-muted-foreground text-sm">Merhaba,</p>
-            <h1 className="text-3xl font-bold">{member?.user_name
+      <div className="mb-12">
+        <h1 className="text-4xl font-bold">Hoş geldiniz, {member?.user_name
     ? member.user_name
         .split(" ")
         .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
         .join(" ")
-    : "Hoş Geldin"}</h1>
-          </div>
-        </div>
+    : "Üye"}</h1>
+        <p className="text-muted-foreground mt-2">Bugünün derslerine ve rezervasyonlarına hızlı erişim</p>
       </div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
         {/* Membership Card - Left Sidebar */}
         {membership && (
-          <div className="lg:col-span-1">
-            <div className="sticky top-24 relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-primary/70 p-6 text-primary-foreground h-fit">
+          <div className="xl:col-span-1">
+            <div className="sticky top-32 relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-primary/70 p-8 text-primary-foreground h-fit">
               <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-8 translate-x-8" />
               <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/5 rounded-full translate-y-4 -translate-x-4" />
               <div className="relative z-10">
@@ -129,11 +122,11 @@ export default function Home() {
         )}
 
         {/* Classes & Reservations - Right Content */}
-        <div className={membership ? "lg:col-span-3 space-y-6" : "lg:col-span-4 space-y-6"}>
+        <div className={membership ? "xl:col-span-3 space-y-8" : "xl:col-span-4 space-y-8"}>
           {/* Today's Classes */}
           <div>
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="font-semibold text-lg">Bugünkü Dersler</h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold">Bugünkü Dersler</h2>
               <Link to="/calendar" className="text-primary text-sm font-medium flex items-center gap-0.5">
                 Tümü <ChevronRight className="w-4 h-4" />
               </Link>
@@ -145,7 +138,7 @@ export default function Home() {
                 <p className="text-sm">Bugün ders bulunmuyor</p>
               </Card>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {todayClasses.map((cls) => (
               <Link key={cls.id} to={`/class/${cls.id}`}>
                 <Card className="p-5 flex flex-col gap-3 hover:shadow-lg transition-all active:scale-[0.98]">

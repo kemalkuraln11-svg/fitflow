@@ -82,11 +82,11 @@ export default function ClassCalendar() {
     <>
     <ExpiredMembershipModal />
     <PullToRefresh onRefresh={handleRefresh}>
-    <div className="w-full px-4 pt-6 pb-20">
-      <h1 className="text-2xl font-bold tracking-tight mb-5">Takvim</h1>
+    <div className="max-w-[1400px] mx-auto px-8 pt-8 pb-24">
+      <h1 className="text-4xl font-bold tracking-tight mb-8">Sınıf Takvimi</h1>
 
-      {/* Week navigation */}
-      <div className="flex items-center justify-between mb-6">
+       {/* Week navigation */}
+       <div className="flex items-center justify-between mb-8">
         <Button
           variant="ghost"
           size="icon"
@@ -125,7 +125,7 @@ export default function ClassCalendar() {
 
       {/* Week strip */}
       <div 
-       className="flex gap-2 mb-8 overflow-x-auto pb-2 -mx-4 px-4"
+       className="flex gap-3 mb-10 overflow-x-auto pb-2"
        onTouchStart={handleTouchStart}
        onTouchEnd={handleTouchEnd}
       >
@@ -141,7 +141,7 @@ export default function ClassCalendar() {
                setWeekStart(newWeekStart);
              }}
               className={cn(
-                 "flex flex-col items-center min-w-[56px] py-3 rounded-xl transition-all focus:outline-none focus:ring-0",
+                 "flex flex-col items-center min-w-[64px] py-3.5 px-3 rounded-lg transition-all focus:outline-none focus:ring-0",
                 isSelected
                   ? "bg-orange-500 text-white shadow-lg shadow-orange-500/30 active:bg-orange-500"
                   : isToday
@@ -162,14 +162,14 @@ export default function ClassCalendar() {
       </div>
 
       {/* Classes for selected date */}
-      <div className="sticky top-0 z-10 bg-background pb-4 mb-6 pt-3">
-        <h2 className="font-semibold text-lg">
+      <div className="sticky top-0 z-10 bg-background pb-6 mb-8 pt-3">
+        <h2 className="text-2xl font-bold">
           {format(selectedDate, "d MMMM EEEE", { locale: tr })}
         </h2>
       </div>
 
       {isLoading ? (
-        <div className="space-y-4">
+        <div className="space-y-6">
           {[1, 2, 3].map((i) => (
             <Card key={i} className="p-4 animate-pulse">
               <div className="flex gap-4">
@@ -187,7 +187,7 @@ export default function ClassCalendar() {
           <p className="text-sm">Bu tarihte ders bulunmuyor</p>
         </Card>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-6">
            {classes.map((cls, idx) => {
              const showMore = classes.length > 3 && idx === 2 && !expandedClasses;
             const isFull = (cls.current_count || 0) >= cls.capacity;
@@ -198,7 +198,7 @@ export default function ClassCalendar() {
               <>
               <Link key={cls.id} to={`/class/${cls.id}`}>
                 <Card className={cn(
-                    "p-5 flex items-center gap-4 transition-all active:scale-[0.98] hover:shadow-md",
+                    "p-6 flex items-center gap-5 transition-all active:scale-[0.98] hover:shadow-lg",
                   isFull ? "opacity-60" : "hover:shadow-md"
                 )}>
                   <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-xl shrink-0">

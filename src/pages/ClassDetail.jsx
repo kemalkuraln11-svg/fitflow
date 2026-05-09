@@ -103,13 +103,13 @@ export default function ClassDetail() {
   const classStarted = isBefore(classDateTime, new Date());
 
   return (
-    <div className="w-full px-4 pt-6 pb-20">
+    <div className="max-w-3xl mx-auto px-8 pt-8 pb-24">
       {/* Hero */}
-       <div className="text-center mb-8">
-         <div className="w-24 h-24 rounded-2xl bg-primary/10 flex items-center justify-center text-5xl mx-auto mb-4">
-          {categoryEmojis[cls.category] || "⭐"}
-        </div>
-        <h1 className="text-3xl font-bold">{cls.title}</h1>
+       <div className="text-center mb-10">
+         <div className="w-28 h-28 rounded-2xl bg-primary/10 flex items-center justify-center text-6xl mx-auto mb-6">
+           {categoryEmojis[cls.category] || "⭐"}
+         </div>
+         <h1 className="text-4xl font-bold">{cls.title}</h1>
         {cls.instructor && (
           <p className="text-muted-foreground mt-2 flex items-center justify-center gap-1.5">
             <User className="w-4 h-4" />
@@ -119,7 +119,7 @@ export default function ClassDetail() {
       </div>
 
       {/* Info cards */}
-      <div className="grid grid-cols-2 gap-4 mb-8">
+      <div className="grid grid-cols-2 gap-6 mb-10">
         <Card className="p-5 text-center">
           <Clock className="w-6 h-6 mx-auto mb-2 text-primary" />
           <p className="font-semibold">{cls.start_time} - {cls.end_time}</p>
@@ -136,8 +136,8 @@ export default function ClassDetail() {
 
       {/* Description */}
       {cls.description && (
-        <Card className="p-5 mb-8">
-          <h3 className="font-semibold mb-3">Ders Hakkında</h3>
+        <Card className="p-6 mb-10">
+          <h3 className="font-bold text-lg mb-3">Ders Hakkında</h3>
           <p className="text-muted-foreground leading-relaxed">{cls.description}</p>
         </Card>
       )}

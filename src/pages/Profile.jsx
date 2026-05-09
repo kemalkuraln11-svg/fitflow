@@ -73,12 +73,12 @@ export default function Profile() {
   return (
     <>
     <ExpiredMembershipModal />
-    <div className="w-full px-4 pt-6 pb-20">
-      <h1 className="text-2xl font-bold tracking-tight mb-6">Profil</h1>
+    <div className="max-w-[1400px] mx-auto px-8 pt-8 pb-24">
+      <h1 className="text-4xl font-bold tracking-tight mb-12">Profil</h1>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
         {/* Left Column */}
-        <div className="lg:col-span-1 space-y-5">
+        <div className="xl:col-span-1 space-y-6">
           {/* User Info */}
           <Card className="p-5">
             <div className="flex items-center gap-3">
@@ -136,7 +136,7 @@ export default function Profile() {
         </div>
 
         {/* Right Column */}
-        <div className="lg:col-span-2 space-y-5">
+        <div className="xl:col-span-3 space-y-6">
           {/* Stats */}
           <Card className="p-5">
             <h3 className="font-semibold text-sm mb-4">İstatistikler</h3>
