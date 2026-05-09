@@ -216,7 +216,12 @@ export default function AdminMembers() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <Label>Başlangıç</Label>
-                  <Input type="date" value={form.start_date} onChange={(e) => setForm({ ...form, start_date: e.target.value })} />
+                  <Input type="date" value={form.start_date} onChange={(e) => {
+                    const newStart = e.target.value;
+                    const months = getPlanDuration(form.plan_name);
+                    const newEnd = format(addDays(parseISO(newStart), months * 30), "yyyy-MM-dd");
+                    setForm({ ...form, start_date: newStart, end_date: newEnd });
+                  }} />
                 </div>
                 <div>
                   <Label>Bitiş</Label>
@@ -305,7 +310,12 @@ export default function AdminMembers() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <Label>Başlangıç</Label>
-                  <Input type="date" value={editForm.start_date} onChange={(e) => setEditForm({ ...editForm, start_date: e.target.value })} />
+                  <Input type="date" value={editForm.start_date} onChange={(e) => {
+                    const newStart = e.target.value;
+                    const months = getPlanDuration(editForm.plan_name);
+                    const newEnd = format(addDays(parseISO(newStart), months * 30), "yyyy-MM-dd");
+                    setEditForm({ ...editForm, start_date: newStart, end_date: newEnd });
+                  }} />
                 </div>
                 <div>
                   <Label>Bitiş</Label>
