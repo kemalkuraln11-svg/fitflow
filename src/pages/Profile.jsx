@@ -1,7 +1,7 @@
 import { base44 } from "@/api/base44Client";
 import { useMemberAuth } from "@/lib/MemberAuthContext";
 import { useQuery } from "@tanstack/react-query";
-import { format, parseISO, differenceInDays } from "date-fns";
+import { format, parseISO, differenceInDays, parse, isBefore } from "date-fns";
 import { tr } from "date-fns/locale";
 import { User, Calendar, LogOut, Clock } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -42,13 +42,20 @@ export default function Profile() {
       });
       
       const validClassIds = new Set(Object.keys(classData));
-      return reservations
+      const withUpdatedData = reservations
         .filter((r) => validClassIds.has(r.class_id))
         .map((r) => ({
           ...r,
           class_title: classData[r.class_id]?.title || r.class_title,
           class_time: classData[r.class_id]?.start_time || r.class_time,
         }));
+      
+      // Tarihi ve saati en yakındakı uzağa doğru sırala
+      return withUpdatedData.sort((a, b) => {
+        const aDateTime = parse(`${a.class_date} ${a.class_time}`, "yyyy-MM-dd HH:mm", new Date());
+        const bDateTime = parse(`${b.class_date} ${b.class_time}`, "yyyy-MM-dd HH:mm", new Date());
+        return isBefore(aDateTime, bDateTime) ? -1 : 1;
+      });
     },
     enabled: !!member?.user_email,
   });
