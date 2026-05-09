@@ -70,7 +70,7 @@ export default function ReservationsBottomSheet({ reservations = [] }) {
 
             return (
               <Link key={res.id} to={`/class/${res.class_id}`} onClick={() => setOpen(false)} className="flex justify-center">
-                <Card className="p-3.5 flex items-center gap-3 hover:shadow-sm transition-all active:scale-[0.98] w-3/5">
+                <Card className="p-3.5 flex items-center gap-3 hover:shadow-sm transition-all active:scale-[0.98] w-4/5">
                   <Badge variant="secondary" className="text-xs font-medium shrink-0">
                     {dateLabel}
                   </Badge>
