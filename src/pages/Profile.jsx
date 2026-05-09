@@ -22,7 +22,21 @@ export default function Profile() {
 
   const { data: reservations = [] } = useQuery({
     queryKey: ["myAllReservations", member?.id],
-    queryFn: () => base44.entities.Reservation.filter({ user_email: member.user_email, status: "confirmed" }, "-class_date"),
+    queryFn: async () => {
+      const reservations = await base44.entities.Reservation.filter(
+        { user_email: member.user_email, status: "confirmed" },
+        "-class_date"
+      );
+      // Dersi hâlâ var olan rezervasyonları filtrele
+      const classIds = [...new Set(reservations.map((r) => r.class_id))];
+      const classChecks = await Promise.all(
+        classIds.map((cid) => base44.entities.ClassSchedule.filter({ id: cid }))
+      );
+      const validClassIds = new Set(
+        classChecks.flatMap((res) => res.map((c) => c.id))
+      );
+      return reservations.filter((r) => validClassIds.has(r.class_id));
+    },
     enabled: !!member?.user_email,
   });
 
