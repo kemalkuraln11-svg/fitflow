@@ -2,7 +2,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useMemberAuth } from "@/lib/MemberAuthContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import UserHeader from "@/components/UserHeader";
 import ExpiredMembershipModal from "@/components/ExpiredMembershipModal";
 import { format, parseISO, differenceInDays, parse, isBefore, addMinutes } from "date-fns";
 import { tr } from "date-fns/locale";
@@ -106,7 +105,6 @@ export default function ClassDetail() {
 
   return (
     <>
-    <UserHeader />
     <ExpiredMembershipModal />
     <div className="max-w-3xl mx-auto px-8 pt-8 pb-24">
       {/* Hero */}
