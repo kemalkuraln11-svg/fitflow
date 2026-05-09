@@ -82,11 +82,11 @@ export default function ClassCalendar() {
     <>
     <ExpiredMembershipModal />
     <PullToRefresh onRefresh={handleRefresh}>
-    <div className="px-6 pt-6 pb-24">
-      <h1 className="text-4xl font-bold tracking-tight mb-8">Sınıf Takvimi</h1>
+    <div className="px-4 pt-4 pb-24">
+      <h1 className="text-2xl font-bold tracking-tight mb-5">Sınıf Takvimi</h1>
 
        {/* Week navigation */}
-       <div className="flex items-center justify-between mb-8">
+       <div className="flex items-center justify-between mb-5">
         <Button
           variant="ghost"
           size="icon"
@@ -125,45 +125,45 @@ export default function ClassCalendar() {
 
       {/* Week strip */}
       <div 
-       className="flex gap-3 mb-10 overflow-x-auto pb-2"
+       className="flex gap-2 mb-6 overflow-x-auto pb-2"
        onTouchStart={handleTouchStart}
        onTouchEnd={handleTouchEnd}
       >
        {weekDays.map((day) => {
-         const isSelected = isSameDay(day, selectedDate);
-         const isToday = isSameDay(day, new Date());
-         return (
-           <button
-             key={day.toISOString()}
-             onClick={() => {
-               setSelectedDate(day);
-               const newWeekStart = startOfWeek(day, { weekStartsOn: 1 });
-               setWeekStart(newWeekStart);
-             }}
-              className={cn(
-                 "flex flex-col items-center min-w-[64px] py-3.5 px-3 rounded-lg transition-all focus:outline-none focus:ring-0",
-                isSelected
-                  ? "bg-orange-500 text-white shadow-lg shadow-orange-500/30 active:bg-orange-500"
-                  : isToday
-                  ? "bg-primary/10 text-primary"
-                  : "bg-card text-foreground hover:bg-muted"
-              )}
-            >
-              <span className={cn(
-                "text-[10px] font-medium uppercase",
-                isSelected ? "" : "opacity-70"
-              )}>
-                {format(day, "EEE", { locale: tr })}
-              </span>
-              <span className="text-lg font-bold mt-0.5">{format(day, "d")}</span>
-            </button>
-          );
-        })}
-      </div>
+          const isSelected = isSameDay(day, selectedDate);
+          const isToday = isSameDay(day, new Date());
+          return (
+            <button
+              key={day.toISOString()}
+              onClick={() => {
+                setSelectedDate(day);
+                const newWeekStart = startOfWeek(day, { weekStartsOn: 1 });
+                setWeekStart(newWeekStart);
+              }}
+               className={cn(
+                  "flex flex-col items-center min-w-[56px] py-2.5 px-2 rounded-lg transition-all focus:outline-none focus:ring-0",
+                 isSelected
+                   ? "bg-orange-500 text-white shadow-lg shadow-orange-500/30 active:bg-orange-500"
+                   : isToday
+                   ? "bg-primary/10 text-primary"
+                   : "bg-card text-foreground hover:bg-muted"
+               )}
+             >
+               <span className={cn(
+                 "text-[9px] font-medium uppercase",
+                 isSelected ? "" : "opacity-70"
+               )}>
+                 {format(day, "EEE", { locale: tr })}
+               </span>
+               <span className="text-base font-bold mt-0.5">{format(day, "d")}</span>
+             </button>
+           );
+         })}
+       </div>
 
       {/* Classes for selected date */}
-      <div className="sticky top-0 z-10 bg-background pb-6 mb-8 pt-3">
-        <h2 className="text-2xl font-bold">
+      <div className="sticky top-0 z-10 bg-background pb-4 mb-5 pt-2">
+        <h2 className="text-lg font-bold">
           {format(selectedDate, "d MMMM EEEE", { locale: tr })}
         </h2>
       </div>
@@ -198,17 +198,17 @@ export default function ClassCalendar() {
               <React.Fragment key={cls.id}>
               <Link to={`/class/${cls.id}`}>
                 <Card className={cn(
-                    "p-6 flex items-center gap-5 transition-all active:scale-[0.98] hover:shadow-lg",
+                    "p-4 flex items-center gap-3 transition-all active:scale-[0.98] hover:shadow-lg",
                   isFull ? "opacity-60" : "hover:shadow-md"
                 )}>
-                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-xl shrink-0">
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-lg shrink-0">
                     {categoryEmojis[cls.category] || "⭐"}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className="font-semibold truncate">{cls.title}</p>
+                    <div className="flex items-center gap-1.5">
+                      <p className="font-semibold text-sm truncate">{cls.title}</p>
                       {isFull && (
-                        <span className="text-[10px] font-bold text-destructive bg-destructive/10 px-2 py-0.5 rounded-full shrink-0">
+                        <span className="text-[9px] font-bold text-destructive bg-destructive/10 px-1.5 py-0.5 rounded-full shrink-0">
                           DOLU
                         </span>
                       )}
@@ -216,13 +216,13 @@ export default function ClassCalendar() {
                     {cls.instructor && (
                       <p className="text-xs text-muted-foreground mt-0.5">{cls.instructor}</p>
                     )}
-                    <div className="flex items-center gap-3 text-sm text-muted-foreground mt-1">
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-3.5 h-3.5" />
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
+                      <span className="flex items-center gap-0.5">
+                        <Clock className="w-3 h-3" />
                         {cls.start_time} - {cls.end_time}
                       </span>
-                      <span className="flex items-center gap-1">
-                        <Users className="w-3.5 h-3.5" />
+                      <span className="flex items-center gap-0.5">
+                        <Users className="w-3 h-3" />
                         {cls.current_count || 0}/{cls.capacity}
                       </span>
                     </div>
@@ -232,10 +232,10 @@ export default function ClassCalendar() {
               {showMore && (
                 <button
                   onClick={() => setExpandedClasses(true)}
-                  className="w-full flex items-center justify-center gap-2 py-3 px-4 text-sm font-medium text-primary hover:bg-muted rounded-lg transition-all"
+                  className="w-full flex items-center justify-center gap-2 py-2 px-3 text-xs font-medium text-primary hover:bg-muted rounded-lg transition-all"
                 >
                   <span>{classes.length - 3} daha göster</span>
-                  <ChevronDown className="w-4 h-4" />
+                  <ChevronDown className="w-3.5 h-3.5" />
                 </button>
               )}
               </React.Fragment>
@@ -244,10 +244,10 @@ export default function ClassCalendar() {
               {expandedClasses && classes.length > 3 && (
                 <button
                   onClick={() => setExpandedClasses(false)}
-                  className="w-full flex items-center justify-center gap-2 py-3 px-4 text-sm font-medium text-muted-foreground hover:bg-muted rounded-lg transition-all"
+                  className="w-full flex items-center justify-center gap-2 py-2 px-3 text-xs font-medium text-muted-foreground hover:bg-muted rounded-lg transition-all"
                 >
                   <span>Kapat</span>
-                  <ChevronDown className="w-4 h-4 rotate-180" />
+                  <ChevronDown className="w-3.5 h-3.5 rotate-180" />
                 </button>
               )}
              </div>
