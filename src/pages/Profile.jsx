@@ -107,6 +107,13 @@ export default function Profile() {
         </div>
       </Card>
 
+      {/* Expired warning */}
+      {daysLeft === 0 && membership && (
+        <div className="mb-3 p-4 rounded-xl bg-destructive/10 border border-destructive/30 text-destructive text-sm font-semibold text-center">
+          Üyeliğinizin süresi dolmuştur. Lütfen üyeliğinizi yenileyin.
+        </div>
+      )}
+
       {/* Actions */}
       <div className="space-y-3">
         <Button
