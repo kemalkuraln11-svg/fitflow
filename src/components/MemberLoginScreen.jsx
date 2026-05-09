@@ -45,7 +45,7 @@ export default function MemberLoginScreen() {
           <Label>Kullanıcı Adı</Label>
           <Input
             className="h-12 mt-1"
-            placeholder="kullaniciadiniz"
+            placeholder="kullanıcı adınız"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             autoCapitalize="none"
