@@ -13,7 +13,13 @@ export const MemberAuthProvider = ({ children }) => {
     // Restore session from sessionStorage
     const saved = sessionStorage.getItem(SESSION_KEY);
     if (saved) {
-      setMember(JSON.parse(saved));
+      const parsed = JSON.parse(saved);
+      // Üyelik süresi dolmuşsa oturumu kapat
+      if (parsed.end_date && new Date(parsed.end_date) < new Date()) {
+        sessionStorage.removeItem(SESSION_KEY);
+      } else {
+        setMember(parsed);
+      }
     }
     setIsLoading(false);
   }, []);
