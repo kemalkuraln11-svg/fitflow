@@ -31,7 +31,7 @@ export default function ExpiredMembershipModal() {
         <div className="w-14 h-14 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-4">
           <AlertTriangle className="w-7 h-7 text-destructive" />
         </div>
-        <h2 className="text-lg font-bold mb-2">Erişim Engellendi</h2>
+        <h2 className="text-lg font-bold mb-2">Süreniz Doldu</h2>
         <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
           {message}
         </p>
