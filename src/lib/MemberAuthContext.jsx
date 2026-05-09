@@ -37,6 +37,7 @@ export const MemberAuthProvider = ({ children }) => {
     const m = results[0];
     if (m.status === 'suspended') throw new Error('Üyeliğiniz askıya alınmıştır. Lütfen iletişime geçin.');
     if (m.status === 'expired') throw new Error('Üyeliğinizin süresi dolmuştur.');
+    if (m.status === 'frozen') throw new Error('Üyeliğiniz dondurulmuştur. Lütfen iletişime geçin.');
 
     const sessionData = {
       id: m.id,

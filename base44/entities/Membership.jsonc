@@ -33,7 +33,8 @@
       "enum": [
         "active",
         "expired",
-        "suspended"
+        "suspended",
+        "frozen"
       ],
       "default": "active",
       "description": "Current membership status"
@@ -41,6 +42,11 @@
     "plan_name": {
       "type": "string",
       "description": "Name of the membership plan"
+    },
+    "frozen_at": {
+      "type": "string",
+      "format": "date",
+      "description": "Date when membership was frozen"
     }
   },
   "required": [
