@@ -238,6 +238,9 @@ export default function ClassCalendar() {
                   <ChevronDown className="w-4 h-4" />
                 </button>
               )}
+              </>
+              );
+              })}
               {expandedClasses && classes.length > 3 && (
                 <button
                   onClick={() => setExpandedClasses(false)}
@@ -247,13 +250,10 @@ export default function ClassCalendar() {
                   <ChevronDown className="w-4 h-4 rotate-180" />
                 </button>
               )}
-              </>
-              );
-              })}
               </div>
               )}
-    </div>
-    </PullToRefresh>
+              </div>
+              </PullToRefresh>
 
     <Dialog open={showCalendar} onOpenChange={setShowCalendar}>
       <DialogContent className="w-full">
