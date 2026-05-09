@@ -90,7 +90,10 @@ export default function Home() {
     <PullToRefresh onRefresh={handleRefresh}>
     <div className="px-4 pt-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center gap-4 mb-6">
+        <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-3xl font-bold text-primary">
+          🏃
+        </div>
         <div>
           <p className="text-muted-foreground text-sm">Merhaba,</p>
           <h1 className="text-2xl font-bold tracking-tight">{member?.user_name
@@ -102,7 +105,6 @@ export default function Home() {
         .join(" ")
     : "Hoş Geldin"}</h1>
         </div>
-
       </div>
 
       {/* Membership Card */}
