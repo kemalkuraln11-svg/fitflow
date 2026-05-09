@@ -3,6 +3,7 @@ import MobileNav from "./MobileNav";
 import TopHeader from "./TopHeader";
 import { MemberAuthProvider, useMemberAuth } from "@/lib/MemberAuthContext";
 import MemberLoginScreen from "@/components/MemberLoginScreen";
+import AnimatedRoutes from "@/components/AnimatedRoutes";
 
 function UserLayoutInner() {
   const { member, isLoading } = useMemberAuth();
@@ -20,10 +21,12 @@ function UserLayoutInner() {
   }
 
   return (
-    <div className="min-h-[100dvh] bg-background flex flex-col max-w-md mx-auto">
+    <div className="w-full h-screen bg-background flex flex-col max-w-md mx-auto overflow-hidden">
       <TopHeader />
       <main className="flex-1 overflow-y-auto pb-20">
-        <Outlet />
+        <AnimatedRoutes>
+          <Outlet />
+        </AnimatedRoutes>
       </main>
       <MobileNav />
     </div>

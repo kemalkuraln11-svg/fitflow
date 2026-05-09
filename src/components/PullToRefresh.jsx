@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback } from "react";
 import { RefreshCw } from "lucide-react";
 
-const THRESHOLD = 70;
+const THRESHOLD = 80;
 
 export default function PullToRefresh({ onRefresh, children }) {
   const [pullDistance, setPullDistance] = useState(0);
@@ -12,6 +12,7 @@ export default function PullToRefresh({ onRefresh, children }) {
   const handleTouchStart = useCallback((e) => {
     if (containerRef.current?.scrollTop === 0) {
       startY.current = e.touches[0].clientY;
+      setPullDistance(0);
     }
   }, []);
 
@@ -19,15 +20,19 @@ export default function PullToRefresh({ onRefresh, children }) {
     if (startY.current === null || refreshing) return;
     const diff = e.touches[0].clientY - startY.current;
     if (diff > 0 && containerRef.current?.scrollTop === 0) {
-      setPullDistance(Math.min(diff * 0.5, THRESHOLD + 20));
+      e.preventDefault?.();
+      setPullDistance(Math.min(diff * 0.6, THRESHOLD + 30));
     }
   }, [refreshing]);
 
   const handleTouchEnd = useCallback(async () => {
     if (pullDistance >= THRESHOLD) {
       setRefreshing(true);
-      await onRefresh();
-      setRefreshing(false);
+      try {
+        await onRefresh();
+      } finally {
+        setRefreshing(false);
+      }
     }
     setPullDistance(0);
     startY.current = null;
@@ -38,10 +43,11 @@ export default function PullToRefresh({ onRefresh, children }) {
   return (
     <div
       ref={containerRef}
-      className="h-full overflow-y-auto"
+      className="h-full w-full overflow-y-auto overscroll-none"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
+      style={{ touchAction: 'pan-y' }}
     >
       {/* Pull indicator */}
       <div

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import ExpiredMembershipModal from "@/components/ExpiredMembershipModal";
 import ReservationsBottomSheet from "@/components/ReservationsBottomSheet";
+import AccountDeleteDialog from "@/components/AccountDeleteDialog";
 
 
 export default function Profile() {
@@ -152,7 +153,7 @@ export default function Profile() {
       </Card>
 
       {/* Actions */}
-      <div className="space-y-3">
+      <div className="space-y-3 pb-6">
         <Button
           variant="outline"
           className="w-full justify-start gap-3 h-12 text-destructive hover:text-destructive hover:bg-destructive/5"
@@ -161,6 +162,7 @@ export default function Profile() {
           <LogOut className="w-5 h-5" />
           <span className="font-medium">Çıkış Yap</span>
         </Button>
+        <AccountDeleteDialog onDeleted={() => window.location.href = '/'} />
       </div>
     </div>
     </>

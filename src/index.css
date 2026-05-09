@@ -82,12 +82,29 @@
   * {
     @apply border-border outline-ring/50;
   }
+  
+  html, body {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    overflow: hidden;
+  }
+  
   body {
     @apply bg-background text-foreground font-inter;
     overscroll-behavior: none;
+    -webkit-font-smoothing: antialiased;
+    -webkit-touch-callout: none;
   }
+  
   nav, button, a {
     user-select: none;
     -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  input, textarea, select {
+    -webkit-user-select: text;
   }
 }
