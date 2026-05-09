@@ -105,19 +105,38 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column - Membership */}
+      {/* Header */}
+      <div className="mb-8">
+        <div className="flex items-center gap-4">
+          <div className="w-14 h-14 rounded-lg bg-primary/10 flex items-center justify-center text-3xl">
+            {member?.gender === "female" ? "🏃‍♀️" : "🏃"}
+          </div>
+          <div>
+            <p className="text-muted-foreground text-sm">Merhaba,</p>
+            <h1 className="text-3xl font-bold">{member?.user_name
+    ? member.user_name
+        .split(" ")
+        .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+        .join(" ")
+    : "Hoş Geldin"}</h1>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* Membership Card - Left Sidebar */}
         {membership && (
           <div className="lg:col-span-1">
-            <div className="sticky top-20 relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-primary/70 p-5 text-primary-foreground h-fit">
+            <div className="sticky top-24 relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-primary/70 p-6 text-primary-foreground h-fit">
               <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-8 translate-x-8" />
               <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/5 rounded-full translate-y-4 -translate-x-4" />
               <div className="relative z-10">
                 <p className="text-xs opacity-80 font-medium">{membership.plan_name || "Üyelik"}</p>
-                <p className="text-3xl font-bold mt-3">{daysLeft}</p>
-                <p className="text-xs opacity-70 mt-0.5">gün kalan</p>
-                <div className="mt-4 pt-4 border-t border-white/20 flex items-center gap-2 text-xs opacity-70">
-                  <Calendar className="w-3 h-3 flex-shrink-0" />
+                <p className="text-4xl font-bold mt-4">{daysLeft}</p>
+                <p className="text-sm opacity-70 mt-1">gün kalan</p>
+                <div className="mt-5 pt-4 border-t border-white/20 flex items-center gap-2 text-xs opacity-70">
+                  <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
                   <span>{format(parseISO(membership.end_date), "d MMM", { locale: tr })}</span>
                 </div>
               </div>
@@ -125,8 +144,8 @@ export default function Home() {
           </div>
         )}
 
-        {/* Right Column - Classes & Reservations */}
-        <div className={membership ? "lg:col-span-2 space-y-6" : "lg:col-span-3 space-y-6"}>
+        {/* Classes & Reservations - Right Content */}
+        <div className={membership ? "lg:col-span-3 space-y-6" : "lg:col-span-4 space-y-6"}>
           {/* Today's Classes */}
           <div>
             <div className="flex items-center justify-between mb-3">
@@ -142,27 +161,28 @@ export default function Home() {
                 <p className="text-sm">Bugün ders bulunmuyor</p>
               </Card>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
             {todayClasses.map((cls) => (
               <Link key={cls.id} to={`/class/${cls.id}`}>
-                <Card className="p-4 flex items-center gap-4 hover:shadow-md transition-all active:scale-[0.98]">
-                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-xl">
-                    {categoryEmojis[cls.category] || "⭐"}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold truncate">{cls.title}</p>
-                    <div className="flex items-center gap-3 text-sm text-muted-foreground mt-0.5">
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-3.5 h-3.5" />
-                        {cls.start_time} - {cls.end_time}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Users className="w-3.5 h-3.5" />
-                        {cls.current_count || 0}/{cls.capacity}
-                      </span>
+                <Card className="p-5 flex flex-col gap-3 hover:shadow-lg transition-all active:scale-[0.98]">
+                  <div className="flex items-start gap-3">
+                    <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center text-2xl flex-shrink-0">
+                      {categoryEmojis[cls.category] || "⭐"}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold leading-snug">{cls.title}</p>
                     </div>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                  <div className="flex flex-col gap-2 text-sm text-muted-foreground">
+                    <span className="flex items-center gap-2">
+                      <Clock className="w-4 h-4 flex-shrink-0" />
+                      {cls.start_time} - {cls.end_time}
+                    </span>
+                    <span className="flex items-center gap-2">
+                      <Users className="w-4 h-4 flex-shrink-0" />
+                      {cls.current_count || 0}/{cls.capacity} kişi
+                    </span>
+                  </div>
                 </Card>
               </Link>
             ))}
