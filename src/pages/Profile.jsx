@@ -73,9 +73,11 @@ export default function Profile() {
   return (
     <>
     <ExpiredMembershipModal />
-    <div className="px-4 pt-6">
+    <div className="max-w-4xl mx-auto px-4 pt-6 pb-6">
       <h1 className="text-2xl font-bold tracking-tight mb-6">Profil</h1>
 
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="md:col-span-1">
       {/* User Info */}
       <Card className="p-5 mb-5">
         <div className="flex items-center gap-4">
@@ -93,8 +95,8 @@ export default function Profile() {
         </div>
       </Card>
 
-      {/* Membership Status */}
-      <Card className="p-5 mb-5">
+        {/* Membership Status */}
+        <Card className="p-5 mb-5">
         <div className="flex items-center gap-2 mb-4">
           <Calendar className="w-5 h-5 text-primary" />
           <h3 className="font-semibold">Üyelik Durumu</h3>
@@ -134,7 +136,9 @@ export default function Profile() {
           </div>
         )}
       </Card>
+        </div>
 
+        <div className="md:col-span-2">
       {/* Stats */}
       <Card className="p-5 mb-5">
         <h3 className="font-semibold mb-3">İstatistikler</h3>
@@ -152,7 +156,7 @@ export default function Profile() {
       </Card>
 
       {/* Actions */}
-      <div className="space-y-3 pb-6">
+      <div className="space-y-3">
         <Button
           variant="outline"
           className="w-full justify-start gap-3 h-12 text-destructive hover:text-destructive hover:bg-destructive/5"
@@ -161,6 +165,8 @@ export default function Profile() {
           <LogOut className="w-5 h-5" />
           <span className="font-medium">Çıkış Yap</span>
         </Button>
+      </div>
+        </div>
       </div>
     </div>
     </>
