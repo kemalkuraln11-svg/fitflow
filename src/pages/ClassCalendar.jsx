@@ -141,7 +141,7 @@ export default function ClassCalendar() {
                setWeekStart(newWeekStart);
              }}
               className={cn(
-                "flex flex-col items-center flex-1 min-w-[44px] py-2.5 rounded-xl transition-all focus:outline-none",
+                "flex flex-col items-center flex-1 min-w-[44px] py-2.5 rounded-xl transition-all focus:outline-none focus:ring-0",
                 isSelected
                   ? "bg-orange-500 text-white shadow-lg shadow-orange-500/30 active:bg-orange-500"
                   : isToday
