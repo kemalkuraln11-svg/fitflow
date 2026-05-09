@@ -15,7 +15,7 @@ export default function TopHeader() {
           <img
             src="https://media.base44.com/images/public/69ff298a8db8d1511d286b61/2bf5548a7_ChatGPTImage9May202623_29_58.png"
             alt="FitKafa"
-            className="w-7 h-7 rounded-full object-cover"
+            className="w-10 h-10 rounded-full object-cover"
           />
           <span className="font-bold text-lg tracking-tight">FitKafa-Hyrox</span>
         </button>
