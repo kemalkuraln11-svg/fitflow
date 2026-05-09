@@ -90,14 +90,19 @@ export default function Home() {
     <PullToRefresh onRefresh={handleRefresh}>
     <div className="px-6 pt-6 pb-24">
       {/* Header */}
-      <div className="mb-12">
-        <h1 className="text-4xl font-bold">Hoş geldiniz, {member?.user_name
+      <div className="mb-12 flex items-center gap-4">
+        <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-4xl flex-shrink-0">
+          {member?.gender === "female" ? "👩" : "👨"}
+        </div>
+        <div>
+          <p className="text-muted-foreground text-sm">Merhaba,</p>
+          <h1 className="text-3xl font-bold">{member?.user_name
     ? member.user_name
         .split(" ")
         .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
         .join(" ")
     : "Üye"}</h1>
-        <p className="text-muted-foreground mt-2">Bugünün derslerine ve rezervasyonlarına hızlı erişim</p>
+        </div>
       </div>
 
       {/* Main Content Grid */}
