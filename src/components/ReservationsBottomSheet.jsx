@@ -14,10 +14,10 @@ export default function ReservationsBottomSheet({ reservations = [] }) {
   useEffect(() => {
     if (reservations.length === 0) return;
     
+    const classIds = [...new Set(reservations.map((r) => r.class_id))];
+    const data = {};
+    
     const fetchClasses = async () => {
-      const classIds = [...new Set(reservations.map((r) => r.class_id))];
-      const data = {};
-      
       for (const id of classIds) {
         try {
           const classes = await base44.entities.ClassSchedule.filter({ id });
@@ -28,11 +28,24 @@ export default function ReservationsBottomSheet({ reservations = [] }) {
           console.error(`Failed to fetch class ${id}:`, err);
         }
       }
-      
       setClassesData(data);
     };
     
     fetchClasses();
+
+    // Subscribe to real-time updates
+    const unsubscribers = classIds.map((id) =>
+      base44.entities.ClassSchedule.subscribe((event) => {
+        if (event.id === id) {
+          setClassesData((prev) => ({
+            ...prev,
+            [id]: event.data,
+          }));
+        }
+      })
+    );
+
+    return () => unsubscribers.forEach((unsub) => unsub());
   }, [reservations]);
 
   if (reservations.length === 0) return null;
