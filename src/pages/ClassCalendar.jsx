@@ -4,7 +4,7 @@ import { base44 } from "@/api/base44Client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import PullToRefresh from "@/components/PullToRefresh";
 import ExpiredMembershipModal from "@/components/ExpiredMembershipModal";
-import { format, addDays, startOfWeek, isSameDay, parseISO } from "date-fns";
+import { format, addDays, startOfWeek, isSameDay, parseISO, isSameWeek } from "date-fns";
 import { tr } from "date-fns/locale";
 import { Clock, Users, ChevronLeft, ChevronRight } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -49,24 +49,26 @@ export default function ClassCalendar() {
           size="icon"
           className="h-8 w-8"
           onClick={() => {
-            const newWeekStart = addDays(weekStart, -1);
+            const newDate = addDays(selectedDate, -1);
+            const newWeekStart = startOfWeek(newDate, { weekStartsOn: 1 });
             setWeekStart(newWeekStart);
-            setSelectedDate(addDays(selectedDate, -1));
+            setSelectedDate(newDate);
           }}
-        >
+          >
           <ChevronLeft className="w-4 h-4" />
-        </Button>
-        <p className="text-sm font-medium text-muted-foreground">
+          </Button>
+          <p className="text-sm font-medium text-muted-foreground">
           {format(weekStart, "MMMM yyyy", { locale: tr })}
-        </p>
-        <Button
+          </p>
+          <Button
           variant="ghost"
           size="icon"
           className="h-8 w-8"
           onClick={() => {
-            const newWeekStart = addDays(weekStart, 1);
+            const newDate = addDays(selectedDate, 1);
+            const newWeekStart = startOfWeek(newDate, { weekStartsOn: 1 });
             setWeekStart(newWeekStart);
-            setSelectedDate(addDays(selectedDate, 1));
+            setSelectedDate(newDate);
           }}
         >
           <ChevronRight className="w-4 h-4" />
