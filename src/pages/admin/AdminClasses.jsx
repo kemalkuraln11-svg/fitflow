@@ -15,12 +15,9 @@ import { toast } from "sonner";
 import ClassAttendees from "@/components/admin/ClassAttendees";
 
 const CATEGORIES = [
-  { value: "yoga", label: "Yoga" },
-  { value: "pilates", label: "Pilates" },
+  { value: "hyrox", label: "Hyrox" },
+  { value: "crossfit", label: "Crossfit" },
   { value: "fitness", label: "Fitness" },
-  { value: "dance", label: "Dans" },
-  { value: "boxing", label: "Boks" },
-  { value: "swimming", label: "Yüzme" },
   { value: "other", label: "Diğer" },
 ];
 
