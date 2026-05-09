@@ -11,12 +11,7 @@ import { Badge } from "@/components/ui/badge";
 const categoryEmojis = {
   hyrox: "🏃",
   crossfit: "🔥",
-  yoga: "🧘",
-  pilates: "💪",
   fitness: "🏋️",
-  dance: "💃",
-  boxing: "🥊",
-  swimming: "🏊",
   other: "⭐",
 };
 
