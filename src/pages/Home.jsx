@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
+import { useMemberAuth } from "@/lib/MemberAuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { format, isToday, isTomorrow, parseISO } from "date-fns";
 import { tr } from "date-fns/locale";
@@ -19,11 +19,7 @@ const categoryEmojis = {
 };
 
 export default function Home() {
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    base44.auth.me().then(setUser);
-  }, []);
+  const { member } = useMemberAuth();
 
   const today = format(new Date(), "yyyy-MM-dd");
 
@@ -33,15 +29,15 @@ export default function Home() {
   });
 
   const { data: myReservations = [] } = useQuery({
-    queryKey: ["myReservations", user?.email],
-    queryFn: () => base44.entities.Reservation.filter({ user_email: user.email, status: "confirmed" }, "-class_date", 5),
-    enabled: !!user?.email,
+    queryKey: ["myReservations", member?.id],
+    queryFn: () => base44.entities.Reservation.filter({ user_email: member.user_email, status: "confirmed" }, "-class_date", 5),
+    enabled: !!member?.user_email,
   });
 
   const { data: membership } = useQuery({
-    queryKey: ["myMembership", user?.email],
-    queryFn: () => base44.entities.Membership.filter({ user_email: user.email, status: "active" }),
-    enabled: !!user?.email,
+    queryKey: ["myMembership", member?.id],
+    queryFn: () => base44.entities.Membership.filter({ username: member.username, status: "active" }),
+    enabled: !!member?.username,
     select: (data) => data?.[0],
   });
 
@@ -55,7 +51,7 @@ export default function Home() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <p className="text-muted-foreground text-sm">Merhaba,</p>
-          <h1 className="text-2xl font-bold tracking-tight">{user?.full_name || "Hoş Geldin"}</h1>
+          <h1 className="text-2xl font-bold tracking-tight">{member?.user_name || "Hoş Geldin"}</h1>
         </div>
 
       </div>

@@ -1,6 +1,5 @@
-import { useState, useEffect } from "react";
-
 import { base44 } from "@/api/base44Client";
+import { useMemberAuth } from "@/lib/MemberAuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { format, parseISO, differenceInDays } from "date-fns";
 import { tr } from "date-fns/locale";
@@ -10,23 +9,19 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 
 export default function Profile() {
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    base44.auth.me().then(setUser);
-  }, []);
+  const { member, logout } = useMemberAuth();
 
   const { data: membership } = useQuery({
-    queryKey: ["myMembership", user?.email],
-    queryFn: () => base44.entities.Membership.filter({ user_email: user.email, status: "active" }),
-    enabled: !!user?.email,
+    queryKey: ["myMembership", member?.id],
+    queryFn: () => base44.entities.Membership.filter({ username: member.username, status: "active" }),
+    enabled: !!member?.username,
     select: (data) => data?.[0],
   });
 
   const { data: reservations = [] } = useQuery({
-    queryKey: ["myAllReservations", user?.email],
-    queryFn: () => base44.entities.Reservation.filter({ user_email: user.email, status: "confirmed" }, "-class_date"),
-    enabled: !!user?.email,
+    queryKey: ["myAllReservations", member?.id],
+    queryFn: () => base44.entities.Reservation.filter({ user_email: member.user_email, status: "confirmed" }, "-class_date"),
+    enabled: !!member?.user_email,
   });
 
   const totalDays = membership
@@ -48,8 +43,8 @@ export default function Profile() {
             <User className="w-7 h-7 text-primary" />
           </div>
           <div>
-            <h2 className="font-bold text-lg">{user?.full_name || "Kullanıcı"}</h2>
-            <p className="text-sm text-muted-foreground">{user?.email}</p>
+            <h2 className="font-bold text-lg">{member?.user_name || "Kullanıcı"}</h2>
+            <p className="text-sm text-muted-foreground">@{member?.username}</p>
           </div>
         </div>
       </Card>
@@ -116,7 +111,7 @@ export default function Profile() {
         <Button
           variant="outline"
           className="w-full justify-start gap-3 h-12 text-destructive hover:text-destructive"
-          onClick={() => base44.auth.logout()}
+          onClick={logout}
         >
           <LogOut className="w-5 h-5" />
           Çıkış Yap

@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
+import { useMemberAuth } from "@/lib/MemberAuthContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { format, parseISO } from "date-fns";
 import { tr } from "date-fns/locale";
@@ -18,11 +18,7 @@ export default function ClassDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    base44.auth.me().then(setUser);
-  }, []);
+  const { member: user } = useMemberAuth();
 
   const { data: cls, isLoading } = useQuery({
     queryKey: ["class", id],
@@ -33,16 +29,16 @@ export default function ClassDetail() {
   });
 
   const { data: myReservation } = useQuery({
-    queryKey: ["myReservation", id, user?.email],
+    queryKey: ["myReservation", id, user?.user_email],
     queryFn: async () => {
       const res = await base44.entities.Reservation.filter({
         class_id: id,
-        user_email: user.email,
+        user_email: user.user_email,
         status: "confirmed",
       });
       return res[0] || null;
     },
-    enabled: !!user?.email,
+    enabled: !!user?.user_email,
   });
 
   const reserveMutation = useMutation({
@@ -52,8 +48,8 @@ export default function ClassDetail() {
         class_title: cls.title,
         class_date: cls.date,
         class_time: cls.start_time,
-        user_email: user.email,
-        user_name: user.full_name,
+        user_email: user.user_email,
+        user_name: user.user_name,
         status: "confirmed",
       });
       await base44.entities.ClassSchedule.update(cls.id, {
