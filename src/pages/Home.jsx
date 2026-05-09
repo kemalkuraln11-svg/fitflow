@@ -88,7 +88,7 @@ export default function Home() {
     <>
     <ExpiredMembershipModal />
     <PullToRefresh onRefresh={handleRefresh}>
-    <div className="max-w-[1400px] mx-auto px-6 pt-6 pb-24">
+    <div className="px-6 pt-6 pb-24">
       {/* Header */}
       <div className="mb-12">
         <h1 className="text-4xl font-bold">Hoş geldiniz, {member?.user_name
@@ -101,10 +101,10 @@ export default function Home() {
       </div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
         {/* Membership Card - Left Sidebar */}
         {membership && (
-          <div className="xl:col-span-1">
+          <div className="md:col-span-1">
             <div className="sticky top-32 relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-primary/70 p-8 text-primary-foreground h-fit">
               <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-8 translate-x-8" />
               <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/5 rounded-full translate-y-4 -translate-x-4" />
@@ -122,7 +122,7 @@ export default function Home() {
         )}
 
         {/* Classes & Reservations - Right Content */}
-        <div className={membership ? "xl:col-span-3 space-y-8" : "xl:col-span-4 space-y-8"}>
+        <div className={membership ? "md:col-span-3 space-y-8" : "md:col-span-4 space-y-8"}>
           {/* Today's Classes */}
           <div>
             <div className="flex items-center justify-between mb-6">

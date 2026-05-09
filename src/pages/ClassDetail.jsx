@@ -106,7 +106,7 @@ export default function ClassDetail() {
   return (
     <>
     <ExpiredMembershipModal />
-    <div className="max-w-3xl mx-auto px-8 pt-8 pb-24">
+    <div className="px-6 pt-6 pb-24">
       {/* Hero */}
        <div className="text-center mb-10">
          <div className="w-28 h-28 rounded-2xl bg-primary/10 flex items-center justify-center text-6xl mx-auto mb-6">

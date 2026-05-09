@@ -82,7 +82,7 @@ export default function ClassCalendar() {
     <>
     <ExpiredMembershipModal />
     <PullToRefresh onRefresh={handleRefresh}>
-    <div className="max-w-[1400px] mx-auto px-8 pt-8 pb-24">
+    <div className="px-6 pt-6 pb-24">
       <h1 className="text-4xl font-bold tracking-tight mb-8">Sınıf Takvimi</h1>
 
        {/* Week navigation */}
