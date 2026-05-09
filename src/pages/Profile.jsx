@@ -25,14 +25,6 @@ export default function Profile() {
     enabled: !!member?.user_email,
   });
 
-  // Auto-logout if expired
-  useEffect(() => {
-    if (membership !== undefined && daysLeft === 0 && membership) {
-      const timer = setTimeout(() => logout(), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [daysLeft, membership]);
-
   const totalDays = membership
     ? differenceInDays(parseISO(membership.end_date), parseISO(membership.start_date))
     : 0;
@@ -40,6 +32,14 @@ export default function Profile() {
     ? Math.max(0, differenceInDays(parseISO(membership.end_date), new Date()))
     : 0;
   const progress = totalDays > 0 ? ((totalDays - daysLeft) / totalDays) * 100 : 0;
+
+  // Auto-logout if expired
+  useEffect(() => {
+    if (membership !== undefined && daysLeft === 0 && membership) {
+      const timer = setTimeout(() => logout(), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [daysLeft, membership]);
 
   return (
     <div className="px-4 pt-6">
