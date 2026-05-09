@@ -9,6 +9,7 @@ import { tr } from "date-fns/locale";
 import { Calendar, Clock, Users, ChevronRight } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import ReservationsBottomSheet from "@/components/ReservationsBottomSheet";
 
 const categoryEmojis = {
   hyrox: "🏃",
@@ -142,33 +143,10 @@ export default function Home() {
         )}
       </div>
 
-      {/* My Upcoming Reservations */}
-      {myReservations.length > 0 && (
-        <div className="mb-6">
-          <h2 className="font-semibold text-lg mb-3">Rezervasyonlarım</h2>
-          <div className="space-y-2">
-            {myReservations.map((res) => {
-              const dateLabel = isToday(parseISO(res.class_date))
-                ? "Bugün"
-                : isTomorrow(parseISO(res.class_date))
-                ? "Yarın"
-                : format(parseISO(res.class_date), "d MMM", { locale: tr });
-
-              return (
-                <Link key={res.id} to={`/class/${res.class_id}`}>
-                  <Card className="p-3.5 flex items-center gap-3 hover:shadow-sm transition-all">
-                    <Badge variant="secondary" className="text-xs font-medium shrink-0">
-                      {dateLabel}
-                    </Badge>
-                    <p className="text-sm font-medium truncate flex-1">{res.class_title}</p>
-                    <span className="text-xs text-muted-foreground">{res.class_time}</span>
-                  </Card>
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      )}
+      {/* My Upcoming Reservations - Bottom Sheet */}
+      <div className="mb-6">
+        <ReservationsBottomSheet reservations={myReservations} />
+      </div>
     </div>
     </PullToRefresh>
     </>
