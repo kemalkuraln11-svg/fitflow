@@ -238,6 +238,15 @@ export default function ClassCalendar() {
                   <ChevronDown className="w-4 h-4" />
                 </button>
               )}
+              {expandedClasses && classes.length > 3 && (
+                <button
+                  onClick={() => setExpandedClasses(false)}
+                  className="w-full flex items-center justify-center gap-2 py-3 px-4 text-sm font-medium text-muted-foreground hover:bg-muted rounded-lg transition-all"
+                >
+                  <span>Kapat</span>
+                  <ChevronDown className="w-4 h-4 rotate-180" />
+                </button>
+              )}
               </>
               );
               })}
