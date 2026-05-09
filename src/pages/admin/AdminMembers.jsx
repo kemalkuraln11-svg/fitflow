@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { format, parseISO, differenceInDays, addDays } from "date-fns";
+import { format, parseISO, differenceInDays, addDays, addMonths } from "date-fns";
 import { tr } from "date-fns/locale";
 import { Plus, Trash2, Eye, EyeOff, Copy, Pencil, Snowflake, Sun } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -36,6 +36,16 @@ const statusLabels = {
   expired: "Süresi Doldu",
   suspended: "Askıda",
   frozen: "Donduruldu",
+};
+
+const getPlanDuration = (planName) => {
+  switch (planName) {
+    case "Aylık": return 1;
+    case "3 Aylık": return 3;
+    case "6 Aylık": return 6;
+    case "Yıllık": return 12;
+    default: return 1;
+  }
 };
 
 export default function AdminMembers() {
@@ -172,7 +182,17 @@ export default function AdminMembers() {
               </div>
               <div>
                 <Label>Plan</Label>
-                <Select value={form.plan_name} onValueChange={(v) => setForm({ ...form, plan_name: v })}>
+                <Select value={form.plan_name} onValueChange={(v) => {
+                  const months = getPlanDuration(v);
+                  const startDate = new Date();
+                  const endDate = addMonths(startDate, months);
+                  setForm({
+                    ...form,
+                    plan_name: v,
+                    start_date: format(startDate, "yyyy-MM-dd"),
+                    end_date: format(endDate, "yyyy-MM-dd"),
+                  });
+                }}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Aylık">Aylık</SelectItem>
