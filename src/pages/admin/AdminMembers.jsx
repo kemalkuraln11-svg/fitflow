@@ -226,20 +226,20 @@ export default function AdminMembers() {
           <DialogHeader><DialogTitle>✅ Üye Oluşturuldu</DialogTitle></DialogHeader>
           <div className="space-y-3 mt-2">
             <p className="text-sm text-muted-foreground">Bu bilgileri kullanıcıya verin:</p>
-            <div className="bg-secondary rounded-xl p-4 space-y-3">
+            <div className="bg-primary/10 rounded-xl p-4 space-y-3 border border-primary/20">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs text-muted-foreground">Kullanıcı Adı</p>
-                  <p className="font-bold text-lg">{createdMember?.username}</p>
+                  <p className="font-bold text-lg text-foreground">{createdMember?.username}</p>
                 </div>
                 <Button variant="ghost" size="icon" onClick={() => copyToClipboard(createdMember?.username)}>
                   <Copy className="w-4 h-4" />
                 </Button>
               </div>
-              <div className="border-t border-border pt-3 flex items-center justify-between">
+              <div className="border-t border-primary/20 pt-3 flex items-center justify-between">
                 <div>
                   <p className="text-xs text-muted-foreground">Şifre</p>
-                  <p className="font-bold text-lg">{createdMember?.password}</p>
+                  <p className="font-bold text-lg text-foreground">{createdMember?.password}</p>
                 </div>
                 <Button variant="ghost" size="icon" onClick={() => copyToClipboard(createdMember?.password)}>
                   <Copy className="w-4 h-4" />
