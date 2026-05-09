@@ -82,7 +82,7 @@ export default function ClassCalendar() {
     <>
     <ExpiredMembershipModal />
     <PullToRefresh onRefresh={handleRefresh}>
-    <div className="max-w-6xl mx-auto px-4 pt-6 pb-20">
+    <div className="w-full px-4 pt-6 pb-20">
       <h1 className="text-2xl font-bold tracking-tight mb-5">Takvim</h1>
 
       {/* Week navigation */}

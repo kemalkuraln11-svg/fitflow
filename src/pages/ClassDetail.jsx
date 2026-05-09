@@ -103,7 +103,7 @@ export default function ClassDetail() {
   const classStarted = isBefore(classDateTime, new Date());
 
   return (
-    <div className="max-w-2xl mx-auto px-4 pt-6 pb-20">
+    <div className="w-full px-4 pt-6 pb-20">
       {/* Hero */}
        <div className="text-center mb-8">
          <div className="w-24 h-24 rounded-2xl bg-primary/10 flex items-center justify-center text-5xl mx-auto mb-4">

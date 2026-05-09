@@ -88,7 +88,7 @@ export default function Home() {
     <>
     <ExpiredMembershipModal />
     <PullToRefresh onRefresh={handleRefresh}>
-    <div className="max-w-7xl mx-auto px-4 pt-6 pb-20">
+    <div className="w-full px-4 pt-6 pb-20">
       {/* Header */}
       <div className="flex items-center gap-4 mb-6">
         <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-2xl">

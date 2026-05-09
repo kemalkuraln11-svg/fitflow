@@ -73,7 +73,7 @@ export default function Profile() {
   return (
     <>
     <ExpiredMembershipModal />
-    <div className="max-w-6xl mx-auto px-4 pt-6 pb-20">
+    <div className="w-full px-4 pt-6 pb-20">
       <h1 className="text-2xl font-bold tracking-tight mb-6">Profil</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
