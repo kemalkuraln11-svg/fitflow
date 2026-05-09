@@ -50,6 +50,7 @@ export default function AdminClasses() {
     mutationFn: (data) => base44.entities.ClassSchedule.update(editingClass.id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["adminClasses"] });
+      setShowForm(false);
       setEditingClass(null);
       setForm({ title: "", instructor: "", date: format(new Date(), "yyyy-MM-dd"), start_time: "09:00", end_time: "10:00", capacity: 20, description: "", category: "fitness", cancellation_deadline_minutes: 30 });
       toast.success("Ders güncellendi");
