@@ -3,8 +3,10 @@ import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { Users, Calendar, BookOpen, TrendingUp } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { useNavigate } from "react-router-dom";
 
 export default function AdminDashboard() {
+  const navigate = useNavigate();
   const today = format(new Date(), "yyyy-MM-dd");
 
   const { data: members = [] } = useQuery({
@@ -25,10 +27,10 @@ export default function AdminDashboard() {
   const activeMembers = members.filter((m) => m.status === "active").length;
 
   const stats = [
-    { label: "Toplam Üye", value: members.length, icon: Users, color: "text-primary bg-primary/10" },
-    { label: "Aktif Üye", value: activeMembers, icon: TrendingUp, color: "text-accent bg-accent/10" },
-    { label: "Bugün Ders", value: todayClasses.length, icon: Calendar, color: "text-chart-3 bg-chart-3/10" },
-    { label: "Bugün Rez.", value: todayReservations.length, icon: BookOpen, color: "text-chart-4 bg-chart-4/10" },
+    { label: "Toplam Üye", value: members.length, icon: Users, color: "text-primary bg-primary/10", href: "/admin/members" },
+    { label: "Aktif Üye", value: activeMembers, icon: TrendingUp, color: "text-accent bg-accent/10", href: "/admin/members" },
+    { label: "Bugün Ders", value: todayClasses.length, icon: Calendar, color: "text-chart-3 bg-chart-3/10", href: "/admin/classes" },
+    { label: "Bugün Rez.", value: todayReservations.length, icon: BookOpen, color: "text-chart-4 bg-chart-4/10", href: "/admin/classes" },
   ];
 
   return (
@@ -37,7 +39,11 @@ export default function AdminDashboard() {
 
       <div className="grid grid-cols-2 gap-3 mb-6">
         {stats.map((stat) => (
-          <Card key={stat.label} className="p-4">
+          <Card
+            key={stat.label}
+            className="p-4 cursor-pointer hover:shadow-md transition-all active:scale-[0.98]"
+            onClick={() => navigate(stat.href)}
+          >
             <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 ${stat.color}`}>
               <stat.icon className="w-5 h-5" />
             </div>
