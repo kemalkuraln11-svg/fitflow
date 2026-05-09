@@ -42,6 +42,25 @@
     --sidebar-ring: 16 100% 50%;
   }
 
+  /* Responsive font scaling */
+  @media (max-width: 480px) {
+    :root {
+      font-size: 14px;
+    }
+  }
+
+  @media (min-width: 481px) and (max-width: 768px) {
+    :root {
+      font-size: 15px;
+    }
+  }
+
+  @media (min-width: 769px) {
+    :root {
+      font-size: 16px;
+    }
+  }
+
   .dark {
     --background: 0 0% 7%;
     --foreground: 0 0% 95%;
@@ -95,6 +114,7 @@
     overscroll-behavior: none;
     -webkit-font-smoothing: antialiased;
     -webkit-touch-callout: none;
+    padding: max(0px, env(safe-area-inset-bottom));
   }
   
   nav, button, a {
