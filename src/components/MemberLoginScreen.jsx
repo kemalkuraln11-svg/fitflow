@@ -42,26 +42,26 @@ export default function MemberLoginScreen() {
 
       <form onSubmit={handleLogin} className="w-full space-y-3 mb-4">
         <div>
-           <Label className="text-xs">Kullanıcı Adı</Label>
-           <Input
-             className="h-10 mt-0.5 text-sm"
-             placeholder="kullanıcı adınız"
-             value={username}
-             onChange={(e) => setUsername(e.target.value)}
-             autoCapitalize="none"
-             autoCorrect="off"
-           />
-         </div>
-         <div>
-           <Label className="text-xs">Şifre</Label>
-           <div className="relative mt-0.5">
+             <Label className="text-xs">Kullanıcı Adı</Label>
              <Input
-               className="h-10 pr-10 text-sm"
-               type={showPassword ? "text" : "password"}
-               placeholder="••••••••"
-               value={password}
-               onChange={(e) => setPassword(e.target.value)}
+               className="h-10 mt-0.5 text-base"
+               placeholder="kullanıcı adınız"
+               value={username}
+               onChange={(e) => setUsername(e.target.value)}
+               autoCapitalize="none"
+               autoCorrect="off"
              />
+           </div>
+           <div>
+             <Label className="text-xs">Şifre</Label>
+             <div className="relative mt-0.5">
+               <Input
+                 className="h-10 pr-10 text-base"
+                 type={showPassword ? "text" : "password"}
+                 placeholder="••••••••"
+                 value={password}
+                 onChange={(e) => setPassword(e.target.value)}
+               />
              <button
                type="button"
                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground"
@@ -80,7 +80,7 @@ export default function MemberLoginScreen() {
 
          <Button
            type="submit"
-           className="w-full h-10 text-sm font-semibold shadow-lg shadow-primary/25 mt-1"
+           className="w-full h-10 text-base font-semibold shadow-lg shadow-primary/25 mt-1"
            disabled={loading || !username || !password}
          >
            {loading ? "Giriş yapılıyor..." : "Giriş Yap"}
