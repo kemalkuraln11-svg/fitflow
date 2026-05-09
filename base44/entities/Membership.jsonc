@@ -4,11 +4,19 @@
   "properties": {
     "user_email": {
       "type": "string",
-      "description": "Email of the member"
+      "description": "Email of the member (auto-generated)"
     },
     "user_name": {
       "type": "string",
       "description": "Full name of the member"
+    },
+    "username": {
+      "type": "string",
+      "description": "Auto-generated username (adisoyad format)"
+    },
+    "password": {
+      "type": "string",
+      "description": "Password set by admin"
     },
     "start_date": {
       "type": "string",
@@ -36,8 +44,9 @@
     }
   },
   "required": [
-    "user_email",
     "user_name",
+    "username",
+    "password",
     "start_date",
     "end_date"
   ]

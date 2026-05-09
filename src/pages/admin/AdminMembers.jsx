@@ -3,7 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { format, parseISO, differenceInDays } from "date-fns";
 import { tr } from "date-fns/locale";
-import { Plus, Trash2, UserCheck, UserX } from "lucide-react";
+import { Plus, Trash2, UserCheck, UserX, Eye, EyeOff, Copy } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,15 +13,33 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 
+function generateUsername(fullName) {
+  return fullName
+    .toLowerCase()
+    .replace(/ğ/g, "g").replace(/ü/g, "u").replace(/ş/g, "s")
+    .replace(/ı/g, "i").replace(/ö/g, "o").replace(/ç/g, "c")
+    .replace(/\s+/g, "")
+    .replace(/[^a-z0-9]/g, "");
+}
+
+const APP_DOMAIN = window.location.hostname;
+
 export default function AdminMembers() {
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({
-    user_email: "", user_name: "",
+  const [showPasswordFor, setShowPasswordFor] = useState(null);
+  const [createdMember, setCreatedMember] = useState(null);
+
+  const emptyForm = {
+    user_name: "", password: "",
     start_date: format(new Date(), "yyyy-MM-dd"),
     end_date: format(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), "yyyy-MM-dd"),
     plan_name: "Aylık", status: "active",
-  });
+  };
+  const [form, setForm] = useState(emptyForm);
+
+  const autoUsername = generateUsername(form.user_name);
+  const autoEmail = autoUsername ? `${autoUsername}@${APP_DOMAIN}` : "";
 
   const { data: members = [], isLoading } = useQuery({
     queryKey: ["allMembers"],
@@ -30,16 +48,11 @@ export default function AdminMembers() {
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.Membership.create(data),
-    onSuccess: () => {
+    onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ["allMembers"] });
       setShowForm(false);
-      setForm({
-        user_email: "", user_name: "",
-        start_date: format(new Date(), "yyyy-MM-dd"),
-        end_date: format(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), "yyyy-MM-dd"),
-        plan_name: "Aylık", status: "active",
-      });
-      toast.success("Üyelik oluşturuldu");
+      setCreatedMember(result);
+      setForm(emptyForm);
     },
   });
 
@@ -62,6 +75,19 @@ export default function AdminMembers() {
     },
   });
 
+  const handleCreate = () => {
+    createMutation.mutate({
+      ...form,
+      username: autoUsername,
+      user_email: autoEmail,
+    });
+  };
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+    toast.success("Kopyalandı!");
+  };
+
   const statusColors = {
     active: "bg-accent/10 text-accent border-accent/20",
     expired: "bg-destructive/10 text-destructive border-destructive/20",
@@ -76,22 +102,41 @@ export default function AdminMembers() {
           <DialogTrigger asChild>
             <Button size="sm" className="gap-2">
               <Plus className="w-4 h-4" />
-              Yeni Üyelik
+              Yeni Üye
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Yeni Üyelik Oluştur</DialogTitle>
+              <DialogTitle>Yeni Üye Oluştur</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 mt-2">
               <div>
                 <Label>Ad Soyad</Label>
-                <Input value={form.user_name} onChange={(e) => setForm({ ...form, user_name: e.target.value })} placeholder="Kullanıcı adı" />
+                <Input
+                  value={form.user_name}
+                  onChange={(e) => setForm({ ...form, user_name: e.target.value })}
+                  placeholder="Ahmet Yılmaz"
+                />
               </div>
+
+              {/* Auto-generated username preview */}
+              {autoUsername && (
+                <div className="bg-secondary/60 rounded-xl p-3 text-sm space-y-1">
+                  <p className="text-muted-foreground text-xs font-medium">Otomatik oluşturulan kullanıcı adı:</p>
+                  <p className="font-bold text-primary text-base">{autoUsername}</p>
+                </div>
+              )}
+
               <div>
-                <Label>E-posta</Label>
-                <Input type="email" value={form.user_email} onChange={(e) => setForm({ ...form, user_email: e.target.value })} placeholder="kullanici@email.com" />
+                <Label>Şifre</Label>
+                <Input
+                  type="text"
+                  value={form.password}
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                  placeholder="Şifre belirleyin"
+                />
               </div>
+
               <div>
                 <Label>Plan</Label>
                 <Select value={form.plan_name} onValueChange={(v) => setForm({ ...form, plan_name: v })}>
@@ -104,6 +149,7 @@ export default function AdminMembers() {
                   </SelectContent>
                 </Select>
               </div>
+
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <Label>Başlangıç</Label>
@@ -114,17 +160,51 @@ export default function AdminMembers() {
                   <Input type="date" value={form.end_date} onChange={(e) => setForm({ ...form, end_date: e.target.value })} />
                 </div>
               </div>
+
               <Button
                 className="w-full"
-                onClick={() => createMutation.mutate(form)}
-                disabled={!form.user_email || !form.user_name || createMutation.isPending}
+                onClick={handleCreate}
+                disabled={!form.user_name || !form.password || createMutation.isPending}
               >
-                {createMutation.isPending ? "Oluşturuluyor..." : "Üyelik Oluştur"}
+                {createMutation.isPending ? "Oluşturuluyor..." : "Üye Oluştur"}
               </Button>
             </div>
           </DialogContent>
         </Dialog>
       </div>
+
+      {/* Created member credentials dialog */}
+      <Dialog open={!!createdMember} onOpenChange={() => setCreatedMember(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>✅ Üye Oluşturuldu</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 mt-2">
+            <p className="text-sm text-muted-foreground">Bu bilgileri kullanıcıya verin:</p>
+            <div className="bg-secondary rounded-xl p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground">Kullanıcı Adı</p>
+                  <p className="font-bold text-lg">{createdMember?.username}</p>
+                </div>
+                <Button variant="ghost" size="icon" onClick={() => copyToClipboard(createdMember?.username)}>
+                  <Copy className="w-4 h-4" />
+                </Button>
+              </div>
+              <div className="border-t border-border pt-3 flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground">Şifre</p>
+                  <p className="font-bold text-lg">{createdMember?.password}</p>
+                </div>
+                <Button variant="ghost" size="icon" onClick={() => copyToClipboard(createdMember?.password)}>
+                  <Copy className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+            <Button className="w-full" onClick={() => setCreatedMember(null)}>Tamam</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {isLoading ? (
         <div className="space-y-3">
@@ -143,9 +223,10 @@ export default function AdminMembers() {
         <div className="space-y-2">
           {members.map((member) => {
             const daysLeft = Math.max(0, differenceInDays(parseISO(member.end_date), new Date()));
+            const isShowingPassword = showPasswordFor === member.id;
             return (
               <Card key={member.id} className="p-4">
-                <div className="flex items-start justify-between">
+                <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <p className="font-semibold">{member.user_name}</p>
@@ -153,28 +234,31 @@ export default function AdminMembers() {
                         {member.status === "active" ? "Aktif" : member.status === "expired" ? "Süresi Doldu" : "Askıda"}
                       </Badge>
                     </div>
-                    <p className="text-sm text-muted-foreground mt-0.5">{member.user_email}</p>
+                    <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
+                      <span>👤 {member.username}</span>
+                      <button
+                        className="flex items-center gap-1 hover:text-foreground transition-colors"
+                        onClick={() => setShowPasswordFor(isShowingPassword ? null : member.id)}
+                      >
+                        {isShowingPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                        {isShowingPassword ? member.password : "••••••"}
+                      </button>
+                    </div>
                     <p className="text-xs text-muted-foreground mt-1">
-                      {member.plan_name} • {daysLeft} gün kaldı • Bitiş: {format(parseISO(member.end_date), "d MMM yyyy", { locale: tr })}
+                      {member.plan_name} • {daysLeft} gün kaldı • {format(parseISO(member.end_date), "d MMM yyyy", { locale: tr })}
                     </p>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
                     <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8"
+                      variant="ghost" size="icon" className="h-8 w-8"
                       onClick={() => toggleStatusMutation.mutate({ id: member.id, currentStatus: member.status })}
                     >
-                      {member.status === "active" ? (
-                        <UserX className="w-4 h-4 text-muted-foreground" />
-                      ) : (
-                        <UserCheck className="w-4 h-4 text-accent" />
-                      )}
+                      {member.status === "active"
+                        ? <UserX className="w-4 h-4 text-muted-foreground" />
+                        : <UserCheck className="w-4 h-4 text-accent" />}
                     </Button>
                     <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-destructive"
+                      variant="ghost" size="icon" className="h-8 w-8 text-destructive"
                       onClick={() => deleteMutation.mutate(member.id)}
                     >
                       <Trash2 className="w-4 h-4" />
