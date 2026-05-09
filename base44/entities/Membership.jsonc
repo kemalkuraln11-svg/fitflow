@@ -1,0 +1,44 @@
+{
+  "name": "Membership",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "Email of the member"
+    },
+    "user_name": {
+      "type": "string",
+      "description": "Full name of the member"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Membership start date"
+    },
+    "end_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Membership end date"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "expired",
+        "suspended"
+      ],
+      "default": "active",
+      "description": "Current membership status"
+    },
+    "plan_name": {
+      "type": "string",
+      "description": "Name of the membership plan"
+    }
+  },
+  "required": [
+    "user_email",
+    "user_name",
+    "start_date",
+    "end_date"
+  ]
+}

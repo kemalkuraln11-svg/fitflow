@@ -5,7 +5,15 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
-// Add page imports here
+import UserLayout from './components/layout/UserLayout';
+import AdminLayout from './components/layout/AdminLayout';
+import Home from './pages/Home';
+import ClassCalendar from './pages/ClassCalendar';
+import ClassDetail from './pages/ClassDetail';
+import Profile from './pages/Profile';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminClasses from './pages/admin/AdminClasses';
+import AdminMembers from './pages/admin/AdminMembers';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -33,7 +41,17 @@ const AuthenticatedApp = () => {
   // Render the main app
   return (
     <Routes>
-      {/* Add your page Route elements here */}
+      <Route element={<UserLayout />}>
+        <Route path="/" element={<Home />} />
+        <Route path="/calendar" element={<ClassCalendar />} />
+        <Route path="/class/:id" element={<ClassDetail />} />
+        <Route path="/profile" element={<Profile />} />
+      </Route>
+      <Route path="/admin" element={<AdminLayout />}>
+        <Route index element={<AdminDashboard />} />
+        <Route path="classes" element={<AdminClasses />} />
+        <Route path="members" element={<AdminMembers />} />
+      </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

@@ -1,0 +1,65 @@
+{
+  "name": "ClassSchedule",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Class name"
+    },
+    "instructor": {
+      "type": "string",
+      "description": "Instructor name"
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Class date"
+    },
+    "start_time": {
+      "type": "string",
+      "description": "Start time (HH:mm)"
+    },
+    "end_time": {
+      "type": "string",
+      "description": "End time (HH:mm)"
+    },
+    "capacity": {
+      "type": "number",
+      "description": "Max number of participants"
+    },
+    "current_count": {
+      "type": "number",
+      "default": 0,
+      "description": "Current number of reservations"
+    },
+    "description": {
+      "type": "string",
+      "description": "Class description"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "yoga",
+        "pilates",
+        "fitness",
+        "dance",
+        "boxing",
+        "swimming",
+        "other"
+      ],
+      "description": "Class category"
+    },
+    "recurring": {
+      "type": "boolean",
+      "default": false,
+      "description": "Is this a recurring class"
+    }
+  },
+  "required": [
+    "title",
+    "date",
+    "start_time",
+    "end_time",
+    "capacity"
+  ]
+}

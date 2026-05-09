@@ -1,0 +1,47 @@
+{
+  "name": "Reservation",
+  "type": "object",
+  "properties": {
+    "class_id": {
+      "type": "string",
+      "description": "ID of the class"
+    },
+    "class_title": {
+      "type": "string",
+      "description": "Title of the class for display"
+    },
+    "class_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of the class"
+    },
+    "class_time": {
+      "type": "string",
+      "description": "Time of the class"
+    },
+    "user_email": {
+      "type": "string",
+      "description": "Email of the user"
+    },
+    "user_name": {
+      "type": "string",
+      "description": "Name of the user"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "confirmed",
+        "cancelled"
+      ],
+      "default": "confirmed",
+      "description": "Reservation status"
+    }
+  },
+  "required": [
+    "class_id",
+    "class_title",
+    "class_date",
+    "user_email",
+    "user_name"
+  ]
+}
