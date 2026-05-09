@@ -144,7 +144,7 @@ export default function ClassCalendar() {
                   ? "bg-orange-500 text-white shadow-lg shadow-orange-500/30 active:bg-orange-500"
                   : isToday
                   ? "bg-primary/10 text-primary"
-                  : "bg-card text-foreground hover:bg-secondary"
+                  : "bg-card text-foreground hover:bg-muted"
               )}
             >
               <span className={cn(
