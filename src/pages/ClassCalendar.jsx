@@ -147,7 +147,10 @@ export default function ClassCalendar() {
                   : "bg-card text-foreground hover:bg-secondary"
               )}
             >
-              <span className="text-[10px] font-medium opacity-70 uppercase">
+              <span className={cn(
+                "text-[10px] font-medium uppercase",
+                isSelected ? "" : "opacity-70"
+              )}>
                 {format(day, "EEE", { locale: tr })}
               </span>
               <span className="text-lg font-bold mt-0.5">{format(day, "d")}</span>
