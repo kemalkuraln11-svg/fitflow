@@ -41,7 +41,7 @@ export default function ReservationsBottomSheet({ reservations = [] }) {
         className={`fixed bottom-0 left-0 right-0 z-50 bg-background rounded-t-3xl shadow-2xl transition-transform duration-300 ${
           open ? "translate-y-0" : "translate-y-full"
         }`}
-        style={{ maxHeight: "75vh" }}
+        style={{ height: reservations.length <= 5 ? "auto" : "60vh", maxHeight: "60vh" }}
       >
         {/* Handle */}
         <div className="flex justify-center pt-3 pb-1">
@@ -60,7 +60,7 @@ export default function ReservationsBottomSheet({ reservations = [] }) {
         </div>
 
         {/* List */}
-        <div className="overflow-y-auto px-4 py-4 space-y-2" style={{ maxHeight: "calc(75vh - 100px)" }}>
+        <div className="overflow-y-auto px-4 py-4 space-y-2" style={{ maxHeight: "calc(60vh - 100px)" }}>
           {reservations.map((res) => {
             const dateLabel = isToday(parseISO(res.class_date))
               ? "Bugün"
