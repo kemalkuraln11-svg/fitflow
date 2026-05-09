@@ -10,9 +10,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const categoryEmojis = {
-  hyrox: "🏃", crossfit: "🔥",
-  yoga: "🧘", pilates: "💪", fitness: "🏋️", dance: "💃",
-  boxing: "🥊", swimming: "🏊", other: "⭐",
+  hyrox: "🏃", crossfit: "🔥", fitness: "🏋️", other: "⭐",
 };
 
 export default function ClassCalendar() {
