@@ -103,15 +103,15 @@ export default function ClassDetail() {
   const classStarted = isBefore(classDateTime, new Date());
 
   return (
-    <div className="px-4 pt-6 pb-8">
+    <div className="max-w-2xl mx-auto px-4 pt-6 pb-20">
       {/* Hero */}
-      <div className="text-center mb-6">
-        <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center text-4xl mx-auto mb-4">
+       <div className="text-center mb-8">
+         <div className="w-24 h-24 rounded-2xl bg-primary/10 flex items-center justify-center text-5xl mx-auto mb-4">
           {categoryEmojis[cls.category] || "⭐"}
         </div>
-        <h1 className="text-2xl font-bold">{cls.title}</h1>
+        <h1 className="text-3xl font-bold">{cls.title}</h1>
         {cls.instructor && (
-          <p className="text-muted-foreground mt-1 flex items-center justify-center gap-1.5">
+          <p className="text-muted-foreground mt-2 flex items-center justify-center gap-1.5">
             <User className="w-4 h-4" />
             {cls.instructor}
           </p>
@@ -119,32 +119,32 @@ export default function ClassDetail() {
       </div>
 
       {/* Info cards */}
-      <div className="grid grid-cols-2 gap-3 mb-6">
-        <Card className="p-4 text-center">
-          <Clock className="w-5 h-5 mx-auto mb-1.5 text-primary" />
-          <p className="text-sm font-semibold">{cls.start_time} - {cls.end_time}</p>
-          <p className="text-xs text-muted-foreground mt-0.5">
+      <div className="grid grid-cols-2 gap-4 mb-8">
+        <Card className="p-5 text-center">
+          <Clock className="w-6 h-6 mx-auto mb-2 text-primary" />
+          <p className="font-semibold">{cls.start_time} - {cls.end_time}</p>
+          <p className="text-sm text-muted-foreground mt-1">
             {format(parseISO(cls.date), "d MMMM", { locale: tr })}
           </p>
         </Card>
-        <Card className="p-4 text-center">
-          <Users className="w-5 h-5 mx-auto mb-1.5 text-accent" />
-          <p className="text-sm font-semibold">{cls.current_count || 0} / {cls.capacity}</p>
-          <p className="text-xs text-muted-foreground mt-0.5">Katılımcı</p>
+        <Card className="p-5 text-center">
+          <Users className="w-6 h-6 mx-auto mb-2 text-accent" />
+          <p className="font-semibold">{cls.current_count || 0} / {cls.capacity}</p>
+          <p className="text-sm text-muted-foreground mt-1">Katılımcı</p>
         </Card>
       </div>
 
       {/* Description */}
       {cls.description && (
-        <Card className="p-4 mb-6">
-          <h3 className="font-semibold text-sm mb-2">Ders Hakkında</h3>
-          <p className="text-sm text-muted-foreground leading-relaxed">{cls.description}</p>
+        <Card className="p-5 mb-8">
+          <h3 className="font-semibold mb-3">Ders Hakkında</h3>
+          <p className="text-muted-foreground leading-relaxed">{cls.description}</p>
         </Card>
       )}
 
       {/* Action Button */}
       {membershipExpired ? (
-        <div className="w-full h-14 flex items-center justify-center rounded-xl bg-destructive/10 border border-destructive/30 text-destructive font-semibold text-sm text-center px-4">
+        <div className="w-full h-14 flex items-center justify-center rounded-lg bg-destructive/10 border border-destructive/30 text-destructive font-semibold text-center px-4">
           Üyeliğinizin süresi dolmuştur. Lütfen üyeliğinizi yenileyin.
         </div>
       ) : hasReservation ? (
@@ -158,12 +158,12 @@ export default function ClassDetail() {
             {cancelMutation.isPending ? "İptal ediliyor..." : "Rezervasyonu İptal Et"}
           </Button>
         ) : (
-          <div className="w-full h-14 flex items-center justify-center rounded-xl bg-destructive/10 border border-destructive/30 text-destructive font-semibold text-sm text-center px-4">
+          <div className="w-full h-14 flex items-center justify-center rounded-lg bg-destructive/10 border border-destructive/30 text-destructive font-semibold text-center px-4">
             Dersin başlangıcına {cls.cancellation_deadline_minutes || 30} dakikadan az kala iptal edilemez
           </div>
         )
         ) : classStarted ? (
-        <div className="w-full h-14 flex items-center justify-center rounded-xl bg-destructive/10 border border-destructive/30 text-destructive font-semibold text-sm text-center px-4">
+        <div className="w-full h-14 flex items-center justify-center rounded-lg bg-destructive/10 border border-destructive/30 text-destructive font-semibold text-center px-4">
           Ders başladı. Rezervasyon yapamazsınız.
         </div>
         ) : (

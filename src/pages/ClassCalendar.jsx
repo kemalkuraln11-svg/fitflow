@@ -82,15 +82,15 @@ export default function ClassCalendar() {
     <>
     <ExpiredMembershipModal />
     <PullToRefresh onRefresh={handleRefresh}>
-    <div className="px-4 pt-6">
+    <div className="max-w-6xl mx-auto px-4 pt-6 pb-20">
       <h1 className="text-2xl font-bold tracking-tight mb-5">Takvim</h1>
 
       {/* Week navigation */}
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between mb-6">
         <Button
           variant="ghost"
           size="icon"
-          className="h-8 w-8"
+          className="h-9 w-9"
           onClick={() => {
             const newDate = addDays(selectedDate, -1);
             const newWeekStart = startOfWeek(newDate, { weekStartsOn: 1 });
@@ -111,7 +111,7 @@ export default function ClassCalendar() {
           <Button
           variant="ghost"
           size="icon"
-          className="h-8 w-8"
+          className="h-9 w-9"
           onClick={() => {
             const newDate = addDays(selectedDate, 1);
             const newWeekStart = startOfWeek(newDate, { weekStartsOn: 1 });
@@ -125,7 +125,7 @@ export default function ClassCalendar() {
 
       {/* Week strip */}
       <div 
-       className="flex gap-1.5 mb-6 overflow-x-auto pb-1"
+       className="flex gap-2 mb-8 overflow-x-auto pb-2 -mx-4 px-4"
        onTouchStart={handleTouchStart}
        onTouchEnd={handleTouchEnd}
       >
@@ -141,7 +141,7 @@ export default function ClassCalendar() {
                setWeekStart(newWeekStart);
              }}
               className={cn(
-                "flex flex-col items-center flex-1 min-w-[44px] py-2.5 rounded-xl transition-all focus:outline-none focus:ring-0",
+                 "flex flex-col items-center min-w-[56px] py-3 rounded-xl transition-all focus:outline-none focus:ring-0",
                 isSelected
                   ? "bg-orange-500 text-white shadow-lg shadow-orange-500/30 active:bg-orange-500"
                   : isToday
@@ -162,14 +162,14 @@ export default function ClassCalendar() {
       </div>
 
       {/* Classes for selected date */}
-      <div className="sticky top-0 z-10 bg-background pb-3 mb-3 pt-3">
-        <h2 className="font-semibold">
+      <div className="sticky top-0 z-10 bg-background pb-4 mb-6 pt-3">
+        <h2 className="font-semibold text-lg">
           {format(selectedDate, "d MMMM EEEE", { locale: tr })}
         </h2>
       </div>
 
       {isLoading ? (
-        <div className="space-y-3">
+        <div className="space-y-4">
           {[1, 2, 3].map((i) => (
             <Card key={i} className="p-4 animate-pulse">
               <div className="flex gap-4">
@@ -187,7 +187,7 @@ export default function ClassCalendar() {
           <p className="text-sm">Bu tarihte ders bulunmuyor</p>
         </Card>
       ) : (
-        <div className="space-y-10">
+        <div className="space-y-4">
            {classes.map((cls, idx) => {
              const showMore = classes.length > 3 && idx === 2 && !expandedClasses;
             const isFull = (cls.current_count || 0) >= cls.capacity;
@@ -198,7 +198,7 @@ export default function ClassCalendar() {
               <>
               <Link key={cls.id} to={`/class/${cls.id}`}>
                 <Card className={cn(
-                  "p-4 flex items-center gap-4 transition-all active:scale-[0.98]",
+                    "p-5 flex items-center gap-4 transition-all active:scale-[0.98] hover:shadow-md",
                   isFull ? "opacity-60" : "hover:shadow-md"
                 )}>
                   <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-xl shrink-0">
