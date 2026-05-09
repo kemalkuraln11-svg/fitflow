@@ -36,15 +36,29 @@ export default function Home() {
         "-class_date",
         20
       );
-      // Dersi hâlâ var olan rezervasyonları filtrele
+      // Dersi hâlâ var olan rezervasyonları filtrele ve sınıf verilerini birleştir
       const classIds = [...new Set(reservations.map((r) => r.class_id))];
+      const classData = {};
+      
       const classChecks = await Promise.all(
         classIds.map((cid) => base44.entities.ClassSchedule.filter({ id: cid }))
       );
-      const validClassIds = new Set(
-        classChecks.flatMap((res) => res.map((c) => c.id))
-      );
-      return reservations.filter((r) => validClassIds.has(r.class_id)).slice(0, 5);
+      
+      classChecks.forEach((classes) => {
+        if (classes.length > 0) {
+          classData[classes[0].id] = classes[0];
+        }
+      });
+      
+      const validClassIds = new Set(Object.keys(classData));
+      return reservations
+        .filter((r) => validClassIds.has(r.class_id))
+        .map((r) => ({
+          ...r,
+          class_title: classData[r.class_id]?.title || r.class_title,
+          class_time: classData[r.class_id]?.start_time || r.class_time,
+        }))
+        .slice(0, 5);
     },
     enabled: !!member?.user_email,
   });
