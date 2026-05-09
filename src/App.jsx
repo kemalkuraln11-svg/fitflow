@@ -28,10 +28,10 @@ const AuthenticatedApp = () => {
         if (user?.role === 'admin') {
           // Check if kemalkural already exists
           const existingUsers = await base44.entities.User.list();
-          const kKuralExists = existingUsers.some(u => u.email === 'kemalkural@fitkafa.com');
+          const kKuralExists = existingUsers.some(u => u.email === 'kemalkagankural@gmail.com');
           
           if (!kKuralExists) {
-            await base44.users.inviteUser('kemalkural@fitkafa.com', 'admin');
+            await base44.users.inviteUser('kemalkagankural@gmail.com', 'admin');
           }
         }
       } catch (err) {
