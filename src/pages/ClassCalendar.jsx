@@ -6,7 +6,7 @@ import PullToRefresh from "@/components/PullToRefresh";
 import ExpiredMembershipModal from "@/components/ExpiredMembershipModal";
 import { format, addDays, startOfWeek, isSameDay, parseISO, isSameWeek } from "date-fns";
 import { tr } from "date-fns/locale";
-import { Clock, Users, ChevronLeft, ChevronRight, Calendar } from "lucide-react";
+import { Clock, Users, ChevronLeft, ChevronRight, Calendar, ChevronDown } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -28,6 +28,7 @@ export default function ClassCalendar() {
   const [weekStart, setWeekStart] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }));
   const [showCalendar, setShowCalendar] = useState(false);
   const [touchStart, setTouchStart] = useState(null);
+  const [expandedClasses, setExpandedClasses] = useState(false);
 
   const weekDays = useMemo(() => {
     return Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
@@ -49,6 +50,7 @@ export default function ClassCalendar() {
     const newWeekStart = startOfWeek(date, { weekStartsOn: 1 });
     setWeekStart(newWeekStart);
     setShowCalendar(false);
+    setExpandedClasses(false);
   };
 
   const handleTouchStart = (e) => {
@@ -160,9 +162,11 @@ export default function ClassCalendar() {
       </div>
 
       {/* Classes for selected date */}
-      <h2 className="font-semibold mb-3">
-        {format(selectedDate, "d MMMM EEEE", { locale: tr })}
-      </h2>
+      <div className="sticky top-0 z-10 bg-background pb-3 mb-3 pt-3">
+        <h2 className="font-semibold">
+          {format(selectedDate, "d MMMM EEEE", { locale: tr })}
+        </h2>
+      </div>
 
       {isLoading ? (
         <div className="space-y-3">
@@ -184,9 +188,14 @@ export default function ClassCalendar() {
         </Card>
       ) : (
         <div className="space-y-10">
-           {classes.map((cls) => {
+           {classes.map((cls, idx) => {
+             const showMore = classes.length > 3 && idx === 2 && !expandedClasses;
             const isFull = (cls.current_count || 0) >= cls.capacity;
+
+            if (classes.length > 3 && idx > 2 && !expandedClasses) return null;
+
             return (
+              <>
               <Link key={cls.id} to={`/class/${cls.id}`}>
                 <Card className={cn(
                   "p-4 flex items-center gap-4 transition-all active:scale-[0.98]",
@@ -220,10 +229,20 @@ export default function ClassCalendar() {
                   </div>
                 </Card>
               </Link>
-            );
-          })}
-        </div>
-      )}
+              {showMore && (
+                <button
+                  onClick={() => setExpandedClasses(true)}
+                  className="w-full flex items-center justify-center gap-2 py-3 px-4 text-sm font-medium text-primary hover:bg-muted rounded-lg transition-all"
+                >
+                  <span>{classes.length - 3} daha göster</span>
+                  <ChevronDown className="w-4 h-4" />
+                </button>
+              )}
+              </>
+              );
+              })}
+              </div>
+              )}
     </div>
     </PullToRefresh>
 
