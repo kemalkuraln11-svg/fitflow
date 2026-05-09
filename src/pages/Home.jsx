@@ -101,10 +101,10 @@ export default function Home() {
       </div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-        {/* Membership Card - Left Sidebar */}
+      <div className="space-y-8">
+        {/* Membership Card */}
         {membership && (
-          <div className="md:col-span-1">
+          <div>
             <div className="sticky top-32 relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-primary/70 p-8 text-primary-foreground h-fit">
               <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-8 translate-x-8" />
               <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/5 rounded-full translate-y-4 -translate-x-4" />
@@ -121,8 +121,8 @@ export default function Home() {
           </div>
         )}
 
-        {/* Classes & Reservations - Right Content */}
-        <div className={membership ? "md:col-span-3 space-y-8" : "md:col-span-4 space-y-8"}>
+        {/* Classes & Reservations */}
+        <div className="space-y-8">
           {/* Today's Classes */}
           <div>
             <div className="flex items-center justify-between mb-6">

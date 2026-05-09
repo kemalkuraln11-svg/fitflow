@@ -76,93 +76,87 @@ export default function Profile() {
     <div className="px-6 pt-6 pb-24">
       <h1 className="text-2xl font-bold tracking-tight mb-8">Profil</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        {/* Left Column */}
-        <div className="md:col-span-1 space-y-6">
-          {/* User Info */}
-          <Card className="p-5">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-2xl flex-shrink-0">
-                {member?.gender === "female" ? "👩" : "👨"}
+      <div className="space-y-6">
+        {/* User Info */}
+        <Card className="p-5">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-2xl flex-shrink-0">
+              {member?.gender === "female" ? "👩" : "👨"}
+            </div>
+            <div className="min-w-0">
+              <h2 className="font-bold text-base truncate">
+                {member?.user_name
+                  ? member.user_name.split(" ").map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(" ")
+                  : "Kullanıcı"}
+              </h2>
+              <p className="text-xs text-muted-foreground truncate">@{member?.username}</p>
+            </div>
+          </div>
+        </Card>
+
+        {/* Membership Status */}
+        <Card className="p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <Calendar className="w-4 h-4 text-primary flex-shrink-0" />
+            <h3 className="font-semibold text-sm">Üyelik Durumu</h3>
+          </div>
+
+          {membership ? (
+            <div className="space-y-3 text-sm">
+              <div>
+                <span className="text-xs text-muted-foreground block">Plan</span>
+                <span className="font-medium">{membership.plan_name || "Standart"}</span>
               </div>
-              <div className="min-w-0">
-                <h2 className="font-bold text-base truncate">
-                  {member?.user_name
-                    ? member.user_name.split(" ").map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(" ")
-                    : "Kullanıcı"}
-                </h2>
-                <p className="text-xs text-muted-foreground truncate">@{member?.username}</p>
+              <div>
+                <span className="text-xs text-muted-foreground block">Başlangıç</span>
+                <span className="font-medium text-xs">{format(parseISO(membership.start_date), "d MMM yyyy", { locale: tr })}</span>
+              </div>
+              <div>
+                <span className="text-xs text-muted-foreground block">Bitiş</span>
+                <span className="font-medium text-xs">{format(parseISO(membership.end_date), "d MMM yyyy", { locale: tr })}</span>
+              </div>
+
+              <div className="pt-2 border-t">
+                <div className="flex justify-between text-xs mb-2">
+                  <span className="text-muted-foreground">Kalan süre</span>
+                  <span className="font-bold text-primary">{daysLeft} gün</span>
+                </div>
+                <Progress value={progress} className="h-1.5" />
               </div>
             </div>
-          </Card>
-
-          {/* Membership Status */}
-          <Card className="p-5">
-            <div className="flex items-center gap-2 mb-4">
-              <Calendar className="w-4 h-4 text-primary flex-shrink-0" />
-              <h3 className="font-semibold text-sm">Üyelik Durumu</h3>
+          ) : (
+            <div className="text-center py-3 text-muted-foreground">
+              <Clock className="w-6 h-6 mx-auto mb-2 opacity-40" />
+              <p className="text-xs">Aktif üyelik yok</p>
             </div>
+          )}
+        </Card>
 
-            {membership ? (
-              <div className="space-y-3 text-sm">
-                <div>
-                  <span className="text-xs text-muted-foreground block">Plan</span>
-                  <span className="font-medium">{membership.plan_name || "Standart"}</span>
-                </div>
-                <div>
-                  <span className="text-xs text-muted-foreground block">Başlangıç</span>
-                  <span className="font-medium text-xs">{format(parseISO(membership.start_date), "d MMM yyyy", { locale: tr })}</span>
-                </div>
-                <div>
-                  <span className="text-xs text-muted-foreground block">Bitiş</span>
-                  <span className="font-medium text-xs">{format(parseISO(membership.end_date), "d MMM yyyy", { locale: tr })}</span>
-                </div>
-
-                <div className="pt-2 border-t">
-                  <div className="flex justify-between text-xs mb-2">
-                    <span className="text-muted-foreground">Kalan süre</span>
-                    <span className="font-bold text-primary">{daysLeft} gün</span>
-                  </div>
-                  <Progress value={progress} className="h-1.5" />
-                </div>
-              </div>
-            ) : (
-              <div className="text-center py-3 text-muted-foreground">
-                <Clock className="w-6 h-6 mx-auto mb-2 opacity-40" />
-                <p className="text-xs">Aktif üyelik yok</p>
-              </div>
-            )}
-          </Card>
-        </div>
-
-        {/* Right Column */}
-        <div className="md:col-span-3 space-y-6">
-          {/* Stats */}
-          <Card className="p-5">
-            <h3 className="font-semibold text-sm mb-4">İstatistikler</h3>
-            <div className="grid grid-cols-2 gap-3 mb-4">
-              <div className="text-center p-4 bg-primary/5 rounded-lg">
-                <p className="text-3xl font-bold text-primary">{reservations.length}</p>
-                <p className="text-xs text-muted-foreground mt-1">Aktif Rezervasyon</p>
-              </div>
-              <div className="text-center p-4 bg-accent/10 rounded-lg">
-                <p className="text-3xl font-bold text-accent">{daysLeft}</p>
-                <p className="text-xs text-muted-foreground mt-1">Kalan Gün</p>
-              </div>
+        {/* Stats */}
+        <Card className="p-5">
+          <h3 className="font-semibold text-sm mb-4">İstatistikler</h3>
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            <div className="text-center p-4 bg-primary/5 rounded-lg">
+              <p className="text-3xl font-bold text-primary">{reservations.length}</p>
+              <p className="text-xs text-muted-foreground mt-1">Aktif Rezervasyon</p>
             </div>
-            <ReservationsBottomSheet reservations={reservations} />
-          </Card>
+            <div className="text-center p-4 bg-accent/10 rounded-lg">
+              <p className="text-3xl font-bold text-accent">{daysLeft}</p>
+              <p className="text-xs text-muted-foreground mt-1">Kalan Gün</p>
+            </div>
+          </div>
+          <ReservationsBottomSheet reservations={reservations} />
+        </Card>
 
-          {/* Actions */}
-          <Button
-            variant="outline"
-            className="w-full justify-center gap-2 h-11 text-destructive hover:text-destructive hover:bg-destructive/5"
-            onClick={logout}
-          >
-            <LogOut className="w-4 h-4" />
-            <span className="font-medium">Çıkış Yap</span>
-          </Button>
-        </div>
+        {/* Actions */}
+        <Button
+          variant="outline"
+          className="w-full justify-center gap-2 h-11 text-destructive hover:text-destructive hover:bg-destructive/5"
+          onClick={logout}
+        >
+          <LogOut className="w-4 h-4" />
+          <span className="font-medium">Çıkış Yap</span>
+        </Button>
       </div>
     </div>
     </>
