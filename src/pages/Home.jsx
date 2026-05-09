@@ -88,7 +88,7 @@ export default function Home() {
     <>
     <ExpiredMembershipModal />
     <PullToRefresh onRefresh={handleRefresh}>
-    <div className="px-4 pt-6">
+    <div className="max-w-6xl mx-auto px-4 pt-6 pb-6">
       {/* Header */}
       <div className="flex items-center gap-4 mb-6">
         <div className="w-14 h-14 rounded-lg bg-primary/10 flex items-center justify-center text-3xl font-bold text-primary">
@@ -137,7 +137,7 @@ export default function Home() {
             <p className="text-sm">Bugün ders bulunmuyor</p>
           </Card>
         ) : (
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
             {todayClasses.map((cls) => (
               <Link key={cls.id} to={`/class/${cls.id}`}>
                 <Card className="p-4 flex items-center gap-4 hover:shadow-md transition-all active:scale-[0.98]">
