@@ -6,10 +6,17 @@ import PullToRefresh from "@/components/PullToRefresh";
 import ExpiredMembershipModal from "@/components/ExpiredMembershipModal";
 import { format, addDays, startOfWeek, isSameDay, parseISO, isSameWeek } from "date-fns";
 import { tr } from "date-fns/locale";
-import { Clock, Users, ChevronLeft, ChevronRight } from "lucide-react";
+import { Clock, Users, ChevronLeft, ChevronRight, Calendar } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import CalendarPicker from "@/components/CalendarPicker.jsx";
 
 const categoryEmojis = {
   hyrox: "🏃", crossfit: "🔥", fitness: "🏋️", other: "⭐",
@@ -19,6 +26,8 @@ export default function ClassCalendar() {
   const queryClient = useQueryClient();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [weekStart, setWeekStart] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }));
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [touchStart, setTouchStart] = useState(null);
 
   const weekDays = useMemo(() => {
     return Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
@@ -33,6 +42,38 @@ export default function ClassCalendar() {
 
   const handleRefresh = async () => {
     await queryClient.invalidateQueries({ queryKey: ["classes", dateStr] });
+  };
+
+  const handleDateSelect = (date) => {
+    setSelectedDate(date);
+    const newWeekStart = startOfWeek(date, { weekStartsOn: 1 });
+    setWeekStart(newWeekStart);
+    setShowCalendar(false);
+  };
+
+  const handleTouchStart = (e) => {
+    setTouchStart(e.touches[0].clientX);
+  };
+
+  const handleTouchEnd = (e) => {
+    if (!touchStart) return;
+    const touchEnd = e.changedTouches[0].clientX;
+    const diff = touchStart - touchEnd;
+
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) {
+        const newDate = addDays(selectedDate, 1);
+        const newWeekStart = startOfWeek(newDate, { weekStartsOn: 1 });
+        setWeekStart(newWeekStart);
+        setSelectedDate(newDate);
+      } else {
+        const newDate = addDays(selectedDate, -1);
+        const newWeekStart = startOfWeek(newDate, { weekStartsOn: 1 });
+        setWeekStart(newWeekStart);
+        setSelectedDate(newDate);
+      }
+    }
+    setTouchStart(null);
   };
 
   return (
@@ -57,9 +98,14 @@ export default function ClassCalendar() {
           >
           <ChevronLeft className="w-4 h-4" />
           </Button>
-          <p className="text-sm font-medium text-muted-foreground">
-          {format(weekStart, "MMMM yyyy", { locale: tr })}
-          </p>
+          <Button
+            variant="ghost"
+            className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
+            onClick={() => setShowCalendar(true)}
+          >
+            <Calendar className="w-4 h-4" />
+            {format(weekStart, "MMMM yyyy", { locale: tr })}
+          </Button>
           <Button
           variant="ghost"
           size="icon"
@@ -76,7 +122,11 @@ export default function ClassCalendar() {
       </div>
 
       {/* Week strip */}
-      <div className="flex gap-1.5 mb-6 overflow-x-auto pb-1">
+      <div 
+        className="flex gap-1.5 mb-6 overflow-x-auto pb-1"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
         {weekDays.map((day) => {
           const isSelected = isSameDay(day, selectedDate);
           const isToday = isSameDay(day, new Date());
@@ -169,6 +219,15 @@ export default function ClassCalendar() {
       )}
     </div>
     </PullToRefresh>
+
+    <Dialog open={showCalendar} onOpenChange={setShowCalendar}>
+      <DialogContent className="w-full">
+        <DialogHeader>
+          <DialogTitle>Tarih Seç</DialogTitle>
+        </DialogHeader>
+        <CalendarPicker minDate={new Date()} onDateSelect={handleDateSelect} />
+      </DialogContent>
+    </Dialog>
     </>
   );
 }
