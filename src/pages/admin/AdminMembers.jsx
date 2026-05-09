@@ -297,7 +297,11 @@ export default function AdminMembers() {
               </div>
               <div>
                 <Label>Plan</Label>
-                <Select value={editForm.plan_name} onValueChange={(v) => setEditForm({ ...editForm, plan_name: v })}>
+                <Select value={editForm.plan_name} onValueChange={(v) => {
+                  const months = getPlanDuration(v);
+                  const newEnd = format(addDays(parseISO(editForm.start_date), months * 30), "yyyy-MM-dd");
+                  setEditForm({ ...editForm, plan_name: v, end_date: newEnd });
+                }}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Aylık">Aylık</SelectItem>
