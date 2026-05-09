@@ -183,7 +183,7 @@ export default function ClassCalendar() {
           <p className="text-sm">Bu tarihte ders bulunmuyor</p>
         </Card>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-10">
            {classes.map((cls) => {
             const isFull = (cls.current_count || 0) >= cls.capacity;
             return (
