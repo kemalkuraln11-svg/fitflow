@@ -164,7 +164,7 @@ export default function ClassDetail() {
         )
         ) : classStarted ? (
         <div className="w-full h-14 flex items-center justify-center rounded-xl bg-destructive/10 border border-destructive/30 text-destructive font-semibold text-sm text-center px-4">
-          Ders başladı. Rezervasyon yapılamazsınız.
+          Ders başladı. Rezervasyon yapamazsınız.
         </div>
         ) : (
         <Button
