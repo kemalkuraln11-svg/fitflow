@@ -37,12 +37,12 @@ export default function ReservationsBottomSheet({ reservations = [] }) {
       )}
 
       {/* Bottom Sheet */}
-      <div
-        className={`fixed bottom-0 left-0 right-0 z-50 bg-background rounded-t-3xl shadow-2xl transition-transform duration-300 ${
-          open ? "translate-y-0" : "translate-y-full"
-        }`}
-        style={{ height: reservations.length <= 5 ? "auto" : "60vh", maxHeight: "60vh" }}
-      >
+<div
+  className={`fixed bottom-0 left-0 right-0 z-50 bg-background rounded-t-3xl shadow-2xl transition-transform duration-300 ${
+    open ? "translate-y-0" : "translate-y-full"
+  }`}
+  style={{ height: "75vh", maxHeight: "75vh" }}
+>
         {/* Handle */}
         <div className="flex justify-center pt-3 pb-1">
           <div className="w-10 h-1 bg-muted rounded-full" />
