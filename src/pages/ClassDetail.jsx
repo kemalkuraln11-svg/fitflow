@@ -93,15 +93,6 @@ export default function ClassDetail() {
 
   return (
     <div className="px-4 pt-6 pb-8">
-      {/* Back button */}
-      <button
-        onClick={() => navigate(-1)}
-        className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-6"
-      >
-        <ArrowLeft className="w-5 h-5" />
-        <span className="text-sm font-medium">Geri</span>
-      </button>
-
       {/* Hero */}
       <div className="text-center mb-6">
         <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center text-4xl mx-auto mb-4">

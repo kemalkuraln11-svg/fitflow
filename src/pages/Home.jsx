@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useMemberAuth } from "@/lib/MemberAuthContext";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import PullToRefresh from "@/components/PullToRefresh";
 import { format, isToday, isTomorrow, parseISO } from "date-fns";
 import { tr } from "date-fns/locale";
 import { Calendar, Clock, Users, ChevronRight } from "lucide-react";
@@ -17,7 +18,7 @@ const categoryEmojis = {
 
 export default function Home() {
   const { member } = useMemberAuth();
-
+  const queryClient = useQueryClient();
   const today = format(new Date(), "yyyy-MM-dd");
 
   const { data: todayClasses = [] } = useQuery({
@@ -42,7 +43,12 @@ export default function Home() {
     ? Math.max(0, Math.ceil((new Date(membership.end_date) - new Date()) / (1000 * 60 * 60 * 24)))
     : 0;
 
+  const handleRefresh = async () => {
+    await queryClient.invalidateQueries();
+  };
+
   return (
+    <PullToRefresh onRefresh={handleRefresh}>
     <div className="px-4 pt-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
@@ -139,5 +145,6 @@ export default function Home() {
         </div>
       )}
     </div>
+    </PullToRefresh>
   );
 }

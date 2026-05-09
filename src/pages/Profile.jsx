@@ -1,15 +1,18 @@
+import { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useMemberAuth } from "@/lib/MemberAuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { format, parseISO, differenceInDays } from "date-fns";
 import { tr } from "date-fns/locale";
-import { User, Calendar, LogOut, Clock } from "lucide-react";
+import { User, Calendar, LogOut, Clock, Trash2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export default function Profile() {
   const { member, logout } = useMemberAuth();
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const { data: membership } = useQuery({
     queryKey: ["myMembership", member?.id],
@@ -116,7 +119,38 @@ export default function Profile() {
           <LogOut className="w-5 h-5" />
           Çıkış Yap
         </Button>
+        <Button
+          variant="ghost"
+          className="w-full justify-start gap-3 h-12 text-muted-foreground hover:text-destructive"
+          onClick={() => setShowDeleteDialog(true)}
+        >
+          <Trash2 className="w-5 h-5" />
+          Hesabı Sil
+        </Button>
       </div>
+
+      {/* Account Deletion Dialog */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Hesabı Sil</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 mt-2">
+            <p className="text-sm text-muted-foreground">
+              Hesabınızı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz. Tüm rezervasyonlarınız ve üyelik bilgileriniz silinecektir.
+            </p>
+            <p className="text-sm font-medium">Hesap silme işlemi için lütfen yöneticinizle iletişime geçin.</p>
+            <div className="flex gap-3">
+              <Button variant="outline" className="flex-1" onClick={() => setShowDeleteDialog(false)}>
+                Vazgeç
+              </Button>
+              <Button variant="destructive" className="flex-1" onClick={() => setShowDeleteDialog(false)}>
+                Anladım
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

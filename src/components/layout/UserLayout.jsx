@@ -1,5 +1,6 @@
 import { Outlet } from "react-router-dom";
 import MobileNav from "./MobileNav";
+import TopHeader from "./TopHeader";
 import { MemberAuthProvider, useMemberAuth } from "@/lib/MemberAuthContext";
 import MemberLoginScreen from "@/components/MemberLoginScreen";
 
@@ -20,6 +21,7 @@ function UserLayoutInner() {
 
   return (
     <div className="min-h-[100dvh] bg-background flex flex-col max-w-md mx-auto">
+      <TopHeader />
       <main className="flex-1 overflow-y-auto pb-20">
         <Outlet />
       </main>

@@ -1,7 +1,8 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import PullToRefresh from "@/components/PullToRefresh";
 import { format, addDays, startOfWeek, isSameDay, parseISO } from "date-fns";
 import { tr } from "date-fns/locale";
 import { Clock, Users, ChevronLeft, ChevronRight } from "lucide-react";
@@ -14,6 +15,7 @@ const categoryEmojis = {
 };
 
 export default function ClassCalendar() {
+  const queryClient = useQueryClient();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [weekStart, setWeekStart] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }));
 
@@ -28,7 +30,12 @@ export default function ClassCalendar() {
     queryFn: () => base44.entities.ClassSchedule.filter({ date: dateStr }, "start_time"),
   });
 
+  const handleRefresh = async () => {
+    await queryClient.invalidateQueries({ queryKey: ["classes", dateStr] });
+  };
+
   return (
+    <PullToRefresh onRefresh={handleRefresh}>
     <div className="px-4 pt-6">
       <h1 className="text-2xl font-bold tracking-tight mb-5">Takvim</h1>
 
@@ -148,5 +155,6 @@ export default function ClassCalendar() {
         </div>
       )}
     </div>
+    </PullToRefresh>
   );
 }
