@@ -28,9 +28,9 @@ export default function MemberLoginScreen() {
   };
 
   return (
-    <div className="min-h-[100dvh] bg-background flex flex-col items-center justify-center px-6 max-w-md mx-auto">
+    <div className="min-h-[100dvh] bg-background flex flex-col items-center justify-center px-6 max-w-md mx-auto overflow-y-auto">
       {/* Logo */}
-      <div className="flex flex-col items-center mb-10">
+      <div className="flex flex-col items-center mb-10 mt-6">
         <img
           src="https://media.base44.com/images/public/69ff298a8db8d1511d286b61/2bf5548a7_ChatGPTImage9May202623_29_58.png"
           alt="FitKafa Hyrox"
@@ -40,7 +40,7 @@ export default function MemberLoginScreen() {
         <p className="text-muted-foreground text-sm mt-1">Hesabınıza giriş yapın</p>
       </div>
 
-      <form onSubmit={handleLogin} className="w-full space-y-4">
+      <form onSubmit={handleLogin} className="w-full space-y-4 mb-6">
         <div>
           <Label>Kullanıcı Adı</Label>
           <Input

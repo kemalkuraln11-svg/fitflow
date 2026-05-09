@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -187,7 +187,7 @@ export default function ClassCalendar() {
           <p className="text-sm">Bu tarihte ders bulunmuyor</p>
         </Card>
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-3">
            {classes.map((cls, idx) => {
              const showMore = classes.length > 3 && idx === 2 && !expandedClasses;
             const isFull = (cls.current_count || 0) >= cls.capacity;
@@ -195,8 +195,8 @@ export default function ClassCalendar() {
             if (classes.length > 3 && idx > 2 && !expandedClasses) return null;
 
             return (
-              <>
-              <Link key={cls.id} to={`/class/${cls.id}`}>
+              <React.Fragment key={cls.id}>
+              <Link to={`/class/${cls.id}`}>
                 <Card className={cn(
                     "p-6 flex items-center gap-5 transition-all active:scale-[0.98] hover:shadow-lg",
                   isFull ? "opacity-60" : "hover:shadow-md"
@@ -238,7 +238,7 @@ export default function ClassCalendar() {
                   <ChevronDown className="w-4 h-4" />
                 </button>
               )}
-              </>
+              </React.Fragment>
               );
               })}
               {expandedClasses && classes.length > 3 && (
@@ -250,7 +250,7 @@ export default function ClassCalendar() {
                   <ChevronDown className="w-4 h-4 rotate-180" />
                 </button>
               )}
-              </div>
+             </div>
               )}
               </div>
               </PullToRefresh>
