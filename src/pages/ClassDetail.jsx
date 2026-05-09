@@ -158,7 +158,7 @@ export default function ClassDetail() {
           </Button>
         ) : (
           <div className="w-full h-14 flex items-center justify-center rounded-xl bg-destructive/10 border border-destructive/30 text-destructive font-semibold text-sm text-center px-4">
-            Dersin başlangıcına 30 dakikadan az kala iptal edilemez
+            Dersin başlangıcına {cls.cancellation_deadline_minutes || 30} dakikadan az kala iptal edilemez
           </div>
         )
         ) : (
