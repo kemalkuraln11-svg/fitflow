@@ -88,15 +88,15 @@ export default function Home() {
     <>
     <ExpiredMembershipModal />
     <PullToRefresh onRefresh={handleRefresh}>
-    <div className="px-6 pt-6 pb-24">
+    <div className="px-4 pt-4 pb-24">
       {/* Header */}
-      <div className="mb-8 flex items-start gap-4">
-        <div className="w-20 h-20 rounded-3xl bg-primary/10 flex items-center justify-center text-5xl flex-shrink-0">
+      <div className="mb-6 flex items-start gap-3">
+        <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-3xl flex-shrink-0">
           {member?.gender === "female" ? "🏃‍♀️" : "🏃‍♂️"}
         </div>
         <div className="flex-1 pt-1">
-          <p className="text-muted-foreground text-base">Merhaba,</p>
-          <h1 className="text-3xl font-bold">{member?.user_name
+          <p className="text-muted-foreground text-sm">Merhaba,</p>
+          <h1 className="text-2xl font-bold">{member?.user_name
     ? member.user_name
         .split(" ")
         .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
@@ -109,59 +109,59 @@ export default function Home() {
       <div className="space-y-8">
         {/* Membership Card */}
         {membership && (
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-primary/70 p-8 text-primary-foreground">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-8 translate-x-8" />
-            <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-4 -translate-x-4" />
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-primary/70 p-5 text-primary-foreground">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-6 translate-x-6" />
+            <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/5 rounded-full translate-y-2 -translate-x-2" />
             <div className="relative z-10">
               <p className="text-xs opacity-80 font-medium">{membership.plan_name ? `${Math.floor(Math.random() * 12) + 1} Aylık` : "Üyelik"}</p>
-              <p className="text-5xl font-bold mt-3">{daysLeft}</p>
-              <p className="text-sm opacity-70 mt-1">kalan süre</p>
-              <div className="mt-6 pt-4 border-t border-white/20 flex items-center gap-2 text-xs opacity-70">
-                <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
-                <span>Bitiş; {format(parseISO(membership.end_date), "d MMMM yyyy", { locale: tr })}</span>
+              <p className="text-4xl font-bold mt-2">{daysLeft}</p>
+              <p className="text-xs opacity-70 mt-0.5">kalan süre</p>
+              <div className="mt-4 pt-3 border-t border-white/20 flex items-center gap-2 text-xs opacity-70">
+                <Calendar className="w-3 h-3 flex-shrink-0" />
+                <span>{format(parseISO(membership.end_date), "d MMMM", { locale: tr })}</span>
               </div>
             </div>
           </div>
         )}
 
         {/* Classes & Reservations */}
-        <div className="space-y-8">
+        <div className="space-y-6">
           {/* Today's Classes */}
           <div>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold">Bugünkü Dersler</h2>
-              <Link to="/calendar" className="text-primary text-sm font-medium flex items-center gap-0.5">
-                Tümü <ChevronRight className="w-4 h-4" />
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold">Bugünkü Dersler</h2>
+              <Link to="/calendar" className="text-primary text-xs font-medium flex items-center gap-0.5">
+                Tümü <ChevronRight className="w-3.5 h-3.5" />
               </Link>
             </div>
 
             {todayClasses.length === 0 ? (
-              <Card className="p-6 text-center text-muted-foreground">
-                <Calendar className="w-8 h-8 mx-auto mb-2 opacity-40" />
-                <p className="text-sm">Bugün ders bulunmuyor</p>
+              <Card className="p-4 text-center text-muted-foreground">
+                <Calendar className="w-6 h-6 mx-auto mb-1 opacity-40" />
+                <p className="text-xs">Bugün ders bulunmuyor</p>
               </Card>
             ) : (
-              <div className="grid grid-cols-1 gap-6">
+              <div className="grid grid-cols-1 gap-3">
             {todayClasses.map((cls) => (
               <Link key={cls.id} to={`/class/${cls.id}`}>
-                <Card className="p-4 flex items-center gap-4 hover:shadow-lg transition-all active:scale-[0.98]">
-                  <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-2xl flex-shrink-0">
+                <Card className="p-3 flex items-center gap-3 hover:shadow-lg transition-all active:scale-[0.98]">
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-xl flex-shrink-0">
                     {categoryEmojis[cls.category] || "⭐"}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-base leading-snug">{cls.title}</p>
-                    <div className="flex items-center gap-4 text-xs text-muted-foreground mt-1">
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-3.5 h-3.5 flex-shrink-0" />
+                    <p className="font-semibold text-sm leading-snug">{cls.title}</p>
+                    <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
+                      <span className="flex items-center gap-0.5">
+                        <Clock className="w-3 h-3 flex-shrink-0" />
                         {cls.start_time} - {cls.end_time}
                       </span>
-                      <span className="flex items-center gap-1">
-                        <Users className="w-3.5 h-3.5 flex-shrink-0" />
+                      <span className="flex items-center gap-0.5">
+                        <Users className="w-3 h-3 flex-shrink-0" />
                         {cls.current_count || 0}/{cls.capacity}
                       </span>
                     </div>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+                  <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                 </Card>
               </Link>
             ))}
