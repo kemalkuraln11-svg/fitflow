@@ -193,7 +193,7 @@ export default function ClassCalendar() {
             if (classes.length > 3 && idx > 2 && !expandedClasses) return null;
 
             return (
-              <React.Fragment key={cls.id}>
+              <div key={cls.id}>
               <Link to={isPastClass ? undefined : `/class/${cls.id}`} className={isPastClass ? "pointer-events-none" : ""}>
                 <Card className={cn(
                     "p-4 flex items-center gap-3 transition-all",
@@ -236,7 +236,7 @@ export default function ClassCalendar() {
                   <ChevronDown className="w-3.5 h-3.5" />
                 </button>
               )}
-              </React.Fragment>
+              </div>
               );
               })}
               {expandedClasses && classes.length > 3 && (

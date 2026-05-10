@@ -10,8 +10,6 @@ export default function AnimatedRoutes({ children }) {
   const location = useLocation();
   const queryClient = useQueryClient();
   const [showSkeleton, setShowSkeleton] = useState(false);
-  const prevPath = useState(location.pathname)[0];
-
   useEffect(() => {
     const isTabSwitch = TAB_PATHS.includes(location.pathname);
     if (!isTabSwitch) return;
