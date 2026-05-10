@@ -85,11 +85,10 @@ export default function ClassDetail() {
       queryClient.invalidateQueries({ queryKey: ["myReservations"] });
       queryClient.invalidateQueries({ queryKey: ["todayClasses"] });
       toast.success("Başarıyla kayıt yaptırdınız!", {
-        description: cls?.title,
         position: "top-right",
-        duration: 3000,
+        duration: 2000,
       });
-      setTimeout(() => navigate("/"), 2000);
+      setTimeout(() => navigate("/"), 4000);
     },
     onError: (err) => {
       if (err.message !== "conflict") toast.error(err.message);
@@ -109,11 +108,10 @@ export default function ClassDetail() {
       queryClient.invalidateQueries({ queryKey: ["myReservations"] });
       queryClient.invalidateQueries({ queryKey: ["todayClasses"] });
       toast.error("Rezervasyon iptal edildi", {
-        description: cls?.title,
         position: "top-right",
-        duration: 3000,
+        duration: 2000,
       });
-      setTimeout(() => navigate("/"), 2000);
+      setTimeout(() => navigate("/"), 4000);
     },
   });
 
