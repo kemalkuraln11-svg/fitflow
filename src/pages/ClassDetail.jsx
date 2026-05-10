@@ -46,12 +46,13 @@ export default function ClassDetail() {
   const reserveMutation = useMutation({
     mutationFn: async () => {
       // Aynı gün ve saatte başka bir rezervasyon var mı kontrol et
-      const existing = await base44.entities.Reservation.filter({
+      const allMyReservations = await base44.entities.Reservation.filter({
         user_email: user.user_email,
-        class_date: cls.date,
-        class_time: cls.start_time,
         status: "confirmed",
       });
+      const existing = allMyReservations.filter(
+        (r) => r.class_date === cls.date && r.class_time === cls.start_time && r.class_id !== id
+      );
       if (existing.length > 0) {
         // Çakışan dersin detaylarını getir
         const conflictClass = await base44.entities.ClassSchedule.filter({ id: existing[0].class_id });
