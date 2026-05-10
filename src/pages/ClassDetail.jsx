@@ -43,6 +43,17 @@ export default function ClassDetail() {
 
   const reserveMutation = useMutation({
     mutationFn: async () => {
+      // Aynı gün ve saatte başka bir rezervasyon var mı kontrol et
+      const existing = await base44.entities.Reservation.filter({
+        user_email: user.user_email,
+        class_date: cls.date,
+        class_time: cls.start_time,
+        status: "confirmed",
+      });
+      if (existing.length > 0) {
+        throw new Error("Bu gün ve saatte zaten bir rezervasyonunuz bulunuyor.");
+      }
+
       await base44.entities.Reservation.create({
         class_id: id,
         class_title: cls.title,
@@ -63,6 +74,9 @@ export default function ClassDetail() {
       queryClient.invalidateQueries({ queryKey: ["todayClasses"] });
       toast.success("Rezervasyon yapıldı!");
       navigate("/");
+    },
+    onError: (err) => {
+      toast.error(err.message);
     },
   });
 
