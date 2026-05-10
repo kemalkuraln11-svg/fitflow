@@ -44,7 +44,7 @@ export default function MemberLoginScreen() {
         <div>
              <Label className="text-xs">Kullanıcı Adı</Label>
              <Input
-               className="h-10 mt-0.5"
+               className="h-10 mt-0.5 text-sm"
                style={{ fontSize: '16px' }}
                placeholder="kullanıcı adınız"
                value={username}
