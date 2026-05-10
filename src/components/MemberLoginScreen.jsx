@@ -44,7 +44,7 @@ export default function MemberLoginScreen() {
         <div>
              <Label className="text-xs">Kullanıcı Adı</Label>
              <Input
-               className="h-10 mt-0.5 text-base"
+               className="h-10 mt-0.5 text-base sm:text-base"
                placeholder="kullanıcı adınız"
                value={username}
                onChange={(e) => setUsername(e.target.value)}
@@ -56,7 +56,7 @@ export default function MemberLoginScreen() {
              <Label className="text-xs">Şifre</Label>
              <div className="relative mt-0.5">
                <Input
-                 className="h-10 pr-10 text-base"
+                 className="h-10 pr-10 text-base sm:text-base"
                  type={showPassword ? "text" : "password"}
                  placeholder="••••••••"
                  value={password}
