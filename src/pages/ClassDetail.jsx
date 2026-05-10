@@ -1,11 +1,12 @@
 import { useParams, useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useMemberAuth } from "@/lib/MemberAuthContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import ExpiredMembershipModal from "@/components/ExpiredMembershipModal";
 import { format, parseISO, parse, isBefore, addMinutes } from "date-fns";
 import { tr } from "date-fns/locale";
-import { Clock, Users, User } from "lucide-react";
+import { Clock, Users, User, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
@@ -19,6 +20,7 @@ export default function ClassDetail() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { member: user } = useMemberAuth();
+  const [conflictPopup, setConflictPopup] = useState(false);
 
   const { data: cls, isLoading } = useQuery({
     queryKey: ["class", id],
@@ -51,7 +53,8 @@ export default function ClassDetail() {
         status: "confirmed",
       });
       if (existing.length > 0) {
-        throw new Error("Bu gün ve saatte zaten bir rezervasyonunuz bulunuyor.");
+        setConflictPopup(true);
+        throw new Error("conflict");
       }
 
       await base44.entities.Reservation.create({
@@ -76,7 +79,7 @@ export default function ClassDetail() {
       navigate("/");
     },
     onError: (err) => {
-      toast.error(err.message);
+      if (err.message !== "conflict") toast.error(err.message);
     },
   });
 
@@ -121,6 +124,24 @@ export default function ClassDetail() {
   return (
     <>
     <ExpiredMembershipModal />
+
+    {/* Conflict Popup */}
+    {conflictPopup && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-6">
+        <div className="bg-card rounded-2xl shadow-2xl p-6 w-full max-w-sm text-center">
+          <div className="w-14 h-14 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-4">
+            <AlertTriangle className="w-7 h-7 text-amber-500" />
+          </div>
+          <h2 className="text-base font-bold mb-2">Çakışan Rezervasyon</h2>
+          <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
+            Aynı gün aynı saatte başka bir derse rezervasyon yaptırdınız. Diğer dersinizi iptal edip bu derse kayıt olabilirsiniz.
+          </p>
+          <Button className="w-full" onClick={() => setConflictPopup(false)}>
+            Tamam
+          </Button>
+        </div>
+      </div>
+    )}
     <div className="px-4 pt-4 pb-24">
       {/* Hero */}
        <div className="text-center mb-6">
