@@ -53,7 +53,15 @@ export default function ClassDetail() {
         status: "confirmed",
       });
       if (existing.length > 0) {
-        setConflictPopup({ title: existing[0].class_title });
+        // Çakışan dersin detaylarını getir
+        const conflictClass = await base44.entities.ClassSchedule.filter({ id: existing[0].class_id });
+        const cc = conflictClass[0] || {};
+        setConflictPopup({
+          title: existing[0].class_title,
+          date: existing[0].class_date,
+          time: existing[0].class_time,
+          instructor: cc.instructor || null,
+        });
         throw new Error("conflict");
       }
 
@@ -133,9 +141,21 @@ export default function ClassDetail() {
             <AlertTriangle className="w-7 h-7 text-amber-500" />
           </div>
           <h2 className="text-base font-bold mb-2">Aynı Saatte Aktif Rezervasyonunuz Var!</h2>
-          <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
-            Aynı gün aynı saatte <span className="font-bold text-foreground">{conflictPopup?.title}</span> dersine rezervasyon yaptırdınız. Diğer dersinizi iptal edip bu derse kayıt olabilirsiniz.
+          <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
+            Aynı gün aynı saatte başka bir derse rezervasyon yaptırdınız.
           </p>
+          <div className="bg-muted rounded-xl px-4 py-3 mb-6 text-left space-y-1.5">
+            <p className="font-bold text-foreground text-sm">{conflictPopup?.title}</p>
+            {conflictPopup?.date && (
+              <p className="text-xs text-muted-foreground">
+                📅 {format(parseISO(conflictPopup.date), "d MMMM", { locale: tr })} · {conflictPopup?.time}
+              </p>
+            )}
+            {conflictPopup?.instructor && (
+              <p className="text-xs text-muted-foreground">👤 {conflictPopup.instructor}</p>
+            )}
+          </div>
+          <p className="text-xs text-muted-foreground mb-6">Diğer dersinizi iptal edip bu derse kayıt olabilirsiniz.</p>
           <Button className="w-full" onClick={() => setConflictPopup(null)}>
             Tamam
           </Button>
