@@ -1,37 +1,21 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useQueryClient } from '@tanstack/react-query';
 import PageSkeleton from '@/components/PageSkeleton';
 
 const TAB_PATHS = ['/', '/calendar', '/profile'];
 
 export default function AnimatedRoutes({ children }) {
   const location = useLocation();
-  const queryClient = useQueryClient();
   const [showSkeleton, setShowSkeleton] = useState(false);
+
   useEffect(() => {
     const isTabSwitch = TAB_PATHS.includes(location.pathname);
     if (!isTabSwitch) return;
 
+    // Sadece skeleton göster — invalidate etme, staleTime bunu yönetir
     setShowSkeleton(true);
-
-    // Sadece o sayfanın ihtiyacı olan query'leri invalidate et
-    if (location.pathname === '/') {
-      queryClient.invalidateQueries({ queryKey: ['todayClasses'] });
-      queryClient.invalidateQueries({ queryKey: ['myReservations'] });
-      queryClient.invalidateQueries({ queryKey: ['myMembership'] });
-    } else if (location.pathname === '/calendar') {
-      queryClient.invalidateQueries({ queryKey: ['classes'] });
-    } else if (location.pathname === '/profile') {
-      queryClient.invalidateQueries({ queryKey: ['myAllReservations'] });
-      queryClient.invalidateQueries({ queryKey: ['myMembership'] });
-    }
-
-    const timer = setTimeout(() => {
-      setShowSkeleton(false);
-    }, 400);
-
+    const timer = setTimeout(() => setShowSkeleton(false), 300);
     return () => clearTimeout(timer);
   }, [location.pathname]);
 
