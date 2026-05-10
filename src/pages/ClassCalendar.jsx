@@ -27,7 +27,7 @@ export default function ClassCalendar() {
   const today = useMemo(() => new Date(), []);
   const [selectedDate, setSelectedDate] = useState(today);
   // Bugünü her zaman şeridin ortasında göster (3 gün önce, bugün, 3 gün sonra)
-  const [weekStart, setWeekStart] = useState(() => addDays(today, -3));
+  const [weekStart, setWeekStart] = useState(() => today);
   const [showCalendar, setShowCalendar] = useState(false);
   const [touchStart, setTouchStart] = useState(null);
   const [expandedClasses, setExpandedClasses] = useState(false);
@@ -49,8 +49,8 @@ export default function ClassCalendar() {
 
   const handleDateSelect = (date) => {
     setSelectedDate(date);
-    // Seçilen tarihi şeridin ortasına al
-    setWeekStart(addDays(date, -3));
+    // Seçilen tarihi şeridin başına al
+    setWeekStart(date);
     setShowCalendar(false);
     setExpandedClasses(false);
   };
