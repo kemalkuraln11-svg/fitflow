@@ -4,7 +4,7 @@ import { base44 } from "@/api/base44Client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import PullToRefresh from "@/components/PullToRefresh";
 import ExpiredMembershipModal from "@/components/ExpiredMembershipModal";
-import { format, addDays, startOfWeek, isSameDay, parseISO, isSameWeek } from "date-fns";
+import { format, addDays, startOfWeek, isSameDay, parseISO, isSameWeek, isPast, parse } from "date-fns";
 import { tr } from "date-fns/locale";
 import { Clock, Users, ChevronLeft, ChevronRight, Calendar, ChevronDown } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -191,15 +191,17 @@ export default function ClassCalendar() {
            {classes.map((cls, idx) => {
              const showMore = classes.length > 3 && idx === 2 && !expandedClasses;
             const isFull = (cls.current_count || 0) >= cls.capacity;
+            const classDateTime = parse(`${cls.date} ${cls.start_time}`, "yyyy-MM-dd HH:mm", new Date());
+            const isPastClass = isPast(classDateTime);
 
             if (classes.length > 3 && idx > 2 && !expandedClasses) return null;
 
             return (
               <React.Fragment key={cls.id}>
-              <Link to={`/class/${cls.id}`}>
+              <Link to={isPastClass ? undefined : `/class/${cls.id}`} className={isPastClass ? "pointer-events-none" : ""}>
                 <Card className={cn(
-                    "p-4 flex items-center gap-3 transition-all active:scale-[0.98] hover:shadow-lg",
-                  isFull ? "opacity-60" : "hover:shadow-md"
+                    "p-4 flex items-center gap-3 transition-all",
+                  isPastClass ? "opacity-40" : isFull ? "opacity-60 hover:shadow-md active:scale-[0.98]" : "hover:shadow-lg active:scale-[0.98]"
                 )}>
                   <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-lg shrink-0">
                     {categoryEmojis[cls.category] || "⭐"}

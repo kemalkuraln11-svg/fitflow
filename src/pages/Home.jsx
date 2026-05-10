@@ -4,7 +4,7 @@ import { useMemberAuth } from "@/lib/MemberAuthContext";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import PullToRefresh from "@/components/PullToRefresh";
 import ExpiredMembershipModal from "@/components/ExpiredMembershipModal";
-import { format, isToday, isTomorrow, parseISO, differenceInDays, parse, isBefore } from "date-fns";
+import { format, isToday, isTomorrow, parseISO, differenceInDays, parse, isBefore, isPast } from "date-fns";
 import { tr } from "date-fns/locale";
 import { Calendar, Clock, Users, ChevronRight } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -145,9 +145,12 @@ export default function Home() {
               </Card>
             ) : (
               <div className="grid grid-cols-1 gap-3">
-            {todayClasses.map((cls) => (
-              <Link key={cls.id} to={`/class/${cls.id}`}>
-                <Card className="p-3 flex items-center gap-3 hover:shadow-lg transition-all active:scale-[0.98]">
+            {todayClasses.map((cls) => {
+              const classDateTime = parse(`${cls.date} ${cls.start_time}`, "yyyy-MM-dd HH:mm", new Date());
+              const isPastClass = isPast(classDateTime);
+              return (
+              <Link key={cls.id} to={isPastClass ? undefined : `/class/${cls.id}`} className={isPastClass ? "pointer-events-none" : ""}>
+                <Card className={`p-3 flex items-center gap-3 transition-all ${isPastClass ? "opacity-40" : "hover:shadow-lg active:scale-[0.98]"}`}>
                   <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-xl flex-shrink-0">
                     {categoryEmojis[cls.category] || "⭐"}
                   </div>
@@ -167,7 +170,8 @@ export default function Home() {
                   <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                 </Card>
               </Link>
-            ))}
+              );
+            })}
           </div>
             )}
           </div>
