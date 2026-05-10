@@ -26,7 +26,8 @@ export default function ClassCalendar() {
   const queryClient = useQueryClient();
   const today = useMemo(() => new Date(), []);
   const [selectedDate, setSelectedDate] = useState(today);
-  const [weekStart, setWeekStart] = useState(() => startOfWeek(today, { weekStartsOn: 1 }));
+  // Bugünü her zaman şeridin ortasında göster (3 gün önce, bugün, 3 gün sonra)
+  const [weekStart, setWeekStart] = useState(() => addDays(today, -3));
   const [showCalendar, setShowCalendar] = useState(false);
   const [touchStart, setTouchStart] = useState(null);
   const [expandedClasses, setExpandedClasses] = useState(false);
@@ -48,8 +49,8 @@ export default function ClassCalendar() {
 
   const handleDateSelect = (date) => {
     setSelectedDate(date);
-    const newWeekStart = startOfWeek(date, { weekStartsOn: 1 });
-    setWeekStart(newWeekStart);
+    // Seçilen tarihi şeridin ortasına al
+    setWeekStart(addDays(date, -3));
     setShowCalendar(false);
     setExpandedClasses(false);
   };
@@ -134,8 +135,6 @@ export default function ClassCalendar() {
               key={day.toISOString()}
               onClick={() => {
                 setSelectedDate(day);
-                const newWeekStart = startOfWeek(day, { weekStartsOn: 1 });
-                setWeekStart(newWeekStart);
               }}
                className={cn(
                   "flex flex-col items-center min-w-[56px] py-2.5 px-2 rounded-lg transition-all focus:outline-none focus:ring-0",
