@@ -91,7 +91,10 @@ export default function Home() {
     <div className="px-4 pt-4 pb-24">
       {/* Header */}
       <div className="mb-6 flex items-start gap-3">
-        <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-3xl flex-shrink-0">
+        <div
+          className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-3xl flex-shrink-0"
+          style={{ animation: "runningBob 0.5s ease-in-out infinite alternate" }}
+        >
           {member?.gender === "female" ? "🏃‍♀️" : "🏃‍♂️"}
         </div>
         <div className="flex-1 pt-1">

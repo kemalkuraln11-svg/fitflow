@@ -120,3 +120,12 @@
     -webkit-user-select: text;
   }
 }
+
+@keyframes runningBob {
+  from {
+    transform: rotate(-8deg) translateY(0px);
+  }
+  to {
+    transform: rotate(8deg) translateY(-4px);
+  }
+}
