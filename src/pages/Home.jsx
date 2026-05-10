@@ -113,7 +113,7 @@ export default function Home() {
             <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-6 translate-x-6" />
             <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/5 rounded-full translate-y-2 -translate-x-2" />
             <div className="relative z-10">
-              <p className="text-xs opacity-80 font-medium">{membership.plan_name ? `${Math.floor(Math.random() * 12) + 1} Aylık` : "Üyelik"}</p>
+              <p className="text-xs opacity-80 font-medium">{membership.plan_name || "Üyelik"}</p>
               <p className="text-4xl font-bold mt-2">{daysLeft}</p>
               <p className="text-xs opacity-70 mt-0.5">kalan süre</p>
               <div className="mt-4 pt-3 border-t border-white/20 flex items-center gap-2 text-xs opacity-70">
