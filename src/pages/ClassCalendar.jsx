@@ -65,7 +65,7 @@ export default function ClassCalendar() {
     const diff = touchStart - touchEnd;
 
     if (Math.abs(diff) > 50) {
-      const direction = diff > 0 ? 5 : -5;
+      const direction = diff > 0 ? 7 : -7;
       const newWeekStart = addDays(weekStart, direction);
       // Seçili tarihi de aynı yönde kaydır
       const newDate = addDays(selectedDate, direction);
@@ -90,9 +90,9 @@ export default function ClassCalendar() {
           size="icon"
           className="h-9 w-9"
           onClick={() => {
-            const newWeekStart = addDays(weekStart, -5);
+            const newWeekStart = addDays(weekStart, -7);
             setWeekStart(newWeekStart);
-            setSelectedDate(addDays(selectedDate, -5));
+            setSelectedDate(addDays(selectedDate, -7));
             setExpandedClasses(false);
           }}
           >
@@ -111,9 +111,9 @@ export default function ClassCalendar() {
           size="icon"
           className="h-9 w-9"
           onClick={() => {
-            const newWeekStart = addDays(weekStart, 5);
+            const newWeekStart = addDays(weekStart, 7);
             setWeekStart(newWeekStart);
-            setSelectedDate(addDays(selectedDate, 5));
+            setSelectedDate(addDays(selectedDate, 7));
             setExpandedClasses(false);
           }}
         >
