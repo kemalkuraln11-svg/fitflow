@@ -21,6 +21,7 @@ export default function ClassDetail() {
   const queryClient = useQueryClient();
   const { member: user } = useMemberAuth();
   const [conflictPopup, setConflictPopup] = useState(false);
+  const [done, setDone] = useState(false);
 
   const { data: cls, isLoading } = useQuery({
     queryKey: ["class", id],
@@ -84,11 +85,12 @@ export default function ClassDetail() {
       queryClient.invalidateQueries({ queryKey: ["myReservation", id] });
       queryClient.invalidateQueries({ queryKey: ["myReservations"] });
       queryClient.invalidateQueries({ queryKey: ["todayClasses"] });
+      setDone(true);
       toast.success("Başarıyla kayıt yaptırdınız!", {
         position: "top-right",
         duration: 2000,
       });
-      setTimeout(() => navigate("/"), 3000);
+      setTimeout(() => navigate("/"), 2000);
     },
     onError: (err) => {
       if (err.message !== "conflict") toast.error(err.message);
@@ -107,11 +109,12 @@ export default function ClassDetail() {
       queryClient.invalidateQueries({ queryKey: ["myReservation", id] });
       queryClient.invalidateQueries({ queryKey: ["myReservations"] });
       queryClient.invalidateQueries({ queryKey: ["todayClasses"] });
+      setDone(true);
       toast.error("Rezervasyon iptal edildi", {
         position: "top-right",
         duration: 2000,
       });
-      setTimeout(() => navigate("/"), 3000);
+      setTimeout(() => navigate("/"), 2000);
     },
   });
 
@@ -221,7 +224,7 @@ export default function ClassDetail() {
             variant="outline"
             className="w-full h-14 text-base font-semibold border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground"
             onClick={() => cancelMutation.mutate()}
-            disabled={cancelMutation.isPending}
+            disabled={cancelMutation.isPending || done}
           >
             {cancelMutation.isPending ? "İptal ediliyor..." : "Rezervasyonu İptal Et"}
           </Button>
@@ -238,7 +241,7 @@ export default function ClassDetail() {
         <Button
           className="w-full h-14 text-base font-semibold shadow-lg shadow-primary/25"
           onClick={() => reserveMutation.mutate()}
-          disabled={isFull || reserveMutation.isPending}
+          disabled={isFull || reserveMutation.isPending || done}
         >
           {reserveMutation.isPending
             ? "Rezervasyon yapılıyor..."
