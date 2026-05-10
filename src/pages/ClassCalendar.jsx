@@ -33,7 +33,7 @@ export default function ClassCalendar() {
   const [expandedClasses, setExpandedClasses] = useState(false);
 
   const weekDays = useMemo(() => {
-    return Array.from({ length: 5 }, (_, i) => addDays(weekStart, i));
+    return Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
   }, [weekStart]);
 
   const dateStr = format(selectedDate, "yyyy-MM-dd");
@@ -123,7 +123,7 @@ export default function ClassCalendar() {
 
       {/* Week strip */}
       <div 
-       className="flex gap-2 mb-6 overflow-x-auto pb-2"
+       className="flex gap-1 mb-6"
        onTouchStart={handleTouchStart}
        onTouchEnd={handleTouchEnd}
       >
@@ -137,7 +137,7 @@ export default function ClassCalendar() {
                 setSelectedDate(day);
               }}
                className={cn(
-                  "flex flex-col items-center min-w-[56px] py-2.5 px-2 rounded-lg transition-all focus:outline-none focus:ring-0",
+                  "flex flex-col items-center flex-1 py-2.5 px-1 rounded-lg transition-all focus:outline-none focus:ring-0",
                  isSelected
                    ? "bg-orange-500 text-white shadow-lg shadow-orange-500/30 active:bg-orange-500"
                    : isToday
