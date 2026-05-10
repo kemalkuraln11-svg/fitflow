@@ -53,7 +53,7 @@ export default function ClassDetail() {
         status: "confirmed",
       });
       if (existing.length > 0) {
-        setConflictPopup(true);
+        setConflictPopup({ title: existing[0].class_title });
         throw new Error("conflict");
       }
 
@@ -126,7 +126,7 @@ export default function ClassDetail() {
     <ExpiredMembershipModal />
 
     {/* Conflict Popup */}
-    {conflictPopup && (
+    {!!conflictPopup && (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-6">
         <div className="bg-card rounded-2xl shadow-2xl p-6 w-full max-w-sm text-center">
           <div className="w-14 h-14 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-4">
@@ -134,9 +134,9 @@ export default function ClassDetail() {
           </div>
           <h2 className="text-base font-bold mb-2">Aynı Saatte Aktif Rezervasyonunuz Var!</h2>
           <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
-            Aynı gün aynı saatte başka bir derse rezervasyon yaptırdınız. Diğer dersinizi iptal edip bu derse kayıt olabilirsiniz.
+            Aynı gün aynı saatte <span className="font-bold text-foreground">{conflictPopup?.title}</span> dersine rezervasyon yaptırdınız. Diğer dersinizi iptal edip bu derse kayıt olabilirsiniz.
           </p>
-          <Button className="w-full" onClick={() => setConflictPopup(false)}>
+          <Button className="w-full" onClick={() => setConflictPopup(null)}>
             Tamam
           </Button>
         </div>
