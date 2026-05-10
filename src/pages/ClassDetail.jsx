@@ -132,7 +132,7 @@ export default function ClassDetail() {
           <div className="w-14 h-14 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-4">
             <AlertTriangle className="w-7 h-7 text-amber-500" />
           </div>
-          <h2 className="text-base font-bold mb-2">Çakışan Rezervasyon</h2>
+          <h2 className="text-base font-bold mb-2">Aynı Saatte Aktif Rezervasyonunuz Var!</h2>
           <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
             Aynı gün aynı saatte başka bir derse rezervasyon yaptırdınız. Diğer dersinizi iptal edip bu derse kayıt olabilirsiniz.
           </p>
