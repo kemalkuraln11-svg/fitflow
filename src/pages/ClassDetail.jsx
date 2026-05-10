@@ -104,10 +104,16 @@ export default function ClassDetail() {
       });
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["class", id] });
+      queryClient.invalidateQueries({ queryKey: ["myReservation", id] });
       queryClient.invalidateQueries({ queryKey: ["myReservations"] });
       queryClient.invalidateQueries({ queryKey: ["todayClasses"] });
-      toast.success("Rezervasyon iptal edildi");
-      navigate("/");
+      toast.error("Rezervasyon iptal edildi", {
+        description: cls?.title,
+        position: "top-right",
+        duration: 3000,
+      });
+      setTimeout(() => navigate("/"), 2000);
     },
   });
 
