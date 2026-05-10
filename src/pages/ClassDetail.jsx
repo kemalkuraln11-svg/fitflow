@@ -88,7 +88,7 @@ export default function ClassDetail() {
         position: "top-right",
         duration: 2000,
       });
-      setTimeout(() => navigate("/"), 4000);
+      setTimeout(() => navigate("/"), 3000);
     },
     onError: (err) => {
       if (err.message !== "conflict") toast.error(err.message);
@@ -111,7 +111,7 @@ export default function ClassDetail() {
         position: "top-right",
         duration: 2000,
       });
-      setTimeout(() => navigate("/"), 4000);
+      setTimeout(() => navigate("/"), 3000);
     },
   });
 
