@@ -24,8 +24,9 @@ const categoryEmojis = {
 
 export default function ClassCalendar() {
   const queryClient = useQueryClient();
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [weekStart, setWeekStart] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }));
+  const today = useMemo(() => new Date(), []);
+  const [selectedDate, setSelectedDate] = useState(today);
+  const [weekStart, setWeekStart] = useState(() => startOfWeek(today, { weekStartsOn: 1 }));
   const [showCalendar, setShowCalendar] = useState(false);
   const [touchStart, setTouchStart] = useState(null);
   const [expandedClasses, setExpandedClasses] = useState(false);
@@ -63,9 +64,12 @@ export default function ClassCalendar() {
     const diff = touchStart - touchEnd;
 
     if (Math.abs(diff) > 50) {
-      const newDate = addDays(selectedDate, diff > 0 ? 1 : -1);
+      const direction = diff > 0 ? 7 : -7;
+      const newWeekStart = addDays(weekStart, direction);
+      // Seçili tarihi de aynı yönde kaydır
+      const newDate = addDays(selectedDate, direction);
+      setWeekStart(newWeekStart);
       setSelectedDate(newDate);
-      setWeekStart(startOfWeek(newDate, { weekStartsOn: 1 }));
       setExpandedClasses(false);
     }
     setTouchStart(null);
@@ -85,10 +89,10 @@ export default function ClassCalendar() {
           size="icon"
           className="h-9 w-9"
           onClick={() => {
-            const newDate = addDays(selectedDate, -1);
-            const newWeekStart = startOfWeek(newDate, { weekStartsOn: 1 });
+            const newWeekStart = addDays(weekStart, -7);
             setWeekStart(newWeekStart);
-            setSelectedDate(newDate);
+            setSelectedDate(addDays(selectedDate, -7));
+            setExpandedClasses(false);
           }}
           >
           <ChevronLeft className="w-4 h-4" />
@@ -106,10 +110,10 @@ export default function ClassCalendar() {
           size="icon"
           className="h-9 w-9"
           onClick={() => {
-            const newDate = addDays(selectedDate, 1);
-            const newWeekStart = startOfWeek(newDate, { weekStartsOn: 1 });
+            const newWeekStart = addDays(weekStart, 7);
             setWeekStart(newWeekStart);
-            setSelectedDate(newDate);
+            setSelectedDate(addDays(selectedDate, 7));
+            setExpandedClasses(false);
           }}
         >
           <ChevronRight className="w-4 h-4" />
