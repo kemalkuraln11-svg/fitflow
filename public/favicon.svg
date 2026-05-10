@@ -1,0 +1,16 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="95" fill="#ff6600" opacity="0.1" stroke="#ff6600" stroke-width="2"/>
+  
+  <!-- Main "F" shape -->
+  <g transform="translate(50, 40)">
+    <!-- Vertical bar -->
+    <rect x="10" y="0" width="20" height="100" fill="#ff6600" rx="8"/>
+    
+    <!-- Top horizontal bar -->
+    <rect x="10" y="0" width="70" height="18" fill="#ff6600" rx="9"/>
+    
+    <!-- Middle horizontal bar -->
+    <rect x="10" y="40" width="55" height="16" fill="#ff6600" rx="8"/>
+  </g>
+</svg>
