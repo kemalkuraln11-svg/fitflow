@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { format, isToday, isTomorrow, parseISO } from "date-fns";
+import { format, isToday, isTomorrow, parseISO, isPast, parse } from "date-fns";
 import { tr } from "date-fns/locale";
 import { ChevronUp, X, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -108,10 +108,12 @@ export default function ReservationsBottomSheet({ reservations = [] }) {
               : isTomorrow(parseISO(res.class_date))
               ? "Yarın"
               : format(parseISO(res.class_date), "d MMM", { locale: tr });
+            const classDateTime = parse(`${res.class_date} ${displayTime}`, "yyyy-MM-dd HH:mm", new Date());
+            const isPastClass = isPast(classDateTime);
 
             return (
-              <Link key={res.id} to={`/class/${res.class_id}`} onClick={() => setOpen(false)} className="flex justify-center">
-                <Card className="p-3.5 flex items-center gap-3 hover:shadow-sm transition-all active:scale-[0.98] w-4/5">
+              <Link key={res.id} to={isPastClass ? undefined : `/class/${res.class_id}`} onClick={isPastClass ? undefined : () => setOpen(false)} className={`flex justify-center ${isPastClass ? "pointer-events-none" : ""}`}>
+                <Card className={`p-3.5 flex items-center gap-3 transition-all w-4/5 ${isPastClass ? "opacity-40" : "hover:shadow-sm active:scale-[0.98]"}`}>
                   <Badge variant="secondary" className="text-xs font-medium shrink-0">
                     {dateLabel}
                   </Badge>
