@@ -63,17 +63,10 @@ export default function ClassCalendar() {
     const diff = touchStart - touchEnd;
 
     if (Math.abs(diff) > 50) {
-      if (diff > 0) {
-        const newDate = addDays(selectedDate, 1);
-        const newWeekStart = startOfWeek(newDate, { weekStartsOn: 1 });
-        setWeekStart(newWeekStart);
-        setSelectedDate(newDate);
-      } else {
-        const newDate = addDays(selectedDate, -1);
-        const newWeekStart = startOfWeek(newDate, { weekStartsOn: 1 });
-        setWeekStart(newWeekStart);
-        setSelectedDate(newDate);
-      }
+      const newDate = addDays(selectedDate, diff > 0 ? 1 : -1);
+      setSelectedDate(newDate);
+      setWeekStart(startOfWeek(newDate, { weekStartsOn: 1 }));
+      setExpandedClasses(false);
     }
     setTouchStart(null);
   };
@@ -262,7 +255,7 @@ export default function ClassCalendar() {
         <DialogHeader>
           <DialogTitle>Tarih Seç</DialogTitle>
         </DialogHeader>
-        <CalendarPicker minDate={new Date()} onDateSelect={handleDateSelect} />
+        <CalendarPicker onDateSelect={handleDateSelect} />
       </DialogContent>
     </Dialog>
     </>
