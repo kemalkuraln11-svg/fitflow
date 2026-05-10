@@ -33,7 +33,7 @@ export default function ClassCalendar() {
   const [expandedClasses, setExpandedClasses] = useState(false);
 
   const weekDays = useMemo(() => {
-    return Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
+    return Array.from({ length: 5 }, (_, i) => addDays(weekStart, i));
   }, [weekStart]);
 
   const dateStr = format(selectedDate, "yyyy-MM-dd");
@@ -65,7 +65,7 @@ export default function ClassCalendar() {
     const diff = touchStart - touchEnd;
 
     if (Math.abs(diff) > 50) {
-      const direction = diff > 0 ? 7 : -7;
+      const direction = diff > 0 ? 5 : -5;
       const newWeekStart = addDays(weekStart, direction);
       // Seçili tarihi de aynı yönde kaydır
       const newDate = addDays(selectedDate, direction);
@@ -90,9 +90,9 @@ export default function ClassCalendar() {
           size="icon"
           className="h-9 w-9"
           onClick={() => {
-            const newWeekStart = addDays(weekStart, -7);
+            const newWeekStart = addDays(weekStart, -5);
             setWeekStart(newWeekStart);
-            setSelectedDate(addDays(selectedDate, -7));
+            setSelectedDate(addDays(selectedDate, -5));
             setExpandedClasses(false);
           }}
           >
@@ -111,9 +111,9 @@ export default function ClassCalendar() {
           size="icon"
           className="h-9 w-9"
           onClick={() => {
-            const newWeekStart = addDays(weekStart, 7);
+            const newWeekStart = addDays(weekStart, 5);
             setWeekStart(newWeekStart);
-            setSelectedDate(addDays(selectedDate, 7));
+            setSelectedDate(addDays(selectedDate, 5));
             setExpandedClasses(false);
           }}
         >
