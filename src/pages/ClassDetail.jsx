@@ -62,6 +62,7 @@ export default function ClassDetail() {
       queryClient.invalidateQueries({ queryKey: ["myReservations"] });
       queryClient.invalidateQueries({ queryKey: ["todayClasses"] });
       toast.success("Rezervasyon yapıldı!");
+      navigate("/");
     },
   });
 
