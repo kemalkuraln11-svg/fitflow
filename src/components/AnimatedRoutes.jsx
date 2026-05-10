@@ -17,7 +17,18 @@ export default function AnimatedRoutes({ children }) {
     if (!isTabSwitch) return;
 
     setShowSkeleton(true);
-    queryClient.invalidateQueries();
+
+    // Sadece o sayfanın ihtiyacı olan query'leri invalidate et
+    if (location.pathname === '/') {
+      queryClient.invalidateQueries({ queryKey: ['todayClasses'] });
+      queryClient.invalidateQueries({ queryKey: ['myReservations'] });
+      queryClient.invalidateQueries({ queryKey: ['myMembership'] });
+    } else if (location.pathname === '/calendar') {
+      queryClient.invalidateQueries({ queryKey: ['classes'] });
+    } else if (location.pathname === '/profile') {
+      queryClient.invalidateQueries({ queryKey: ['myAllReservations'] });
+      queryClient.invalidateQueries({ queryKey: ['myMembership'] });
+    }
 
     const timer = setTimeout(() => {
       setShowSkeleton(false);
