@@ -81,7 +81,11 @@ export default function Home() {
     : 0;
 
   const handleRefresh = async () => {
-    await queryClient.invalidateQueries();
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["todayClasses"] }),
+      queryClient.invalidateQueries({ queryKey: ["myReservations"] }),
+      queryClient.invalidateQueries({ queryKey: ["myMembership"] }),
+    ]);
   };
 
   return (

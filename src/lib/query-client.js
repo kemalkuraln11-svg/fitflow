@@ -6,6 +6,7 @@ export const queryClientInstance = new QueryClient({
 		queries: {
 			refetchOnWindowFocus: false,
 			retry: 1,
+			staleTime: 30 * 1000, // 30 saniye boyunca data "taze" kabul edilir, gereksiz refetch engellenir
 		},
 	},
 });

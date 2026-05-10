@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
+import { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import { base44 } from '@/api/base44Client';
 
 const MemberAuthContext = createContext();
@@ -74,10 +74,10 @@ export const MemberAuthProvider = ({ children }) => {
     return sessionData;
   };
 
-  const logout = () => {
+  const logout = useCallback(() => {
     sessionStorage.removeItem(SESSION_KEY);
     setMember(null);
-  };
+  }, []);
 
   // Real-time sync: admin panelde üye verisi değişince oturumu güncelle
   useEffect(() => {

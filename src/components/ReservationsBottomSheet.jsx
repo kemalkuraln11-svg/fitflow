@@ -11,42 +11,35 @@ export default function ReservationsBottomSheet({ reservations = [] }) {
   const [open, setOpen] = useState(false);
   const [classesData, setClassesData] = useState({});
 
-  useEffect(() => {
-    if (reservations.length === 0) return;
-    
-    const classIds = [...new Set(reservations.map((r) => r.class_id))];
-    const data = {};
-    
-    const fetchClasses = async () => {
-      for (const id of classIds) {
-        try {
-          const classes = await base44.entities.ClassSchedule.filter({ id });
-          if (classes.length > 0) {
-            data[id] = classes[0];
-          }
-        } catch (err) {
-          console.error(`Failed to fetch class ${id}:`, err);
-        }
-      }
-      setClassesData(data);
-    };
-    
-    fetchClasses();
+  // Stable dependency: sadece class ID listesi değişince yeniden fetch yap
+  const classIdsKey = reservations.map((r) => r.class_id).join(",");
 
-    // Subscribe to real-time updates
+  useEffect(() => {
+    if (!classIdsKey) return;
+
+    const classIds = [...new Set(classIdsKey.split(","))];
+
+    // Paralel fetch — sequential değil
+    Promise.all(
+      classIds.map((id) =>
+        base44.entities.ClassSchedule.filter({ id }).then((res) => res[0] ? [id, res[0]] : null)
+      )
+    ).then((entries) => {
+      const data = Object.fromEntries(entries.filter(Boolean));
+      setClassesData(data);
+    });
+
+    // Real-time subscribe
     const unsubscribers = classIds.map((id) =>
       base44.entities.ClassSchedule.subscribe((event) => {
         if (event.id === id) {
-          setClassesData((prev) => ({
-            ...prev,
-            [id]: event.data,
-          }));
+          setClassesData((prev) => ({ ...prev, [id]: event.data }));
         }
       })
     );
 
     return () => unsubscribers.forEach((unsub) => unsub());
-  }, [reservations]);
+  }, [classIdsKey]);
 
   if (reservations.length === 0) return null;
 
