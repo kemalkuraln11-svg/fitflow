@@ -139,6 +139,7 @@ export default function QRScanner({ onClose }) {
                       <p><span className="font-semibold">Bitiş:</span> {scanResult.person.endDate ? format(parseISO(scanResult.person.endDate), "d MMMM yyyy", { locale: tr }) : '-'}</p>
                       {scanResult.classDate && (
                         <>
+                          {scanResult.person.className && <p><span className="font-semibold">Ders:</span> {scanResult.person.className}</p>}
                           <p><span className="font-semibold">Tarih:</span> {format(parseISO(scanResult.classDate), "d MMMM", { locale: tr })}</p>
                           {scanResult.classTime && <p><span className="font-semibold">Saat:</span> {scanResult.classTime}</p>}
                         </>

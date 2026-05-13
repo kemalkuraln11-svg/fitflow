@@ -92,6 +92,17 @@ Deno.serve(async (req) => {
         result.found = true;
         result.classDate = date;
         result.classTime = time;
+        
+        // Find class for this date/time if available
+        let className = '';
+        if (date && time) {
+          const classes = await base44.asServiceRole.entities.ClassSchedule.filter({ date: date });
+          const matchedClass = classes.find(c => c.start_time === time);
+          if (matchedClass) {
+            className = matchedClass.title;
+          }
+        }
+        
         result.person = {
           id: member.id,
           fullName: member.user_name,
@@ -101,6 +112,7 @@ Deno.serve(async (req) => {
           status: member.status,
           planName: member.plan_name,
           endDate: member.end_date,
+          className: className,
           attended: member.attended,
         };
       } else {
