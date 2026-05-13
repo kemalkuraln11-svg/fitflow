@@ -162,8 +162,20 @@ export default function QRScanner({ onClose }) {
       
       QrScanner.scanImage(imageData, { returnDetailedScanResult: true })
         .then(result => {
-          console.log("[QRScanner] Tarama sonucu:", result);
-          const qrData = result?.data || result;
+          console.log("[QRScanner] Full tarama sonucu:", result);
+          let qrData = null;
+          
+          // QrScanner sonucunun yapısına göre veriyi çıkar
+          if (result?.data) {
+            qrData = result.data;
+          } else if (typeof result === 'string') {
+            qrData = result;
+          } else if (result?.innerCode?.rawValue) {
+            qrData = result.innerCode.rawValue;
+          }
+          
+          console.log("[QRScanner] Parsed QR data:", qrData);
+          
           if (qrData) {
             console.log("[QRScanner] QR kodu bulundu:", qrData);
             stopCamera();
@@ -177,7 +189,7 @@ export default function QRScanner({ onClose }) {
           }
         })
         .catch(err => {
-          console.log("[QRScanner] Tarama deneniyor...");
+          console.log("[QRScanner] Tarama hatası, tekrar deniyor...", err);
           if (cameraActiveRef.current) {
             setTimeout(captureAndScanQR, 300);
           }
