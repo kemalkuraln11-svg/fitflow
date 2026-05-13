@@ -35,6 +35,11 @@
       ],
       "default": "confirmed",
       "description": "Reservation status"
+    },
+    "attended": {
+      "type": "boolean",
+      "default": null,
+      "description": "Whether the member actually attended the class (null = not yet marked)"
     }
   },
   "required": [
