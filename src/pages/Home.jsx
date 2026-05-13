@@ -83,12 +83,7 @@ export default function Home() {
     enabled: !!member?.user_email,
   });
 
-  const { data: membership } = useQuery({
-    queryKey: ["myMembership", member?.id],
-    queryFn: () => base44.entities.Membership.filter({ username: member.username, status: "active" }),
-    enabled: !!member?.username,
-    select: (data) => data?.[0],
-  });
+  const membership = member?.status === "active" ? member : null;
 
   const daysLeft = membership
     ? Math.max(0, differenceInDays(parseISO(membership.end_date), new Date()))

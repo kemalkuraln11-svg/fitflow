@@ -14,12 +14,7 @@ import ReservationsBottomSheet from "@/components/ReservationsBottomSheet";
 
 export default function Profile() {
   const { member, logout } = useMemberAuth();
-  const { data: membership } = useQuery({
-    queryKey: ["myMembership", member?.id],
-    queryFn: () => base44.entities.Membership.filter({ username: member.username, status: "active" }),
-    enabled: !!member?.username,
-    select: (data) => data?.[0],
-  });
+  const membership = member?.status === "active" ? member : null;
 
   const { data: reservations = [] } = useQuery({
     queryKey: ["myAllReservations", member?.id],
