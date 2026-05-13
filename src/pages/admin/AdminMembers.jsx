@@ -70,7 +70,7 @@ export default function AdminMembers() {
 
   const { data: members = [], isLoading } = useQuery({
     queryKey: ["allMembers"],
-    queryFn: () => base44.entities.Membership.list("-created_date", 200),
+    queryFn: () => base44.functions.invoke("listMemberships", {}).then(r => r?.data ?? r),
   });
 
   const createMutation = useMutation({
