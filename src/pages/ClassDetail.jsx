@@ -260,6 +260,14 @@ export default function ClassDetail() {
         </Card>
       )}
 
+      {/* QR Code for reservation */}
+      {hasReservation && (
+        <Card className="p-4 mb-6">
+          <p className="text-xs text-muted-foreground mb-3 text-center font-semibold">Derse girerken bu QR kodunuz taranacak:</p>
+          <QRCodeDisplay data={`member:${user.user_name}:${user.username}`} />
+        </Card>
+      )}
+
       {/* Action Button */}
       {membershipExpired ? (
         <div className="w-full h-14 flex items-center justify-center rounded-lg bg-destructive/10 border border-destructive/30 text-destructive font-semibold text-center px-4">
