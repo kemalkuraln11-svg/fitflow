@@ -157,10 +157,8 @@ export default function QRScanner({ onClose }) {
       ctx.drawImage(video, 0, 0);
       console.log("[QRScanner] Frame yakalandı, taranıyor...");
 
-      // Get image data and scan
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      
-      QrScanner.scanImage(imageData, { returnDetailedScanResult: true })
+      // Use canvas element directly instead of ImageData
+      QrScanner.scanImage(canvas, { returnDetailedScanResult: true })
         .then(result => {
           console.log("[QRScanner] Full tarama sonucu:", result);
           let qrData = null;
