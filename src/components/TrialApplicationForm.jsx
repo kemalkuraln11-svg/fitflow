@@ -165,14 +165,20 @@ export default function TrialApplicationForm({ onBack }) {
             </div>
             <div>
               <Label className="text-xs">Telefon</Label>
-              <Input
-                className="mt-0.5"
-                style={{ fontSize: "16px" }}
-                placeholder="+90 5xx xxx xx xx"
-                type="tel"
-                value={form.phone}
-                onChange={(e) => setForm({ ...form, phone: e.target.value })}
-              />
+              <div className="flex items-center mt-0.5 border border-input rounded-md bg-white overflow-hidden" style={{ fontSize: "16px" }}>
+                <span className="font-semibold text-foreground px-3 bg-muted py-2">+90</span>
+                <Input
+                  className="border-0 rounded-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                  placeholder="(5xx) xxx xx xx"
+                  type="tel"
+                  maxLength="10"
+                  value={form.phone.replace(/^\+90/, "")}
+                  onChange={(e) => {
+                    const digits = e.target.value.replace(/[^\d]/g, "").slice(0, 10);
+                    setForm({ ...form, phone: digits ? "+90" + digits : "" });
+                  }}
+                />
+              </div>
             </div>
             <Button
               type="submit"
