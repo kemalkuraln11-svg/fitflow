@@ -36,6 +36,7 @@ export default function QRScanner({ onClose }) {
   const canvasRef = useRef(null);
   const animationRef = useRef(null);
   const cameraStreamRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   const handleScan = async () => {
     if (!qrInput.trim()) return;
@@ -142,6 +143,43 @@ export default function QRScanner({ onClose }) {
     animationRef.current = requestAnimationFrame(scanQRFromCamera);
   };
 
+  const handlePhotoCapture = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+        ctx.drawImage(img, 0, 0);
+
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        try {
+          const qrCode = jsQR(imageData.data, imageData.width, imageData.height, {
+            inversionAttempts: "dontInvert"
+          });
+
+          if (qrCode && qrCode.data) {
+            setQrInput(qrCode.data);
+            handleScan();
+          } else {
+            toast.error("QR kod bulunamadı. Lütfen daha net bir fotoğraf çekin.");
+          }
+        } catch (err) {
+          toast.error("Fotoğraf işlenemedi");
+        }
+      };
+      img.src = event.target?.result;
+    };
+    reader.readAsDataURL(file);
+  };
+
   useEffect(() => {
     return () => {
       stopCamera();
@@ -176,6 +214,22 @@ export default function QRScanner({ onClose }) {
                <Button onClick={() => setUseCamera(true)} variant="outline" size="icon">
                  <Camera className="w-4 h-4" />
                </Button>
+               <Button 
+                 onClick={() => fileInputRef.current?.click()} 
+                 variant="outline" 
+                 size="icon"
+                 title="Fotoğraf seç"
+               >
+                 📷
+               </Button>
+               <input
+                 ref={fileInputRef}
+                 type="file"
+                 accept="image/*"
+                 capture="environment"
+                 onChange={handlePhotoCapture}
+                 style={{ display: "none" }}
+               />
              </div>
            ) : (
              <div className="space-y-2">
