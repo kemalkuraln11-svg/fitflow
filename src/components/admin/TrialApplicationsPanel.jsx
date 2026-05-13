@@ -92,9 +92,13 @@ export default function TrialApplicationsPanel() {
 
   const rejectMutation = useMutation({
     mutationFn: (app) => base44.entities.TrialApplication.update(app.id, { status: "rejected" }),
-    onSuccess: () => {
+    onSuccess: (_, app) => {
       queryClient.invalidateQueries({ queryKey: ["trialApplications"] });
-      toast.success("Başvuru reddedildi.");
+      // WhatsApp linki aç
+      const message = `Merhaba ${capitalizeName(app.first_name + " " + app.last_name)}, üzgünüz başvurunuz reddedilmiştir. Salon yönetimiyle iletişime geçin.`;
+      const whatsappUrl = `https://wa.me/${app.phone.replace(/[^\d]/g, '')}?text=${encodeURIComponent(message)}`;
+      window.open(whatsappUrl, '_blank');
+      toast.success("Başvuru reddedildi, WhatsApp açılıyor.");
     },
     onError: (err) => toast.error("Hata: " + err.message),
   });
