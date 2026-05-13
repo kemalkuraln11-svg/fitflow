@@ -164,6 +164,13 @@ export default function TrialApplicationsPanel() {
                   </span>{" "}
                   için deneme dersini onaylayacak mısınız?
                 </p>
+                {approvingApp.trial_class_title && (
+                  <div className="bg-primary/10 rounded-lg p-3 text-sm border border-primary/20 space-y-1">
+                    <p><span className="font-semibold">Ders:</span> {approvingApp.trial_class_title}</p>
+                    <p><span className="font-semibold">Gün:</span> {approvingApp.trial_class_date ? format(parseISO(approvingApp.trial_class_date), "d MMMM yyyy", { locale: tr }) : "-"}</p>
+                    <p><span className="font-semibold">Saat:</span> {approvingApp.trial_class_time || "-"}</p>
+                  </div>
+                )}
                 <div className="bg-blue-500/10 rounded-lg p-3 text-xs text-muted-foreground border border-blue-500/20 space-y-1">
                   <p>Derse geldikten sonra kullanıcı isterse kayıt oluşturabilirsiniz.</p>
                   {classDetails[approvingApp.trial_class_id] && (
