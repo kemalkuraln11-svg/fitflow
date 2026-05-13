@@ -102,11 +102,11 @@ export default function TrialApplicationForm({ onBack }) {
       return base44.entities.TrialApplication.create(data);
     },
     onSuccess: (result) => {
-      // Generate QR data for successful application
-      const qrData = `trial:${form.first_name} ${form.last_name}:${form.phone}:${form.trial_class_date}:${form.trial_class_time}`;
-      setSuccessData({ ...result, qrData });
-      setSuccess(true);
-    },
+       // Generate QR data for successful application
+       const qrData = `trial:${form.first_name.trim()}:${form.last_name.trim()}:${form.phone.trim()}:${form.trial_class_date}:${form.trial_class_time}`;
+       setSuccessData({ ...result, qrData });
+       setSuccess(true);
+     },
     onError: (err) => {
       if (err.message === "ALREADY_APPLIED") {
         setBlacklisted(true);
