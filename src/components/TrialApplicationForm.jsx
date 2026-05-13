@@ -21,7 +21,6 @@ function capitalizeName(str) {
 
 export default function TrialApplicationForm({ onBack }) {
   const today = format(new Date(), "yyyy-MM-dd");
-  const [step, setStep] = useState(1); // 1: kişisel bilgi, 2: ders seç + ödeme
   const [form, setForm] = useState({
     first_name: "",
     last_name: "",
@@ -34,12 +33,7 @@ export default function TrialApplicationForm({ onBack }) {
   const [success, setSuccess] = useState(false);
   const [blacklisted, setBlacklisted] = useState(false);
 
-  // Seçili tarihe göre dersler
-  const { data: classes = [] } = useQuery({
-    queryKey: ["trialClasses", form.trial_class_date],
-    queryFn: () => base44.entities.ClassSchedule.filter({ date: form.trial_class_date }, "start_time"),
-    enabled: step === 2,
-  });
+
 
   const mutation = useMutation({
     mutationFn: async (data) => {
@@ -64,21 +58,7 @@ export default function TrialApplicationForm({ onBack }) {
     },
   });
 
-  const handleClassSelect = (classId) => {
-    const cls = classes.find((c) => c.id === classId);
-    setForm({
-      ...form,
-      trial_class_id: classId,
-      trial_class_title: cls?.title || "",
-      trial_class_time: cls?.start_time || "",
-    });
-  };
 
-  const handleNextStep = (e) => {
-    e.preventDefault();
-    if (!form.first_name || !form.last_name || !form.phone) return;
-    setStep(2);
-  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -136,19 +116,17 @@ export default function TrialApplicationForm({ onBack }) {
   return (
     <div className="min-h-[100dvh] bg-background flex flex-col items-center justify-start px-4 pt-6 pb-10 max-w-md mx-auto overflow-y-auto">
       <div className="w-full flex items-center gap-2 mb-5">
-        <button onClick={step === 2 ? () => setStep(1) : onBack} className="text-muted-foreground hover:text-foreground">
+        <button onClick={onBack} className="text-muted-foreground hover:text-foreground">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <h1 className="text-lg font-bold">Üyelik Başvurusu</h1>
-        <span className="ml-auto text-xs text-muted-foreground">{step}/2</span>
       </div>
 
       <Card className="w-full p-5">
-        {step === 1 ? (
-          <form onSubmit={handleNextStep} className="space-y-4">
-            <p className="text-sm text-muted-foreground mb-2">Kişisel bilgilerinizi girin.</p>
-            <div>
-              <Label className="text-xs">Ad</Label>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <p className="text-sm text-muted-foreground mb-2">Kişisel bilgilerinizi girin.</p>
+          <div>
+            <Label className="text-xs">Ad</Label>
               <Input
                 className="mt-0.5"
                 style={{ fontSize: "16px" }}
@@ -178,61 +156,14 @@ export default function TrialApplicationForm({ onBack }) {
                 onChange={(e) => setForm({ ...form, phone: e.target.value })}
               />
             </div>
-            <Button
-              type="submit"
-              className="w-full h-10 font-semibold shadow-lg shadow-primary/25 mt-1"
-              disabled={!form.first_name || !form.last_name || !form.phone}
-            >
-              Devam Et
-            </Button>
-          </form>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <p className="text-sm text-muted-foreground mb-2">
-              Merhaba <span className="font-semibold text-foreground">{capitalizeName(form.first_name + " " + form.last_name)}</span>, deneme dersinizi seçin.
-            </p>
-
-            {/* Tarih seçimi */}
-            <div>
-              <Label className="text-xs">Tarih</Label>
-              <Input
-                className="mt-0.5"
-                type="date"
-                min={today}
-                max={format(addDays(new Date(), 14), "yyyy-MM-dd")}
-                value={form.trial_class_date}
-                onChange={(e) =>
-                  setForm({ ...form, trial_class_date: e.target.value, trial_class_id: "", trial_class_title: "", trial_class_time: "" })
-                }
-              />
-            </div>
-
-            {/* Ders seçimi */}
-            <div>
-              <Label className="text-xs">Ders Seç (opsiyonel)</Label>
-              <Select value={form.trial_class_id} onValueChange={handleClassSelect}>
-                <SelectTrigger className="mt-0.5">
-                  <SelectValue placeholder={classes.length === 0 ? "O gün ders yok" : "Ders seçin"} />
-                </SelectTrigger>
-                <SelectContent>
-                  {classes.map((cls) => (
-                    <SelectItem key={cls.id} value={cls.id}>
-                      {cls.title} — {cls.start_time}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <Button
-              type="submit"
-              className="w-full h-10 font-semibold shadow-lg shadow-primary/25 mt-1"
-              disabled={mutation.isPending}
-            >
-              {mutation.isPending ? "Gönderiliyor..." : "Başvuruyu Gönder"}
-            </Button>
-          </form>
-        )}
+          <Button
+            type="submit"
+            className="w-full h-10 font-semibold shadow-lg shadow-primary/25 mt-1"
+            disabled={!form.first_name || !form.last_name || !form.phone || mutation.isPending}
+          >
+            {mutation.isPending ? "Gönderiliyor..." : "Başvuruyu Gönder"}
+          </Button>
+        </form>
       </Card>
     </div>
   );
