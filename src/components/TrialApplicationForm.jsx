@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { format, addDays } from "date-fns";
@@ -33,12 +33,32 @@ export default function TrialApplicationForm({ onBack }) {
   const [success, setSuccess] = useState(false);
   const [blacklisted, setBlacklisted] = useState(false);
   const [step, setStep] = useState(1);
+  const [approvedApp, setApprovedApp] = useState(null);
 
   const { data: classes = [] } = useQuery({
     queryKey: ["classSchedule", form.trial_class_date],
     queryFn: () => base44.entities.ClassSchedule.filter({ date: form.trial_class_date }),
     enabled: !!form.trial_class_date,
   });
+
+  const { data: approvedTrialApp } = useQuery({
+    queryKey: ["approvedTrialApp", form.first_name, form.last_name, form.phone],
+    queryFn: async () => {
+      if (!form.first_name || !form.last_name || !form.phone) return null;
+      const existing = await base44.entities.TrialApplication.filter({
+        first_name: form.first_name,
+        last_name: form.last_name,
+        phone: form.phone,
+        status: "approved",
+      });
+      return existing && existing.length > 0 ? existing[0] : null;
+    },
+    enabled: step === 2 && !!form.first_name && !!form.last_name && !!form.phone,
+  });
+
+  useEffect(() => {
+    setApprovedApp(approvedTrialApp);
+  }, [approvedTrialApp]);
 
   const handleClassSelect = (classId) => {
     const selectedClass = classes.find((c) => c.id === classId);
@@ -190,38 +210,46 @@ export default function TrialApplicationForm({ onBack }) {
             </Button>
           </form>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <p className="text-sm text-muted-foreground mb-2">
-              Merhaba <span className="font-semibold text-foreground">{capitalizeName(form.first_name + " " + form.last_name)}</span>, deneme dersinizi seçin.
-            </p>
-            <div>
-              <Label className="text-xs">Tarih</Label>
-              <Input
-                className="mt-0.5"
-                type="date"
-                min={today}
-                max={format(addDays(new Date(), 14), "yyyy-MM-dd")}
-                value={form.trial_class_date}
-                onChange={(e) =>
-                  setForm({ ...form, trial_class_date: e.target.value, trial_class_id: "", trial_class_title: "", trial_class_time: "" })
-                }
-              />
-            </div>
-            <div>
-              <Label className="text-xs">Ders Seç (opsiyonel)</Label>
-              <Select value={form.trial_class_id} onValueChange={handleClassSelect}>
-                <SelectTrigger className="mt-0.5">
-                  <SelectValue placeholder={classes.length === 0 ? "O gün ders yok" : "Ders seçin"} />
-                </SelectTrigger>
-                <SelectContent>
-                  {classes.map((cls) => (
-                    <SelectItem key={cls.id} value={cls.id}>
-                      {cls.title} — {cls.start_time}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+           <form onSubmit={handleSubmit} className="space-y-4">
+             {approvedApp && (
+               <div className="bg-orange-500/10 border border-orange-500/30 rounded-lg p-3 text-sm text-orange-900 mb-3">
+                 <p className="font-semibold mb-1">⚠️ Onaylanmış Deneme Dersiniz Var</p>
+                 <p className="text-xs">{approvedApp.trial_class_title} — {format(new Date(approvedApp.trial_class_date), "d MMMM", { locale: tr })} {approvedApp.trial_class_time}</p>
+               </div>
+             )}
+             <p className="text-sm text-muted-foreground mb-2">
+               Merhaba <span className="font-semibold text-foreground">{capitalizeName(form.first_name + " " + form.last_name)}</span>, deneme dersinizi seçin.
+             </p>
+             <div>
+               <Label className="text-xs">Tarih</Label>
+               <Input
+                 className="mt-0.5"
+                 type="date"
+                 min={today}
+                 max={format(addDays(new Date(), 14), "yyyy-MM-dd")}
+                 value={form.trial_class_date}
+                 onChange={(e) =>
+                   setForm({ ...form, trial_class_date: e.target.value, trial_class_id: "", trial_class_title: "", trial_class_time: "" })
+                 }
+               />
+             </div>
+             <div>
+               <Label className="text-xs">Ders Seç (opsiyonel)</Label>
+               <Select value={form.trial_class_id} onValueChange={handleClassSelect} disabled={classes.length === 0}>
+                 <SelectTrigger className="mt-0.5">
+                   <SelectValue placeholder={classes.length === 0 ? "O gün ders yok" : "Ders seçin"} />
+                 </SelectTrigger>
+                 {classes.length > 0 && (
+                   <SelectContent>
+                     {classes.map((cls) => (
+                       <SelectItem key={cls.id} value={cls.id}>
+                         {cls.title} — {cls.start_time}
+                       </SelectItem>
+                     ))}
+                   </SelectContent>
+                 )}
+               </Select>
+             </div>
             <div className="flex gap-2">
               <Button
                 type="button"
