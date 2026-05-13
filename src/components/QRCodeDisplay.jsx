@@ -7,10 +7,10 @@ export default function QRCodeDisplay({ data }) {
   const [qrUrl, setQrUrl] = useState("");
 
   useEffect(() => {
-    // Generate QR code data string
+    // Generate QR code data string with maximum error correction for instant scanning
     const qrData = encodeURIComponent(data);
-    // Use a simple QR code API with higher resolution and error correction
-    setQrUrl(`https://api.qrserver.com/v1/create-qr-code/?size=400x400&format=png&error_correction=H&data=${qrData}`);
+    // Use largest size (500x500), maximum error correction (L), margin for better detection
+    setQrUrl(`https://api.qrserver.com/v1/create-qr-code/?size=500x500&format=png&error_correction=L&margin=2&data=${qrData}`);
   }, [data]);
 
   const copyToClipboard = () => {
@@ -23,7 +23,7 @@ export default function QRCodeDisplay({ data }) {
     <div className="space-y-3">
       {qrUrl && (
          <div className="flex justify-center">
-           <img src={qrUrl} alt="QR Code" className="w-64 h-64 border-4 border-primary rounded-lg p-3 bg-white shadow-md" />
+           <img src={qrUrl} alt="QR Code" className="w-80 h-80 border-4 border-primary rounded-lg p-2 bg-white shadow-lg" />
          </div>
        )}
       <div className="bg-muted rounded-lg p-3 text-xs text-muted-foreground break-all space-y-2">
