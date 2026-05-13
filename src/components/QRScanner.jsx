@@ -218,11 +218,16 @@ export default function QRScanner({ onClose }) {
                </Button>
              </div>
            )}
-           {useCamera && !cameraActive && (
-             <Button onClick={startCamera} className="w-full gap-2">
-               <Camera className="w-4 h-4" />
-               Kamerayı Başlat
-             </Button>
+           {useCamera && (
+             <>
+               <canvas ref={canvasRef} style={{ display: "none" }} />
+               {!cameraActive && (
+                 <Button onClick={startCamera} className="w-full gap-2">
+                   <Camera className="w-4 h-4" />
+                   Kamerayı Başlat
+                 </Button>
+               )}
+             </>
            )}
 
           {scanResult && (
