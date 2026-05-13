@@ -74,7 +74,7 @@ export default function AdminMembers() {
   });
 
   const createMutation = useMutation({
-    mutationFn: ({ _plaintextPassword, ...data }) => base44.entities.Membership.create(data),
+    mutationFn: ({ _plaintextPassword, ...data }) => base44.functions.invoke("createMembership", data),
     onSuccess: (result, variables) => {
       queryClient.invalidateQueries({ queryKey: ["allMembers"] });
       setShowForm(false);
@@ -106,8 +106,6 @@ export default function AdminMembers() {
   const handleCreate = async () => {
     const plaintext = form.password;
     const hashed = await hashPassword(plaintext);
-    const me = await base44.auth.me();
-    console.log("Current user:", me?.email, "role:", me?.role);
     createMutation.mutate({
       user_name: form.user_name,
       gender: form.gender,
