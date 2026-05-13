@@ -79,13 +79,9 @@ Deno.serve(async (req) => {
         result.message = 'Günlük giriş kaydı bulunamadı';
       }
     } else if (type === 'member') {
-      // Search in Membership
+      // Search in Membership - name is username, phone is user_name
       const memberships = await base44.asServiceRole.entities.Membership.list();
-      const member = memberships.find(m => {
-        const memberName = m.user_name.toLowerCase();
-        const searchName = name.toLowerCase();
-        return (memberName === searchName || memberName.includes(searchName)) && m.phone === phone;
-      });
+      const member = memberships.find(m => m.username === name || m.username.toLowerCase() === name.toLowerCase());
 
       if (member) {
         result.found = true;

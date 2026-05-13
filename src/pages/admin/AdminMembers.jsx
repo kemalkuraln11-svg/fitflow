@@ -182,7 +182,6 @@ export default function AdminMembers() {
 
   return (
     <div>
-      {showQRScanner && <QRScanner onClose={() => setShowQRScanner(false)} />}
 
       {/* Sekmeler */}
       <div className="flex gap-1 mb-5 bg-muted rounded-xl p-1">
@@ -203,14 +202,18 @@ export default function AdminMembers() {
             </span>
           )}
         </button>
+        <button
+          className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all flex items-center justify-center gap-1.5 ${activeTab === "scanner" ? "bg-card shadow text-foreground" : "text-muted-foreground"}`}
+          onClick={() => setActiveTab("scanner")}
+        >
+          <QrCode className="w-4 h-4" />
+          QR Tara
+        </button>
       </div>
 
-      <Button className="w-full gap-2 mb-4 bg-primary" onClick={() => setShowQRScanner(true)}>
-        <QrCode className="w-4 h-4" />
-        QR Tara
-      </Button>
-
       {activeTab === "applications" && <TrialApplicationsPanel />}
+      
+      {activeTab === "scanner" && <QRScanner onClose={() => setActiveTab("members")} />}
 
       {activeTab === "members" && (
       <div>

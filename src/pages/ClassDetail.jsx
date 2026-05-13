@@ -94,8 +94,7 @@ export default function ClassDetail() {
       return data;
     },
     onSuccess: (data) => {
-      const qrData = `member:${user.user_name}:${user.username}`;
-      setSuccessData({ qrData });
+      setSuccessData({ success: true });
       queryClient.invalidateQueries({ queryKey: ["class", id] });
       queryClient.invalidateQueries({ queryKey: ["myReservation", id] });
       queryClient.invalidateQueries({ queryKey: ["classReservations", id] });
@@ -177,7 +176,7 @@ export default function ClassDetail() {
 
         <Card className="w-full p-4 mb-6">
           <p className="text-xs text-muted-foreground mb-3 text-center font-semibold">Derse girerken bu QR kodunuz taranacak:</p>
-          <QRCodeDisplay data={successData.qrData} />
+          <QRCodeDisplay data={`member:${user.username}`} />
         </Card>
 
         <Button className="w-full" onClick={() => navigate("/")}>
@@ -264,7 +263,7 @@ export default function ClassDetail() {
       {hasReservation && (
         <Card className="p-4 mb-6">
           <p className="text-xs text-muted-foreground mb-3 text-center font-semibold">Derse girerken bu QR kodunuz taranacak:</p>
-          <QRCodeDisplay data={`member:${user.user_name}:${user.username}`} />
+          <QRCodeDisplay data={`member:${user.username}`} />
         </Card>
       )}
 
