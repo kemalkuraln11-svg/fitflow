@@ -78,7 +78,8 @@ export default function AdminMembers() {
     onSuccess: (response, variables) => {
       queryClient.invalidateQueries({ queryKey: ["allMembers"] });
       setShowForm(false);
-      const result = response?.data ?? response;
+      // base44.functions.invoke returns axios response, actual data is in .data
+      const result = response?.data?.id ? response.data : (response?.id ? response : response?.data);
       setCreatedMember({ ...result, plaintextPassword: variables._plaintextPassword });
       setForm(emptyForm);
     },
