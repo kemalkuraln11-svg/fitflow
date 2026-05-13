@@ -23,19 +23,7 @@ export default function DailyVisitForm({ onBack }) {
   });
 
   const mutation = useMutation({
-    mutationFn: async (data) => {
-      await base44.entities.DailyVisit.create(data);
-      // Ders seçildiyse current_count artır
-      if (data.class_id) {
-        const clsList = await base44.entities.ClassSchedule.filter({ id: data.class_id });
-        const cls = clsList[0];
-        if (cls) {
-          await base44.entities.ClassSchedule.update(cls.id, {
-            current_count: (cls.current_count || 0) + 1,
-          });
-        }
-      }
-    },
+    mutationFn: (data) => base44.entities.DailyVisit.create(data),
     onSuccess: () => setSuccess(true),
     onError: () => toast.error("Kayıt başarısız, tekrar deneyin."),
   });
