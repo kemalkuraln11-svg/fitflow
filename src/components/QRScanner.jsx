@@ -1,6 +1,6 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Zap, X, CheckCircle2, AlertCircle, Clock } from "lucide-react";
+import { Zap, X, CheckCircle2, AlertCircle, Clock, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { format, parseISO } from "date-fns";
 import { tr } from "date-fns/locale";
+import jsQR from "jsqr";
 
 const typeLabels = {
   trial: "Deneme Dersi",
@@ -28,7 +29,13 @@ export default function QRScanner({ onClose }) {
   const [qrInput, setQrInput] = useState("");
   const [scanResult, setScanResult] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [useCamera, setUseCamera] = useState(false);
+  const [cameraActive, setCameraActive] = useState(false);
   const inputRef = useRef(null);
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+  const animationRef = useRef(null);
+  const cameraStreamRef = useRef(null);
 
   const handleScan = async () => {
     if (!qrInput.trim()) return;
@@ -74,6 +81,66 @@ export default function QRScanner({ onClose }) {
     }
   };
 
+  const startCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "environment" }
+      });
+      cameraStreamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        setCameraActive(true);
+        scanQRFromCamera();
+      }
+    } catch (err) {
+      toast.error("Kamera erişimi reddedildi: " + err.message);
+    }
+  };
+
+  const stopCamera = () => {
+    if (cameraStreamRef.current) {
+      cameraStreamRef.current.getTracks().forEach(track => track.stop());
+      cameraStreamRef.current = null;
+    }
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+    }
+    setCameraActive(false);
+  };
+
+  const scanQRFromCamera = () => {
+    if (!cameraActive || !videoRef.current || !canvasRef.current) return;
+
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+
+    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0);
+
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const qrCode = jsQR(imageData.data, imageData.width, imageData.height);
+
+      if (qrCode) {
+        setQrInput(qrCode.data);
+        stopCamera();
+        setUseCamera(false);
+        handleScan();
+        return;
+      }
+    }
+
+    animationRef.current = requestAnimationFrame(scanQRFromCamera);
+  };
+
+  useEffect(() => {
+    return () => {
+      stopCamera();
+    };
+  }, []);
+
   return (
     <div className="fixed inset-0 bg-black/80 flex items-end z-50">
       <div className="w-full bg-card rounded-t-2xl p-4 max-h-[90vh] overflow-y-auto">
@@ -85,20 +152,52 @@ export default function QRScanner({ onClose }) {
         </div>
 
         <div className="space-y-4">
-          <div className="flex gap-2">
-            <Input
-              ref={inputRef}
-              value={qrInput}
-              onChange={(e) => setQrInput(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleScan()}
-              placeholder="QR kodunu tarayın..."
-              autoFocus
-              style={{ fontSize: "16px" }}
-            />
-            <Button onClick={handleScan} disabled={loading || !qrInput.trim()} size="icon">
-              <Zap className="w-4 h-4" />
-            </Button>
-          </div>
+           {!useCamera ? (
+             <div className="flex gap-2">
+               <Input
+                 ref={inputRef}
+                 value={qrInput}
+                 onChange={(e) => setQrInput(e.target.value)}
+                 onKeyDown={(e) => e.key === "Enter" && handleScan()}
+                 placeholder="QR kodunu tarayın..."
+                 autoFocus
+                 style={{ fontSize: "16px" }}
+               />
+               <Button onClick={handleScan} disabled={loading || !qrInput.trim()} size="icon">
+                 <Zap className="w-4 h-4" />
+               </Button>
+               <Button onClick={() => setUseCamera(true)} variant="outline" size="icon">
+                 <Camera className="w-4 h-4" />
+               </Button>
+             </div>
+           ) : (
+             <div className="space-y-2">
+               <video
+                 ref={videoRef}
+                 autoPlay
+                 playsInline
+                 className="w-full rounded-lg bg-black"
+                 style={{ aspectRatio: "16/9" }}
+               />
+               <canvas ref={canvasRef} style={{ display: "none" }} />
+               <Button
+                 onClick={() => {
+                   stopCamera();
+                   setUseCamera(false);
+                 }}
+                 variant="destructive"
+                 className="w-full"
+               >
+                 İptal Et
+               </Button>
+             </div>
+           )}
+           {useCamera && !cameraActive && (
+             <Button onClick={startCamera} className="w-full gap-2">
+               <Camera className="w-4 h-4" />
+               Kamerayı Başlat
+             </Button>
+           )}
 
           {scanResult && (
             <Card className="p-4 space-y-3">
