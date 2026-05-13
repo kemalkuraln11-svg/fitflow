@@ -109,13 +109,14 @@ Deno.serve(async (req) => {
         let className = '';
         if (date && time) {
           try {
-            const classes = await base44.asServiceRole.entities.ClassSchedule.filter({ date: date });
-            const matchedClass = classes.find(c => c.start_time === time);
+            const classes = await base44.asServiceRole.entities.ClassSchedule.list();
+            const matchedClass = classes.find(c => c.date === date && c.start_time === time);
             if (matchedClass) {
               className = matchedClass.title;
             }
           } catch (e) {
             // Ignore class lookup errors
+            console.log('[scanQRCode] Class lookup error:', e.message);
           }
         }
         
