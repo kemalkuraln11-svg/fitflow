@@ -36,6 +36,7 @@ export default function QRScanner({ onClose }) {
   const canvasRef = useRef(null);
   const animationRef = useRef(null);
   const cameraStreamRef = useRef(null);
+  const cameraActiveRef = useRef(false);
 
   const handleScan = async () => {
     if (!qrInput.trim()) return;
@@ -92,6 +93,7 @@ export default function QRScanner({ onClose }) {
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         console.log("[QRScanner] Video element'e stream atandı");
+        cameraActiveRef.current = true;
         setCameraActive(true);
         // Video yüklemesi için bekle, sonra taramaya başla
         setTimeout(() => {
@@ -112,12 +114,13 @@ export default function QRScanner({ onClose }) {
       cameraStreamRef.current.getTracks().forEach(track => track.stop());
       cameraStreamRef.current = null;
     }
+    cameraActiveRef.current = false;
     setCameraActive(false);
   };
 
   const captureAndScanQR = () => {
-    if (!cameraActive || !videoRef.current || !canvasRef.current) {
-      console.log("[QRScanner] Kamera hazır değil", { cameraActive, video: !!videoRef.current, canvas: !!canvasRef.current });
+    if (!cameraActiveRef.current || !videoRef.current || !canvasRef.current) {
+      console.log("[QRScanner] Kamera hazır değil", { cameraActive: cameraActiveRef.current, video: !!videoRef.current, canvas: !!canvasRef.current });
       return;
     }
 
