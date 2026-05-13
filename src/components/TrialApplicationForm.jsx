@@ -165,12 +165,13 @@ export default function TrialApplicationForm({ onBack }) {
             </div>
             <div>
               <Label className="text-xs">Telefon</Label>
-              <div className="flex items-center mt-0.5 border border-input rounded-md bg-white overflow-hidden" style={{ fontSize: "16px" }}>
-                <span className="font-semibold text-foreground px-3 bg-muted py-2">+90</span>
+              <div className="flex items-center mt-0.5 border border-input rounded-md bg-white overflow-hidden">
+                <span className="text-sm text-muted-foreground px-2.5 py-2 bg-muted/50 font-medium">+90</span>
                 <Input
-                  className="border-0 rounded-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                  className="border-0 rounded-none focus-visible:ring-0 focus-visible:ring-offset-0 text-sm"
                   placeholder="(5xx) xxx xx xx"
                   type="tel"
+                  style={{ fontSize: "16px" }}
                   maxLength="10"
                   value={form.phone.replace(/^\+90/, "")}
                   onChange={(e) => {
