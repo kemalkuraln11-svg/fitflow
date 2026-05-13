@@ -145,11 +145,12 @@ export default function QRScanner({ onClose }) {
       QrScanner.scanImage(canvas)
         .then(result => {
           console.log("[QRScanner] Tarama sonucu:", result);
-          if (result?.data) {
-            console.log("[QRScanner] QR kodu bulundu:", result.data);
+          const qrData = result?.data || result;
+          if (qrData) {
+            console.log("[QRScanner] QR kodu bulundu:", qrData);
             stopCamera();
             setUseCamera(false);
-            handleScan(result.data);
+            handleScan(qrData);
           } else {
             console.log("[QRScanner] QR kodu bulunamadı, tekrar deniyor...");
             setTimeout(captureAndScanQR, 500);
