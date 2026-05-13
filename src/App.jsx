@@ -17,6 +17,7 @@ import Profile from './pages/Profile';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminClasses from './pages/admin/AdminClasses';
 import AdminMembers from './pages/admin/AdminMembers';
+import AdminDailyVisits from './pages/admin/AdminDailyVisits';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -78,6 +79,7 @@ const AuthenticatedApp = () => {
         <Route index element={<AdminDashboard />} />
         <Route path="classes" element={<AdminClasses />} />
         <Route path="members" element={<AdminMembers />} />
+        <Route path="daily-visits" element={<AdminDailyVisits />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

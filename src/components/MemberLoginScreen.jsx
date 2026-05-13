@@ -4,6 +4,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import DailyVisitForm from "@/pages/DailyVisitForm";
 
 export default function MemberLoginScreen() {
   const { login } = useMemberAuth();
@@ -12,6 +13,11 @@ export default function MemberLoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showDailyVisit, setShowDailyVisit] = useState(false);
+
+  if (showDailyVisit) {
+    return <DailyVisitForm onBack={() => setShowDailyVisit(false)} />;
+  }
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -88,6 +94,17 @@ export default function MemberLoginScreen() {
            {loading ? "Giriş yapılıyor..." : "Giriş Yap"}
          </Button>
       </form>
+
+      <div className="w-full border-t pt-4 mt-2 text-center">
+        <p className="text-xs text-muted-foreground mb-2">Üye değil misiniz?</p>
+        <Button
+          variant="outline"
+          className="w-full h-10 font-medium"
+          onClick={() => setShowDailyVisit(true)}
+        >
+          Günlük Giriş Yap
+        </Button>
+      </div>
     </div>
   );
 }

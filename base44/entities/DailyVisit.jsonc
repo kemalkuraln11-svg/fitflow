@@ -1,0 +1,36 @@
+{
+  "name": "DailyVisit",
+  "type": "object",
+  "properties": {
+    "full_name": {
+      "type": "string",
+      "description": "Full name of the visitor"
+    },
+    "phone": {
+      "type": "string",
+      "description": "Phone number"
+    },
+    "visit_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of visit"
+    },
+    "class_id": {
+      "type": "string",
+      "description": "ID of the class they want to join"
+    },
+    "class_title": {
+      "type": "string",
+      "description": "Title of the class"
+    },
+    "class_time": {
+      "type": "string",
+      "description": "Start time of the class"
+    }
+  },
+  "required": [
+    "full_name",
+    "phone",
+    "visit_date"
+  ]
+}
