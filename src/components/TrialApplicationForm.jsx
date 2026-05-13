@@ -32,6 +32,23 @@ export default function TrialApplicationForm({ onBack }) {
   });
   const [success, setSuccess] = useState(false);
   const [blacklisted, setBlacklisted] = useState(false);
+  const [step, setStep] = useState(1);
+
+  const { data: classes = [] } = useQuery({
+    queryKey: ["classSchedule", form.trial_class_date],
+    queryFn: () => base44.entities.ClassSchedule.filter({ date: form.trial_class_date }),
+    enabled: !!form.trial_class_date,
+  });
+
+  const handleClassSelect = (classId) => {
+    const selectedClass = classes.find((c) => c.id === classId);
+    setForm({
+      ...form,
+      trial_class_id: classId,
+      trial_class_title: selectedClass?.title || "",
+      trial_class_time: selectedClass?.start_time || "",
+    });
+  };
 
 
 
@@ -123,10 +140,11 @@ export default function TrialApplicationForm({ onBack }) {
       </div>
 
       <Card className="w-full p-5">
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <p className="text-sm text-muted-foreground mb-2">Kişisel bilgilerinizi girin.</p>
-          <div>
-            <Label className="text-xs">Ad</Label>
+        {step === 1 ? (
+          <form onSubmit={(e) => { e.preventDefault(); setStep(2); }} className="space-y-4">
+            <p className="text-sm text-muted-foreground mb-2">Kişisel bilgilerinizi girin.</p>
+            <div>
+              <Label className="text-xs">Ad</Label>
               <Input
                 className="mt-0.5"
                 style={{ fontSize: "16px" }}
@@ -156,14 +174,66 @@ export default function TrialApplicationForm({ onBack }) {
                 onChange={(e) => setForm({ ...form, phone: e.target.value })}
               />
             </div>
-          <Button
-            type="submit"
-            className="w-full h-10 font-semibold shadow-lg shadow-primary/25 mt-1"
-            disabled={!form.first_name || !form.last_name || !form.phone || mutation.isPending}
-          >
-            {mutation.isPending ? "Gönderiliyor..." : "Başvuruyu Gönder"}
-          </Button>
-        </form>
+            <Button
+              type="submit"
+              className="w-full h-10 font-semibold shadow-lg shadow-primary/25 mt-1"
+              disabled={!form.first_name || !form.last_name || !form.phone}
+            >
+              Devam Et
+            </Button>
+          </form>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <p className="text-sm text-muted-foreground mb-2">
+              Merhaba <span className="font-semibold text-foreground">{capitalizeName(form.first_name + " " + form.last_name)}</span>, deneme dersinizi seçin.
+            </p>
+            <div>
+              <Label className="text-xs">Tarih</Label>
+              <Input
+                className="mt-0.5"
+                type="date"
+                min={today}
+                max={format(addDays(new Date(), 14), "yyyy-MM-dd")}
+                value={form.trial_class_date}
+                onChange={(e) =>
+                  setForm({ ...form, trial_class_date: e.target.value, trial_class_id: "", trial_class_title: "", trial_class_time: "" })
+                }
+              />
+            </div>
+            <div>
+              <Label className="text-xs">Ders Seç (opsiyonel)</Label>
+              <Select value={form.trial_class_id} onValueChange={handleClassSelect}>
+                <SelectTrigger className="mt-0.5">
+                  <SelectValue placeholder={classes.length === 0 ? "O gün ders yok" : "Ders seçin"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {classes.map((cls) => (
+                    <SelectItem key={cls.id} value={cls.id}>
+                      {cls.title} — {cls.start_time}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full h-10 font-semibold mt-1"
+                onClick={() => setStep(1)}
+              >
+                Geri
+              </Button>
+              <Button
+                type="submit"
+                className="w-full h-10 font-semibold shadow-lg shadow-primary/25 mt-1"
+                disabled={mutation.isPending}
+              >
+                {mutation.isPending ? "Gönderiliyor..." : "Başvuruyu Gönder"}
+              </Button>
+            </div>
+          </form>
+        )}
       </Card>
     </div>
   );
