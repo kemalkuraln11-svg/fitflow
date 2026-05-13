@@ -16,6 +16,12 @@ export default function ClassAttendees({ classItem, onClose }) {
     enabled: !!classItem?.id,
   });
 
+  const { data: dailyVisits = [] } = useQuery({
+    queryKey: ["classVisits", classItem?.id],
+    queryFn: () => base44.entities.DailyVisit.filter({ class_id: classItem.id }),
+    enabled: !!classItem?.id,
+  });
+
   const markMutation = useMutation({
     mutationFn: ({ id, attended }) => base44.entities.Reservation.update(id, { attended }),
     onSuccess: () => {
@@ -39,6 +45,12 @@ export default function ClassAttendees({ classItem, onClose }) {
           <DialogTitle>{classItem?.title} - Katılımcılar</DialogTitle>
         </DialogHeader>
 
+        <div className="flex flex-wrap gap-3 text-xs mb-2">
+          <span className="flex items-center gap-1 text-muted-foreground font-medium">
+            Toplam: {attendees.length + dailyVisits.length} kişi
+            {dailyVisits.length > 0 && ` (${attendees.length} üye + ${dailyVisits.length} günlük)`}
+          </span>
+        </div>
         {isClassPast && attendees.length > 0 && (
           <div className="flex gap-3 text-xs mb-2">
             <span className="flex items-center gap-1 text-green-600 font-medium">
@@ -61,57 +73,91 @@ export default function ClassAttendees({ classItem, onClose }) {
               <div key={i} className="h-10 bg-muted rounded animate-pulse" />
             ))}
           </div>
-        ) : attendees.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground text-sm">
-            Henüz katılımcı yok
-          </div>
         ) : (
-          <div className="space-y-2 max-h-[60vh] overflow-y-auto">
-            {attendees.map((a, i) => (
-              <div
-                key={a.id}
-                className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
-                  a.attended === true
-                    ? "bg-green-50 border border-green-200"
-                    : a.attended === false
-                    ? "bg-red-50 border border-red-200"
-                    : "bg-secondary/50"
-                }`}
-              >
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <User className="w-4 h-4 text-primary" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">{a.user_name}</p>
-                  <p className="text-xs text-muted-foreground truncate">{a.user_email}</p>
-                </div>
-
-                {isClassPast ? (
-                  <div className="flex gap-1 shrink-0">
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className={`h-7 w-7 ${a.attended === true ? "text-green-600 bg-green-100" : "text-muted-foreground"}`}
-                      onClick={() => markMutation.mutate({ id: a.id, attended: a.attended === true ? null : true })}
-                      title="Geldi"
+          <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+            {/* Üye Rezervasyonları */}
+            {attendees.length > 0 && (
+              <div>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+                  Üye Rezervasyonları ({attendees.length})
+                </p>
+                <div className="space-y-2">
+                  {attendees.map((a, i) => (
+                    <div
+                      key={a.id}
+                      className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
+                        a.attended === true
+                          ? "bg-green-50 border border-green-200"
+                          : a.attended === false
+                          ? "bg-red-50 border border-red-200"
+                          : "bg-secondary/50"
+                      }`}
                     >
-                      <CheckCircle2 className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className={`h-7 w-7 ${a.attended === false ? "text-destructive bg-red-100" : "text-muted-foreground"}`}
-                      onClick={() => markMutation.mutate({ id: a.id, attended: a.attended === false ? null : false })}
-                      title="Gelmedi"
-                    >
-                      <XCircle className="w-4 h-4" />
-                    </Button>
-                  </div>
-                ) : (
-                  <Badge variant="secondary" className="text-xs shrink-0">{i + 1}</Badge>
-                )}
+                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <User className="w-4 h-4 text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{a.user_name}</p>
+                        <p className="text-xs text-muted-foreground truncate">{a.user_email}</p>
+                      </div>
+                      {isClassPast ? (
+                        <div className="flex gap-1 shrink-0">
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className={`h-7 w-7 ${a.attended === true ? "text-green-600 bg-green-100" : "text-muted-foreground"}`}
+                            onClick={() => markMutation.mutate({ id: a.id, attended: a.attended === true ? null : true })}
+                            title="Geldi"
+                          >
+                            <CheckCircle2 className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className={`h-7 w-7 ${a.attended === false ? "text-destructive bg-red-100" : "text-muted-foreground"}`}
+                            onClick={() => markMutation.mutate({ id: a.id, attended: a.attended === false ? null : false })}
+                            title="Gelmedi"
+                          >
+                            <XCircle className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <Badge variant="secondary" className="text-xs shrink-0">{i + 1}</Badge>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
-            ))}
+            )}
+
+            {/* Günlük Ziyaretçiler */}
+            {dailyVisits.length > 0 && (
+              <div>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+                  Günlük Girişler ({dailyVisits.length})
+                </p>
+                <div className="space-y-2">
+                  {dailyVisits.map((v, i) => (
+                    <div key={v.id} className="flex items-center gap-3 p-3 rounded-lg bg-orange-50 border border-orange-200">
+                      <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
+                        <User className="w-4 h-4 text-orange-500" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{v.full_name}</p>
+                        <p className="text-xs text-muted-foreground truncate">{v.phone}</p>
+                      </div>
+                      <Badge className="text-xs shrink-0 bg-orange-100 text-orange-700 border-orange-200">Günlük</Badge>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {attendees.length === 0 && dailyVisits.length === 0 && (
+              <div className="text-center py-8 text-muted-foreground text-sm">
+                Henüz katılımcı yok
+              </div>
+            )}
           </div>
         )}
       </DialogContent>
