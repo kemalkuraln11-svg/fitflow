@@ -41,6 +41,20 @@ export default function TrialApplicationForm({ onBack }) {
     enabled: !!form.trial_class_date,
   });
 
+  const { data: existingTrialApp } = useQuery({
+    queryKey: ["existingTrialApp", form.first_name, form.last_name, form.phone],
+    queryFn: async () => {
+      if (!form.first_name || !form.last_name || !form.phone) return null;
+      const existing = await base44.entities.TrialApplication.filter({
+        first_name: form.first_name,
+        last_name: form.last_name,
+        phone: form.phone,
+      });
+      return existing && existing.length > 0 ? existing[0] : null;
+    },
+    enabled: !!form.first_name && !!form.last_name && !!form.phone,
+  });
+
   const { data: approvedTrialApp } = useQuery({
     queryKey: ["approvedTrialApp", form.first_name, form.last_name, form.phone],
     queryFn: async () => {
@@ -204,10 +218,13 @@ export default function TrialApplicationForm({ onBack }) {
             <Button
               type="submit"
               className="w-full h-10 font-semibold shadow-lg shadow-primary/25 mt-1"
-              disabled={!form.first_name || !form.last_name || !form.phone}
+              disabled={!form.first_name || !form.last_name || !form.phone || !!existingTrialApp}
             >
-              Devam Et
+              {existingTrialApp ? "Başvurunuz Var" : "Devam Et"}
             </Button>
+            {existingTrialApp && (
+              <p className="text-xs text-destructive text-center">Bu bilgilerle zaten bir başvurunuz bulunuyor.</p>
+            )}
           </form>
         ) : (
            <form onSubmit={handleSubmit} className="space-y-4">
