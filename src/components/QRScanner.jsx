@@ -141,8 +141,10 @@ export default function QRScanner({ onClose }) {
       ctx.drawImage(video, 0, 0);
       console.log("[QRScanner] Frame yakalandı, taranıyor...");
 
-      // Scan the captured image
-      QrScanner.scanImage(canvas)
+      // Get image data and scan
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      
+      QrScanner.scanImage(imageData, { returnDetailedScanResult: true })
         .then(result => {
           console.log("[QRScanner] Tarama sonucu:", result);
           const qrData = result?.data || result;
@@ -153,16 +155,22 @@ export default function QRScanner({ onClose }) {
             handleScan(qrData);
           } else {
             console.log("[QRScanner] QR kodu bulunamadı, tekrar deniyor...");
-            setTimeout(captureAndScanQR, 500);
+            if (cameraActiveRef.current) {
+              setTimeout(captureAndScanQR, 300);
+            }
           }
         })
         .catch(err => {
-          console.error("[QRScanner] Tarama hatası:", err);
-          setTimeout(captureAndScanQR, 500);
+          console.log("[QRScanner] Tarama deneniyor...");
+          if (cameraActiveRef.current) {
+            setTimeout(captureAndScanQR, 300);
+          }
         });
     } catch (err) {
       console.error("[QRScanner] Frame yakalanamadı:", err);
-      setTimeout(captureAndScanQR, 500);
+      if (cameraActiveRef.current) {
+        setTimeout(captureAndScanQR, 300);
+      }
     }
   };
 
