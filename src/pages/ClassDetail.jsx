@@ -31,6 +31,16 @@ export default function ClassDetail() {
     },
   });
 
+  const { data: classReservations = [] } = useQuery({
+    queryKey: ["classReservations", id],
+    queryFn: () => base44.entities.Reservation.filter({ class_id: id, status: "confirmed" }),
+  });
+
+  const { data: classVisits = [] } = useQuery({
+    queryKey: ["classVisits", id],
+    queryFn: () => base44.entities.DailyVisit.filter({ class_id: id }),
+  });
+
   const { data: myReservation } = useQuery({
     queryKey: ["myReservation", id, user?.user_email],
     queryFn: async () => {
@@ -126,7 +136,8 @@ export default function ClassDetail() {
     );
   }
 
-  const isFull = (cls.current_count || 0) >= cls.capacity;
+  const totalCount = classReservations.length + classVisits.length;
+  const isFull = totalCount >= cls.capacity;
   const hasReservation = !!myReservation;
 
   const today = new Date();
@@ -200,7 +211,7 @@ export default function ClassDetail() {
         </Card>
         <Card className="p-3 text-center">
           <Users className="w-5 h-5 mx-auto mb-1.5 text-accent" />
-          <p className="font-semibold text-sm">{cls.current_count || 0} / {cls.capacity}</p>
+          <p className="font-semibold text-sm">{totalCount} / {cls.capacity}</p>
           <p className="text-xs text-muted-foreground mt-0.5">Katılımcı</p>
         </Card>
       </div>
