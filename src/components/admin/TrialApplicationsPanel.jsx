@@ -417,14 +417,26 @@ export default function TrialApplicationsPanel() {
                        </div>
                      )}
                     </div>
+                    <div className="flex flex-col gap-1.5 shrink-0">
+                      <Button
+                       size="sm"
+                       className="h-8 text-xs gap-1 bg-green-600 hover:bg-green-700"
+                      onClick={() => { setCreatingMember(app); setPlan("Aylık"); }}
+                    >
+                      <UserPlus className="w-3.5 h-3.5" />
+                      Kayıt Oluştur
+                    </Button>
                     <Button
-                     size="sm"
-                     className="h-8 text-xs gap-1 bg-green-600 hover:bg-green-700 shrink-0"
-                    onClick={() => { setCreatingMember(app); setPlan("Aylık"); }}
-                  >
-                    <UserPlus className="w-3.5 h-3.5" />
-                    Kayıt Oluştur
-                  </Button>
+                      size="sm"
+                      variant="outline"
+                      className="h-8 text-xs gap-1 border-destructive/30 text-destructive hover:bg-destructive/10"
+                      onClick={() => deleteMutation.mutate(app.id)}
+                      disabled={deleteMutation.isPending}
+                    >
+                      <XCircle className="w-3.5 h-3.5" />
+                      Sil
+                    </Button>
+                    </div>
                 </div>
               </Card>
             ))}
