@@ -77,9 +77,9 @@ export default function TrialApplicationForm({ onBack }) {
   };
 
   const handleNextStep = (e) => {
-    e.preventDefault();
-    if (!form.first_name || !form.last_name || !form.phone) return;
-    setStep(2);
+   e.preventDefault();
+   if (!form.first_name || !form.last_name || !form.phone || !form.payment_type) return;
+   setStep(2);
   };
 
   const handleSubmit = (e) => {
@@ -182,10 +182,23 @@ export default function TrialApplicationForm({ onBack }) {
                 onChange={(e) => setForm({ ...form, phone: e.target.value })}
               />
             </div>
+            <div>
+              <Label className="text-xs">Ödeme Türü</Label>
+              <Select value={form.payment_type} onValueChange={(v) => setForm({ ...form, payment_type: v })}>
+                <SelectTrigger className="mt-0.5">
+                  <SelectValue placeholder="Ödeme türü seçin" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="nakit">Nakit</SelectItem>
+                  <SelectItem value="kredi_karti">Kredi Kartı</SelectItem>
+                  <SelectItem value="havale">Havale / EFT</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
             <Button
               type="submit"
               className="w-full h-10 font-semibold shadow-lg shadow-primary/25 mt-1"
-              disabled={!form.first_name || !form.last_name || !form.phone}
+              disabled={!form.first_name || !form.last_name || !form.phone || !form.payment_type}
             >
               Devam Et
             </Button>
@@ -224,21 +237,6 @@ export default function TrialApplicationForm({ onBack }) {
                       {cls.title} — {cls.start_time}
                     </SelectItem>
                   ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Ödeme türü */}
-            <div>
-              <Label className="text-xs">Ödeme Türü</Label>
-              <Select value={form.payment_type} onValueChange={(v) => setForm({ ...form, payment_type: v })}>
-                <SelectTrigger className="mt-0.5">
-                  <SelectValue placeholder="Ödeme türü seçin" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="nakit">Nakit</SelectItem>
-                  <SelectItem value="kredi_karti">Kredi Kartı</SelectItem>
-                  <SelectItem value="havale">Havale / EFT</SelectItem>
                 </SelectContent>
               </Select>
             </div>
