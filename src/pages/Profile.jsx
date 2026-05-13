@@ -1,12 +1,13 @@
 import { base44 } from "@/api/base44Client";
 import { useMemberAuth } from "@/lib/MemberAuthContext";
 import { useQuery } from "@tanstack/react-query";
-import { format, parseISO, differenceInDays, parse, isBefore } from "date-fns";
+import { format, parseISO, differenceInDays, parse, isBefore, isPast } from "date-fns";
 import { tr } from "date-fns/locale";
-import { Calendar, LogOut, Clock } from "lucide-react";
+import { Calendar, LogOut, Clock, CheckCircle2, History } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
 import ExpiredMembershipModal from "@/components/ExpiredMembershipModal";
 import ReservationsBottomSheet from "@/components/ReservationsBottomSheet";
 
@@ -67,6 +68,16 @@ export default function Profile() {
     ? Math.max(0, differenceInDays(parseISO(membership.end_date), new Date()))
     : 0;
   const progress = totalDays > 0 ? ((totalDays - daysLeft) / totalDays) * 100 : 0;
+
+  const now = new Date();
+  const pastReservations = reservations.filter((r) => {
+    const dt = parse(`${r.class_date} ${r.class_time}`, "yyyy-MM-dd HH:mm", new Date());
+    return isPast(dt);
+  });
+  const upcomingReservations = reservations.filter((r) => {
+    const dt = parse(`${r.class_date} ${r.class_time}`, "yyyy-MM-dd HH:mm", new Date());
+    return !isPast(dt);
+  });
 
 
 
@@ -137,15 +148,46 @@ export default function Profile() {
           <h3 className="font-semibold text-sm mb-4">İstatistikler</h3>
           <div className="grid grid-cols-2 gap-3 mb-4">
             <div className="text-center p-4 bg-primary/5 rounded-lg">
-              <p className="text-3xl font-bold text-primary">{reservations.length}</p>
-              <p className="text-xs text-muted-foreground mt-1">Aktif Rezervasyon</p>
+              <p className="text-3xl font-bold text-primary">{upcomingReservations.length}</p>
+              <p className="text-xs text-muted-foreground mt-1">Yaklaşan Ders</p>
             </div>
             <div className="text-center p-4 bg-accent/10 rounded-lg">
-              <p className="text-3xl font-bold text-accent">{daysLeft}</p>
-              <p className="text-xs text-muted-foreground mt-1">Kalan Gün</p>
+              <p className="text-3xl font-bold text-accent">{pastReservations.length}</p>
+              <p className="text-xs text-muted-foreground mt-1">Katıldığım Ders</p>
             </div>
           </div>
           <ReservationsBottomSheet reservations={reservations} />
+        </Card>
+
+        {/* Geçmiş Ders Kayıtları */}
+        <Card className="p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <History className="w-4 h-4 text-primary flex-shrink-0" />
+            <h3 className="font-semibold text-sm">Geçmiş Derslerim</h3>
+            <Badge variant="secondary" className="ml-auto text-xs">{pastReservations.length} ders</Badge>
+          </div>
+
+          {pastReservations.length === 0 ? (
+            <div className="text-center py-4 text-muted-foreground">
+              <CheckCircle2 className="w-6 h-6 mx-auto mb-2 opacity-30" />
+              <p className="text-xs">Henüz tamamlanan ders yok</p>
+            </div>
+          ) : (
+            <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+              {[...pastReservations].reverse().map((r) => (
+                <div key={r.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted/40">
+                  <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-medium truncate">{r.class_title}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {format(parseISO(r.class_date), "d MMM yyyy", { locale: tr })}
+                      {r.class_time ? ` · ${r.class_time}` : ""}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </Card>
 
         {/* Actions */}
