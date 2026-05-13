@@ -30,7 +30,6 @@ export default function TrialApplicationForm({ onBack }) {
     trial_class_title: "",
     trial_class_date: today,
     trial_class_time: "",
-    payment_type: "",
   });
   const [success, setSuccess] = useState(false);
   const [blacklisted, setBlacklisted] = useState(false);
@@ -77,14 +76,13 @@ export default function TrialApplicationForm({ onBack }) {
   };
 
   const handleNextStep = (e) => {
-   e.preventDefault();
-   if (!form.first_name || !form.last_name || !form.phone || !form.payment_type) return;
-   setStep(2);
+    e.preventDefault();
+    if (!form.first_name || !form.last_name || !form.phone) return;
+    setStep(2);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!form.payment_type) return;
     mutation.mutate({
       first_name: form.first_name.trim(),
       last_name: form.last_name.trim(),
@@ -93,7 +91,6 @@ export default function TrialApplicationForm({ onBack }) {
       trial_class_title: form.trial_class_title,
       trial_class_date: form.trial_class_date,
       trial_class_time: form.trial_class_time,
-      payment_type: form.payment_type,
       status: "pending",
     });
   };
@@ -182,23 +179,10 @@ export default function TrialApplicationForm({ onBack }) {
                 onChange={(e) => setForm({ ...form, phone: e.target.value })}
               />
             </div>
-            <div>
-              <Label className="text-xs">Ödeme Türü</Label>
-              <Select value={form.payment_type} onValueChange={(v) => setForm({ ...form, payment_type: v })}>
-                <SelectTrigger className="mt-0.5">
-                  <SelectValue placeholder="Ödeme türü seçin" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="nakit">Nakit</SelectItem>
-                  <SelectItem value="kredi_karti">Kredi Kartı</SelectItem>
-                  <SelectItem value="havale">Havale / EFT</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
             <Button
               type="submit"
               className="w-full h-10 font-semibold shadow-lg shadow-primary/25 mt-1"
-              disabled={!form.first_name || !form.last_name || !form.phone || !form.payment_type}
+              disabled={!form.first_name || !form.last_name || !form.phone}
             >
               Devam Et
             </Button>
@@ -244,7 +228,7 @@ export default function TrialApplicationForm({ onBack }) {
             <Button
               type="submit"
               className="w-full h-10 font-semibold shadow-lg shadow-primary/25 mt-1"
-              disabled={!form.payment_type || mutation.isPending}
+              disabled={mutation.isPending}
             >
               {mutation.isPending ? "Gönderiliyor..." : "Başvuruyu Gönder"}
             </Button>
