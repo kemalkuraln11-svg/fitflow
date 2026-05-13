@@ -4,7 +4,7 @@ import { hashPassword } from "@/lib/crypto";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { format, parseISO, differenceInDays, addDays } from "date-fns";
 import { tr } from "date-fns/locale";
-import { Plus, Trash2, Eye, Copy, Pencil, Snowflake, Sun } from "lucide-react";
+import { Plus, Trash2, Eye, Copy, Pencil, Snowflake, Sun, QrCode } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import TrialApplicationsPanel from "@/components/admin/TrialApplicationsPanel";
+import QRScanner from "@/components/QRScanner";
 
 function generateUsername(fullName) {
   return fullName
@@ -54,6 +55,7 @@ export default function AdminMembers() {
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState("members");
   const [showForm, setShowForm] = useState(false);
+  const [showQRScanner, setShowQRScanner] = useState(false);
 
   const { data: pendingApps = [] } = useQuery({
     queryKey: ["trialApplicationsPending"],
@@ -180,6 +182,8 @@ export default function AdminMembers() {
 
   return (
     <div>
+      {showQRScanner && <QRScanner onClose={() => setShowQRScanner(false)} />}
+
       {/* Sekmeler */}
       <div className="flex gap-1 mb-5 bg-muted rounded-xl p-1">
         <button
@@ -200,6 +204,11 @@ export default function AdminMembers() {
           )}
         </button>
       </div>
+
+      <Button className="w-full gap-2 mb-4 bg-primary" onClick={() => setShowQRScanner(true)}>
+        <QrCode className="w-4 h-4" />
+        QR Tara
+      </Button>
 
       {activeTab === "applications" && <TrialApplicationsPanel />}
 

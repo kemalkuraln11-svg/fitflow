@@ -50,6 +50,11 @@
       "default": "pending",
       "description": "Ba\u015fvuru durumu"
     },
+    "attended": {
+      "type": "boolean",
+      "default": null,
+      "description": "Derse kat\u0131l\u0131p kat\u0131lmad\u0131\u011f\u0131 (QR ile i\u015faretleme)"
+    },
     "notes": {
       "type": "string",
       "description": "Admin notu"

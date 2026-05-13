@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
+import QRCodeDisplay from "@/components/QRCodeDisplay";
 
 function capitalizeName(str) {
   if (!str) return "";
@@ -31,6 +32,7 @@ export default function TrialApplicationForm({ onBack }) {
     trial_class_time: "",
   });
   const [success, setSuccess] = useState(false);
+  const [successData, setSuccessData] = useState(null);
   const [blacklisted, setBlacklisted] = useState(false);
   const [step, setStep] = useState(1);
   const [approvedApp, setApprovedApp] = useState(null);
@@ -88,7 +90,7 @@ export default function TrialApplicationForm({ onBack }) {
 
   const mutation = useMutation({
     mutationFn: async (data) => {
-      // Kontrolü: aynı ad+soyad+telefon kombinasyonu ile daha önce başvuru var mı?
+      // Check if already applied (any status)
       const existing = await base44.entities.TrialApplication.filter({
         first_name: data.first_name,
         last_name: data.last_name,
@@ -99,7 +101,12 @@ export default function TrialApplicationForm({ onBack }) {
       }
       return base44.entities.TrialApplication.create(data);
     },
-    onSuccess: () => setSuccess(true),
+    onSuccess: (result) => {
+      // Generate QR data for successful application
+      const qrData = `trial:${form.first_name} ${form.last_name}:${form.phone}`;
+      setSuccessData({ ...result, qrData });
+      setSuccess(true);
+    },
     onError: (err) => {
       if (err.message === "ALREADY_APPLIED") {
         setBlacklisted(true);
@@ -142,22 +149,28 @@ export default function TrialApplicationForm({ onBack }) {
     );
   }
 
-  if (success) {
+  if (success && successData) {
     return (
-      <div className="min-h-[100dvh] flex flex-col items-center justify-center px-6 text-center">
+      <div className="min-h-[100dvh] flex flex-col items-center justify-start px-6 pt-6 pb-10 max-w-md mx-auto overflow-y-auto">
         <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mb-4">
           <CheckCircle2 className="w-8 h-8 text-green-600" />
         </div>
-        <h2 className="text-xl font-bold mb-2">Başvurunuz Alındı!</h2>
-        <p className="text-muted-foreground text-sm mb-2 leading-relaxed">
+        <h2 className="text-xl font-bold mb-2 text-center">Başvurunuz Alındı!</h2>
+        <p className="text-muted-foreground text-sm mb-4 leading-relaxed text-center">
           Başvurunuz salon yönetimine iletildi.
         </p>
         {form.trial_class_title && (
-          <p className="text-sm font-medium text-primary mb-6">
+          <p className="text-sm font-medium text-primary mb-6 text-center">
             {capitalizeName(form.first_name + " " + form.last_name)} — {form.trial_class_title}, {format(new Date(form.trial_class_date), "d MMMM", { locale: tr })} {form.trial_class_time}
           </p>
         )}
-        <Button variant="ghost" onClick={onBack}>
+
+        <Card className="w-full p-4 mb-6">
+          <p className="text-xs text-muted-foreground mb-3 text-center font-semibold">Derse geldiğinizde bu QR kodunuz taranacak:</p>
+          <QRCodeDisplay data={successData.qrData} />
+        </Card>
+
+        <Button className="w-full" onClick={onBack}>
           Giriş Ekranına Dön
         </Button>
       </div>

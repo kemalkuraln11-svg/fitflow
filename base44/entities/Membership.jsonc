@@ -18,6 +18,10 @@
       "type": "string",
       "description": "Password set by admin"
     },
+    "phone": {
+      "type": "string",
+      "description": "Phone number of the member"
+    },
     "gender": {
       "type": "string",
       "enum": [
@@ -55,6 +59,11 @@
       "type": "string",
       "format": "date",
       "description": "Date when membership was frozen"
+    },
+    "attended": {
+      "type": "boolean",
+      "default": null,
+      "description": "Attendance status (marked via QR)"
     }
   },
   "required": [

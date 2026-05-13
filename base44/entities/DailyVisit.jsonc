@@ -26,6 +26,11 @@
     "class_time": {
       "type": "string",
       "description": "Start time of the class"
+    },
+    "attended": {
+      "type": "boolean",
+      "default": null,
+      "description": "Whether the visitor attended (QR ile i\u015faretleme)"
     }
   },
   "required": [
