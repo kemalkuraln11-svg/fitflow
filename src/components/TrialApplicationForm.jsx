@@ -103,7 +103,7 @@ export default function TrialApplicationForm({ onBack }) {
     },
     onSuccess: (result) => {
       // Generate QR data for successful application
-      const qrData = `trial:${form.first_name} ${form.last_name}:${form.phone}`;
+      const qrData = `trial:${form.first_name} ${form.last_name}:${form.phone}:${form.trial_class_date}:${form.trial_class_time}`;
       setSuccessData({ ...result, qrData });
       setSuccess(true);
     },

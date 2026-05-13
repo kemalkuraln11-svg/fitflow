@@ -15,12 +15,13 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'QR data is required' }, { status: 400 });
     }
 
-    // Parse QR data (format: "type:name:phone" or "type:name:phone:date")
+    // Parse QR data (format: "type:name:phone:date:time" or variations)
     const parts = qr_data.split(':');
     const type = parts[0];
     const name = parts[1];
     const phone = parts[2];
     const date = parts[3] || new Date().toISOString().split('T')[0];
+    const time = parts[4] || '';
 
     // Normalize name
     const nameParts = name.split(' ');
@@ -35,7 +36,9 @@ Deno.serve(async (req) => {
       const app = apps.find(
         a => a.first_name.toLowerCase() === firstName.toLowerCase() &&
              a.last_name.toLowerCase() === lastName.toLowerCase() &&
-             a.phone === phone
+             a.phone === phone &&
+             a.trial_class_date === date &&
+             (time === '' || a.trial_class_time === time)
       );
 
       if (app) {
@@ -60,7 +63,8 @@ Deno.serve(async (req) => {
       const visit = visits.find(
         v => v.full_name.toLowerCase() === name.toLowerCase() &&
              v.phone === phone &&
-             v.visit_date === date
+             v.visit_date === date &&
+             (time === '' || v.class_time === time)
       );
 
       if (visit) {
@@ -80,11 +84,14 @@ Deno.serve(async (req) => {
       }
     } else if (type === 'member') {
       // Search in Membership - name is username, phone is user_name
+      // QR format: member:username:date:time
       const memberships = await base44.asServiceRole.entities.Membership.list();
       const member = memberships.find(m => m.username === name || m.username.toLowerCase() === name.toLowerCase());
 
       if (member) {
         result.found = true;
+        result.classDate = date;
+        result.classTime = time;
         result.person = {
           id: member.id,
           fullName: member.user_name,

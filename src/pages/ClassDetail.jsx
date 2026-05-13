@@ -176,7 +176,7 @@ export default function ClassDetail() {
 
         <Card className="w-full p-4 mb-6">
           <p className="text-xs text-muted-foreground mb-3 text-center font-semibold">Derse girerken bu QR kodunuz taranacak:</p>
-          <QRCodeDisplay data={`member:${user.username}`} />
+          <QRCodeDisplay data={`member:${user.username}:${cls.date}:${cls.start_time}`} />
         </Card>
 
         <Button className="w-full" onClick={() => navigate("/")}>
@@ -263,7 +263,7 @@ export default function ClassDetail() {
       {hasReservation && (
         <Card className="p-4 mb-6">
           <p className="text-xs text-muted-foreground mb-3 text-center font-semibold">Derse girerken bu QR kodunuz taranacak:</p>
-          <QRCodeDisplay data={`member:${user.username}`} />
+          <QRCodeDisplay data={`member:${user.username}:${cls.date}:${cls.start_time}`} />
         </Card>
       )}
 
