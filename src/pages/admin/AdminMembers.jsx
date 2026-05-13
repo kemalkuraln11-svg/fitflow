@@ -81,6 +81,9 @@ export default function AdminMembers() {
       setCreatedMember({ ...result, plaintextPassword: variables._plaintextPassword });
       setForm(emptyForm);
     },
+    onError: (err) => {
+      toast.error("Üye oluşturulamadı: " + (err?.message || JSON.stringify(err)));
+    },
   });
 
   const updateMutation = useMutation({
