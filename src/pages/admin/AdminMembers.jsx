@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { base44 } from "@/api/base44Client";
+import { hashPassword } from "@/lib/crypto";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { format, parseISO, differenceInDays, addDays } from "date-fns";
 import { tr } from "date-fns/locale";
-import { Plus, Trash2, Eye, EyeOff, Copy, Pencil, Snowflake, Sun } from "lucide-react";
+import { Plus, Trash2, Eye, Copy, Pencil, Snowflake, Sun } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -51,8 +52,8 @@ const getPlanDuration = (planName) => {
 export default function AdminMembers() {
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
-  const [showPasswordFor, setShowPasswordFor] = useState(null);
-  const [createdMember, setCreatedMember] = useState(null);
+  const [createdMember, setCreatedMember] = useState(null); // { ...memberResult, plaintextPassword }
+
   const [editingMember, setEditingMember] = useState(null);
 
   const emptyForm = {
@@ -74,10 +75,10 @@ export default function AdminMembers() {
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.Membership.create(data),
-    onSuccess: (result) => {
+    onSuccess: (result, variables) => {
       queryClient.invalidateQueries({ queryKey: ["allMembers"] });
       setShowForm(false);
-      setCreatedMember(result);
+      setCreatedMember({ ...result, plaintextPassword: variables._plaintextPassword });
       setForm(emptyForm);
     },
   });
@@ -99,11 +100,15 @@ export default function AdminMembers() {
     },
   });
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
+    const plaintext = form.password;
+    const hashed = await hashPassword(plaintext);
     createMutation.mutate({
       ...form,
+      password: hashed,
       username: autoUsername,
       user_email: autoEmail,
+      _plaintextPassword: plaintext,
     });
   };
 
@@ -121,8 +126,13 @@ export default function AdminMembers() {
     setEditingMember(member);
   };
 
-  const handleUpdate = () => {
-    updateMutation.mutate({ id: editingMember.id, data: editForm });
+  const handleUpdate = async () => {
+    let data = { ...editForm };
+    // Only re-hash if password field was changed (not already a 64-char hex hash)
+    if (data.password && !/^[a-f0-9]{64}$/.test(data.password)) {
+      data.password = await hashPassword(data.password);
+    }
+    updateMutation.mutate({ id: editingMember.id, data });
   };
 
   const handleFreeze = (member) => {
@@ -255,9 +265,9 @@ export default function AdminMembers() {
               <div className="border-t border-primary/20 pt-3 flex items-center justify-between">
                 <div>
                   <p className="text-xs text-muted-foreground">Şifre</p>
-                  <p className="font-bold text-lg text-foreground">{createdMember?.password}</p>
+                  <p className="font-bold text-lg text-foreground">{createdMember?.plaintextPassword}</p>
                 </div>
-                <Button variant="ghost" size="icon" onClick={() => copyToClipboard(createdMember?.password)}>
+                <Button variant="ghost" size="icon" onClick={() => copyToClipboard(createdMember?.plaintextPassword)}>
                   <Copy className="w-4 h-4" />
                 </Button>
               </div>
@@ -349,7 +359,6 @@ export default function AdminMembers() {
         <div className="space-y-2">
           {members.map((member) => {
             const daysLeft = Math.max(0, differenceInDays(parseISO(member.end_date), new Date()));
-            const isShowingPassword = showPasswordFor === member.id;
             const isFrozen = member.status === "frozen";
             return (
               <Card key={member.id} className="p-4">
@@ -364,13 +373,10 @@ export default function AdminMembers() {
                     </div>
                     <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
                       <span>👤 {member.username}</span>
-                      <button
-                        className="flex items-center gap-1 hover:text-foreground transition-colors"
-                        onClick={() => setShowPasswordFor(isShowingPassword ? null : member.id)}
-                      >
-                        {isShowingPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                        {isShowingPassword ? member.password : "••••••"}
-                      </button>
+                      <span className="flex items-center gap-1 text-muted-foreground text-xs">
+                        <Eye className="w-3.5 h-3.5" />
+                        ••••••
+                      </span>
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">
                       {member.plan_name} •{" "}

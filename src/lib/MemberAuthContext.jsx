@@ -1,5 +1,6 @@
 import { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import { base44 } from '@/api/base44Client';
+import { hashPassword } from '@/lib/crypto';
 
 const MemberAuthContext = createContext();
 
@@ -29,9 +30,10 @@ export const MemberAuthProvider = ({ children }) => {
   }, []);
 
   const login = async (username, password) => {
+    const hashed = await hashPassword(password);
     const results = await base44.entities.Membership.filter({
       username: username.toLowerCase().trim(),
-      password: password,
+      password: hashed,
     });
 
     if (!results || results.length === 0) {
