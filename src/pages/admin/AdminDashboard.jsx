@@ -78,17 +78,22 @@ export default function AdminDashboard() {
                   </p>
                 </div>
                 <div className="text-left sm:text-right flex-shrink-0">
-                  <p className="font-bold text-primary">{cls.current_count || 0}/{cls.capacity}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {(() => {
-                      const rezCount = todayReservations.filter(r => r.class_id === cls.id).length;
-                      const visitCount = todayVisits.filter(v => v.class_id === cls.id).length;
-                      const parts = [];
-                      if (rezCount > 0) parts.push(`${rezCount} rez.`);
-                      if (visitCount > 0) parts.push(`${visitCount} günlük`);
-                      return parts.length > 0 ? parts.join(" + ") : "kişi";
-                    })()}
-                  </p>
+                  {(() => {
+                    const rezCount = todayReservations.filter(r => r.class_id === cls.id).length;
+                    const visitCount = todayVisits.filter(v => v.class_id === cls.id).length;
+                    const total = rezCount + visitCount;
+                    const parts = [];
+                    if (rezCount > 0) parts.push(`${rezCount} rez.`);
+                    if (visitCount > 0) parts.push(`${visitCount} günlük`);
+                    return (
+                      <>
+                        <p className="font-bold text-primary">{total}/{cls.capacity}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {parts.length > 0 ? parts.join(" + ") : "kişi yok"}
+                        </p>
+                      </>
+                    );
+                  })()}
                 </div>
               </Card>
             ))}
