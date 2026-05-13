@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { format, parseISO } from "date-fns";
 import { tr } from "date-fns/locale";
-import jsQR from "jsqr";
+import QrScanner from "qr-scanner";
 
 const typeLabels = {
   trial: "Deneme Dersi",
@@ -98,48 +98,38 @@ export default function QRScanner({ onClose }) {
   };
 
   const stopCamera = () => {
+    if (animationRef.current && animationRef.current.stop) {
+      animationRef.current.stop();
+    }
     if (cameraStreamRef.current) {
       cameraStreamRef.current.getTracks().forEach(track => track.stop());
       cameraStreamRef.current = null;
-    }
-    if (animationRef.current) {
-      cancelAnimationFrame(animationRef.current);
     }
     setCameraActive(false);
   };
 
   const scanQRFromCamera = () => {
-    if (!cameraActive || !videoRef.current || !canvasRef.current) return;
+    if (!cameraActive || !videoRef.current) return;
 
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d", { willReadFrequently: true });
-
-    if (video.readyState === video.HAVE_ENOUGH_DATA) {
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      ctx.drawImage(video, 0, 0);
-
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
-      try {
-        const qrCode = jsQR(imageData.data, imageData.width, imageData.height, {
-          inversionAttempts: "dontInvert"
-        });
-
-        if (qrCode && qrCode.data) {
-          setQrInput(qrCode.data);
+    const scanner = new QrScanner(
+      videoRef.current,
+      (result) => {
+        if (result?.data) {
+          setQrInput(result.data);
           stopCamera();
           setUseCamera(false);
           handleScan();
-          return;
         }
-      } catch (err) {
-        console.error("QR scan error:", err);
+      },
+      {
+        onDecodeError: () => {},
+        preferredCamera: "environment",
+        highlightCodeOutlineColor: "#ff6600",
       }
-    }
+    );
 
-    animationRef.current = requestAnimationFrame(scanQRFromCamera);
+    scanner.start();
+    animationRef.current = scanner;
   };
 
   useEffect(() => {
@@ -186,7 +176,7 @@ export default function QRScanner({ onClose }) {
                  className="w-full rounded-lg bg-black"
                  style={{ aspectRatio: "16/9" }}
                />
-               <canvas ref={canvasRef} style={{ display: "none" }} />
+
                <Button
                  onClick={() => {
                    stopCamera();
