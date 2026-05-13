@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { hashPassword } from "@/lib/crypto";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -48,6 +48,30 @@ export default function TrialApplicationsPanel() {
     queryKey: ["trialApplications"],
     queryFn: () => base44.entities.TrialApplication.list("-created_date", 100),
   });
+
+  const [classDetails, setClassDetails] = useState({});
+
+  useEffect(() => {
+    const fetchClassDetails = async () => {
+      const classIds = [...new Set(applications.map(a => a.trial_class_id).filter(Boolean))];
+      const details = {};
+      
+      for (const classId of classIds) {
+        try {
+          const allClasses = await base44.entities.ClassSchedule.list();
+          const classData = allClasses.find(c => c.id === classId);
+          if (classData) details[classId] = classData;
+        } catch (err) {
+          console.log("Sınıf detayları yüklenemedi:", err);
+        }
+      }
+      setClassDetails(details);
+    };
+    
+    if (applications.length > 0) {
+      fetchClassDetails();
+    }
+  }, [applications]);
 
   const pending = applications.filter((a) => a.status === "pending");
   const reviewed = applications.filter((a) => a.status !== "pending");
@@ -260,13 +284,21 @@ export default function TrialApplicationsPanel() {
                     <p className="font-semibold">{capitalizeName(app.first_name + " " + app.last_name)}</p>
                     <p className="text-sm text-muted-foreground">{app.phone}</p>
                     {app.trial_class_title && (
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        🎯 {app.trial_class_title} — {app.trial_class_date ? format(parseISO(app.trial_class_date), "d MMM", { locale: tr }) : ""} {app.trial_class_time}
-                      </p>
-                    )}
-                    {app.payment_type && (
-                      <p className="text-xs text-muted-foreground">💳 {paymentLabels[app.payment_type] || app.payment_type}</p>
-                    )}
+                       <div className="text-xs text-muted-foreground mt-0.5 space-y-0.5">
+                         <p>🎯 {app.trial_class_title} — {app.trial_class_date ? format(parseISO(app.trial_class_date), "d MMM", { locale: tr }) : ""} {app.trial_class_time}</p>
+                         {classDetails[app.trial_class_id] && (
+                           <>
+                             {classDetails[app.trial_class_id].instructor && (
+                               <p>👨‍🏫 {classDetails[app.trial_class_id].instructor}</p>
+                             )}
+                             <p>👥 {classDetails[app.trial_class_id].current_count || 0}/{classDetails[app.trial_class_id].capacity}</p>
+                           </>
+                         )}
+                       </div>
+                     )}
+                     {app.payment_type && (
+                       <p className="text-xs text-muted-foreground">💳 {paymentLabels[app.payment_type] || app.payment_type}</p>
+                     )}
                     <p className="text-xs text-muted-foreground mt-0.5">
                       📅 {format(parseISO(app.created_date), "d MMM yyyy HH:mm", { locale: tr })}
                     </p>
@@ -327,14 +359,22 @@ export default function TrialApplicationsPanel() {
                     <p className="font-semibold">{capitalizeName(app.first_name + " " + app.last_name)}</p>
                     <p className="text-sm text-muted-foreground">{app.phone}</p>
                     {app.trial_class_title && (
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        🎯 {app.trial_class_title} — {app.trial_class_date ? format(parseISO(app.trial_class_date), "d MMM", { locale: tr }) : ""} {app.trial_class_time}
-                      </p>
-                    )}
-                  </div>
-                  <Button
-                    size="sm"
-                    className="h-8 text-xs gap-1 bg-green-600 hover:bg-green-700 shrink-0"
+                       <div className="text-xs text-muted-foreground mt-0.5 space-y-0.5">
+                         <p>🎯 {app.trial_class_title} — {app.trial_class_date ? format(parseISO(app.trial_class_date), "d MMM", { locale: tr }) : ""} {app.trial_class_time}</p>
+                         {classDetails[app.trial_class_id] && (
+                           <>
+                             {classDetails[app.trial_class_id].instructor && (
+                               <p>👨‍🏫 {classDetails[app.trial_class_id].instructor}</p>
+                             )}
+                             <p>👥 {classDetails[app.trial_class_id].current_count || 0}/{classDetails[app.trial_class_id].capacity}</p>
+                           </>
+                         )}
+                       </div>
+                     )}
+                    </div>
+                    <Button
+                     size="sm"
+                     className="h-8 text-xs gap-1 bg-green-600 hover:bg-green-700 shrink-0"
                     onClick={() => { setCreatingMember(app); setPlan("Aylık"); }}
                   >
                     <UserPlus className="w-3.5 h-3.5" />
