@@ -9,7 +9,7 @@ import { useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import UserLayout from './components/layout/UserLayout';
-import AdminLayout from './components/layout/AdminLayout';
+import AdminLayout from './components/layout/AdminLayout.jsx';
 import Home from './pages/Home';
 import ClassCalendar from './pages/ClassCalendar';
 import ClassDetail from './pages/ClassDetail';
