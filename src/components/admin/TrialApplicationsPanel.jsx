@@ -40,6 +40,7 @@ const planDurations = { "Aylık": 1, "3 Aylık": 3, "6 Aylık": 6, "Yıllık": 1
 export default function TrialApplicationsPanel() {
   const queryClient = useQueryClient();
   const [approvingApp, setApprovingApp] = useState(null);
+  const [creatingMember, setCreatingMember] = useState(null);
   const [plan, setPlan] = useState("Aylık");
   const [createdMember, setCreatedMember] = useState(null);
 
@@ -52,49 +53,56 @@ export default function TrialApplicationsPanel() {
   const reviewed = applications.filter((a) => a.status !== "pending");
 
   const approveMutation = useMutation({
-    mutationFn: async ({ app, planName }) => {
-      const username = generateUsername(app.first_name, app.last_name);
-      const userEmail = `${username}@${APP_DOMAIN}`;
-      const plainPassword = username; // default şifre = kullanıcı adı
-      const hashedPassword = await hashPassword(plainPassword);
-      const months = planDurations[planName] || 1;
-      const startDate = format(new Date(), "yyyy-MM-dd");
-      const endDate = format(addDays(new Date(), months * 30 + 1), "yyyy-MM-dd");
-      const fullName = capitalizeName(app.first_name + " " + app.last_name);
+     mutationFn: (app) => base44.entities.TrialApplication.update(app.id, { status: "approved" }),
+     onSuccess: (_, app) => {
+       queryClient.invalidateQueries({ queryKey: ["trialApplications"] });
+       setApprovingApp(null);
 
-      // Üye oluştur
-      const memberResult = await base44.functions.invoke("createMembership", {
-        user_name: fullName,
-        username,
-        user_email: userEmail,
-        password: hashedPassword,
-        gender: "male",
-        start_date: startDate,
-        end_date: endDate,
-        plan_name: planName,
-        status: "active",
-      });
+       // WhatsApp linki aç
+       const classInfo = app.trial_class_title ? ` ${app.trial_class_title} dersine` : "";
+       const fullName = capitalizeName(app.first_name + " " + app.last_name);
+       const approvalMessage = `Merhaba ${fullName},\n\nTebrikler! Başvurunuz onaylanmıştır. Deneme dersine${classInfo} gelmeyi unutmayın.\n\n⚠️ ÖNEMLİ BİLGİLER:\n\n1. Derse gelmezseniz deneme dersi hakkı bitecek ve tekrar başvuru oluşturamazsınız.\n2. Başvuru yapmanız için ilgili adrese gelmeniz gerekmektedir.\n3. Adrese gelmeden ÖNCE mutlaka spor salonu yönetimine bilgi vermeniz gerekmektedir.\n\n📍 KRATOS SPOR KULÜBÜ - AYVALIK\n\nSorularınız için salon yönetimiyle iletişime geçiniz.`;
+       const whatsappUrl = `https://wa.me/${app.phone.replace(/[^\d]/g, '')}?text=${encodeURIComponent(approvalMessage)}`;
+       window.open(whatsappUrl, '_blank');
+       toast.success("Deneme dersi onaylandı!");
+     },
+     onError: (err) => toast.error("Hata: " + err.message),
+   });
 
-      // Başvuruyu onayla
-      await base44.entities.TrialApplication.update(app.id, { status: "approved" });
+  const createMemberMutation = useMutation({
+     mutationFn: async ({ app, planName }) => {
+       const username = generateUsername(app.first_name, app.last_name);
+       const userEmail = `${username}@${APP_DOMAIN}`;
+       const plainPassword = username;
+       const hashedPassword = await hashPassword(plainPassword);
+       const months = planDurations[planName] || 1;
+       const startDate = format(new Date(), "yyyy-MM-dd");
+       const endDate = format(addDays(new Date(), months * 30 + 1), "yyyy-MM-dd");
+       const fullName = capitalizeName(app.first_name + " " + app.last_name);
 
-      return { memberResult: memberResult?.data || memberResult, username, plainPassword, fullName, planName, app };
-    },
-    onSuccess: ({ username, plainPassword, fullName, planName, app }) => {
-      queryClient.invalidateQueries({ queryKey: ["trialApplications"] });
-      queryClient.invalidateQueries({ queryKey: ["allMembers"] });
-      setApprovingApp(null);
-      setCreatedMember({ username, plainPassword, fullName, planName });
+       await base44.functions.invoke("createMembership", {
+         user_name: fullName,
+         username,
+         user_email: userEmail,
+         password: hashedPassword,
+         gender: "male",
+         start_date: startDate,
+         end_date: endDate,
+         plan_name: planName,
+         status: "active",
+       });
 
-      // WhatsApp linki aç
-      const classInfo = app.trial_class_title ? ` ${app.trial_class_title} dersine` : "";
-      const approvalMessage = `Merhaba ${fullName},\n\nTebrikler! Başvurunuz onaylanmıştır. Deneme gersine${classInfo} gelmeyi unutmayın.\n\n⚠️ ÖNEMLİ BİLGİLER:\n\n1. Derse gelmezseniz deneme dersi hakkı bitecek ve tekrar başvuru oluşturamazsınız.\n2. Başvuru yapmanız için ilgili adrese gelmeniz gerekmektedir.\n3. Adrese gelmeden ÖNCE mutlaka spor salonu yönetimine bilgi vermeniz gerekmektedir.\n\n📍 KRATOS SPOR KULÜBÜ - AYVALIK\n\nSorularınız için salon yönetimiyle iletişime geçiniz.`;
-      const whatsappUrl = `https://wa.me/${app.phone.replace(/[^\d]/g, '')}?text=${encodeURIComponent(approvalMessage)}`;
-      window.open(whatsappUrl, '_blank');
-      toast.success("Üye oluşturuldu, WhatsApp açılıyor!");
-    },
-    onError: (err) => toast.error("Hata: " + err.message),
-  });
+       return { username, plainPassword, fullName, planName };
+     },
+     onSuccess: ({ username, plainPassword, fullName, planName }) => {
+       queryClient.invalidateQueries({ queryKey: ["trialApplications"] });
+       queryClient.invalidateQueries({ queryKey: ["allMembers"] });
+       setCreatingMember(null);
+       setCreatedMember({ username, plainPassword, fullName, planName });
+       toast.success("Üye oluşturuldu!");
+     },
+     onError: (err) => toast.error("Hata: " + err.message),
+   });
 
   const rejectMutation = useMutation({
     mutationFn: (app) => base44.entities.TrialApplication.update(app.id, { status: "rejected" }),
@@ -118,50 +126,88 @@ export default function TrialApplicationsPanel() {
 
   return (
     <div>
-      {/* Onay dialog */}
-      <Dialog open={!!approvingApp} onOpenChange={(o) => { if (!o) setApprovingApp(null); }}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Başvuruyu Onayla</DialogTitle>
-          </DialogHeader>
-          {approvingApp && (
-            <div className="space-y-4 mt-2">
-              <p className="text-sm text-muted-foreground">
-                <span className="font-semibold text-foreground">
-                  {capitalizeName(approvingApp.first_name + " " + approvingApp.last_name)}
-                </span>{" "}
-                için üyelik planını seçin.
-              </p>
-              <div>
-                <Label>Üyelik Planı</Label>
-                <Select value={plan} onValueChange={setPlan}>
-                  <SelectTrigger className="mt-1">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Aylık">Aylık (30 gün)</SelectItem>
-                    <SelectItem value="3 Aylık">3 Aylık (90 gün)</SelectItem>
-                    <SelectItem value="6 Aylık">6 Aylık (180 gün)</SelectItem>
-                    <SelectItem value="Yıllık">Yıllık (365 gün)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="bg-muted rounded-lg p-3 text-xs text-muted-foreground space-y-1">
-                <p>Kullanıcı adı: <span className="font-mono font-bold text-foreground">{generateUsername(approvingApp.first_name, approvingApp.last_name)}</span></p>
-                <p>Varsayılan şifre: <span className="font-mono font-bold text-foreground">{generateUsername(approvingApp.first_name, approvingApp.last_name)}</span></p>
-              </div>
-              <Button
-                className="w-full"
-                onClick={() => approveMutation.mutate({ app: approvingApp, planName: plan })}
-                disabled={approveMutation.isPending}
-              >
-                <UserPlus className="w-4 h-4 mr-2" />
-                {approveMutation.isPending ? "Oluşturuluyor..." : "Üye Oluştur ve Onayla"}
-              </Button>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+      {/* Deneme dersi onay dialog */}
+       <Dialog open={!!approvingApp} onOpenChange={(o) => { if (!o) setApprovingApp(null); }}>
+         <DialogContent>
+           <DialogHeader>
+             <DialogTitle>Deneme Dersini Onayla</DialogTitle>
+           </DialogHeader>
+           {approvingApp && (
+             <div className="space-y-4 mt-2">
+               <p className="text-sm text-muted-foreground">
+                 <span className="font-semibold text-foreground">
+                   {capitalizeName(approvingApp.first_name + " " + approvingApp.last_name)}
+                 </span>{" "}
+                 için deneme dersini onaylayacak mısınız?
+               </p>
+               <div className="bg-blue-500/10 rounded-lg p-3 text-xs text-muted-foreground border border-blue-500/20">
+                 <p>Derse geldikten sonra kullanıcı isterse kayıt oluşturabilirsiniz.</p>
+               </div>
+               <div className="flex gap-2">
+                 <Button
+                   variant="outline"
+                   className="w-full"
+                   onClick={() => setApprovingApp(null)}
+                 >
+                   İptal
+                 </Button>
+                 <Button
+                   className="w-full"
+                   onClick={() => approveMutation.mutate(approvingApp)}
+                   disabled={approveMutation.isPending}
+                 >
+                   {approveMutation.isPending ? "Onaylanıyor..." : "Onayla"}
+                 </Button>
+               </div>
+             </div>
+           )}
+         </DialogContent>
+       </Dialog>
+
+       {/* Üyelik oluştur dialog */}
+       <Dialog open={!!creatingMember} onOpenChange={(o) => { if (!o) setCreatingMember(null); }}>
+         <DialogContent>
+           <DialogHeader>
+             <DialogTitle>Üyelik Oluştur</DialogTitle>
+           </DialogHeader>
+           {creatingMember && (
+             <div className="space-y-4 mt-2">
+               <p className="text-sm text-muted-foreground">
+                 <span className="font-semibold text-foreground">
+                   {capitalizeName(creatingMember.first_name + " " + creatingMember.last_name)}
+                 </span>{" "}
+                 için üyelik planını seçin.
+               </p>
+               <div>
+                 <Label>Üyelik Planı</Label>
+                 <Select value={plan} onValueChange={setPlan}>
+                   <SelectTrigger className="mt-1">
+                     <SelectValue />
+                   </SelectTrigger>
+                   <SelectContent>
+                     <SelectItem value="Aylık">Aylık (30 gün)</SelectItem>
+                     <SelectItem value="3 Aylık">3 Aylık (90 gün)</SelectItem>
+                     <SelectItem value="6 Aylık">6 Aylık (180 gün)</SelectItem>
+                     <SelectItem value="Yıllık">Yıllık (365 gün)</SelectItem>
+                   </SelectContent>
+                 </Select>
+               </div>
+               <div className="bg-muted rounded-lg p-3 text-xs text-muted-foreground space-y-1">
+                 <p>Kullanıcı adı: <span className="font-mono font-bold text-foreground">{generateUsername(creatingMember.first_name, creatingMember.last_name)}</span></p>
+                 <p>Varsayılan şifre: <span className="font-mono font-bold text-foreground">{generateUsername(creatingMember.first_name, creatingMember.last_name)}</span></p>
+               </div>
+               <Button
+                 className="w-full"
+                 onClick={() => createMemberMutation.mutate({ app: creatingMember, planName: plan })}
+                 disabled={createMemberMutation.isPending}
+               >
+                 <UserPlus className="w-4 h-4 mr-2" />
+                 {createMemberMutation.isPending ? "Oluşturuluyor..." : "Üyelik Oluştur"}
+               </Button>
+             </div>
+           )}
+         </DialogContent>
+       </Dialog>
 
       {/* Oluşturulan üye bilgisi */}
       <Dialog open={!!createdMember} onOpenChange={() => setCreatedMember(null)}>
@@ -227,13 +273,24 @@ export default function TrialApplicationsPanel() {
                   </div>
                   <div className="flex flex-col gap-1.5 shrink-0">
                     <Button
-                      size="sm"
-                      className="h-8 text-xs gap-1"
-                      onClick={() => { setApprovingApp(app); setPlan("Aylık"); }}
-                    >
-                      <CheckCircle className="w-3.5 h-3.5" />
-                      Onayla
-                    </Button>
+                       size="sm"
+                       className="h-8 text-xs gap-1"
+                       onClick={() => { setApprovingApp(app); }}
+                       disabled={approveMutation.isPending}
+                     >
+                       <CheckCircle className="w-3.5 h-3.5" />
+                       Onayla
+                     </Button>
+                    {app.status === "approved" && (
+                       <Button
+                         size="sm"
+                         className="h-8 text-xs gap-1 bg-green-600 hover:bg-green-700"
+                         onClick={() => { setCreatingMember(app); setPlan("Aylık"); }}
+                       >
+                         <UserPlus className="w-3.5 h-3.5" />
+                         Kayıt Oluştur
+                       </Button>
+                     )}
                     <Button
                       size="sm"
                       variant="outline"
@@ -252,12 +309,50 @@ export default function TrialApplicationsPanel() {
         )}
       </div>
 
-      {/* Geçmiş başvurular */}
-      {reviewed.length > 0 && (
+      {/* Onaylanmış ama üyelik oluşturulmamış başvurular */}
+      {applications.filter(a => a.status === "approved").length > 0 && (
+        <div className="mb-6">
+          <h3 className="text-base font-bold mb-3 flex items-center gap-2 text-green-600">
+            <CheckCircle className="w-4 h-4" />
+            Onaylanmış Deneme Dersleri
+            <Badge className="bg-green-500/10 text-green-600 border-green-500/20 border text-xs">
+              {applications.filter(a => a.status === "approved").length}
+            </Badge>
+          </h3>
+          <div className="space-y-3">
+            {applications.filter(a => a.status === "approved").map((app) => (
+              <Card key={app.id} className="p-4">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold">{capitalizeName(app.first_name + " " + app.last_name)}</p>
+                    <p className="text-sm text-muted-foreground">{app.phone}</p>
+                    {app.trial_class_title && (
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        🎯 {app.trial_class_title} — {app.trial_class_date ? format(parseISO(app.trial_class_date), "d MMM", { locale: tr }) : ""} {app.trial_class_time}
+                      </p>
+                    )}
+                  </div>
+                  <Button
+                    size="sm"
+                    className="h-8 text-xs gap-1 bg-green-600 hover:bg-green-700 shrink-0"
+                    onClick={() => { setCreatingMember(app); setPlan("Aylık"); }}
+                  >
+                    <UserPlus className="w-3.5 h-3.5" />
+                    Kayıt Oluştur
+                  </Button>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Reddedilen başvurular */}
+      {applications.filter(a => a.status === "rejected").length > 0 && (
         <div>
-          <h3 className="text-base font-bold mb-3 text-muted-foreground">Geçmiş Başvurular</h3>
+          <h3 className="text-base font-bold mb-3 text-muted-foreground">Reddedilen Başvurular</h3>
           <div className="space-y-2">
-            {reviewed.map((app) => (
+            {applications.filter(a => a.status === "rejected").map((app) => (
               <Card key={app.id} className="p-3 opacity-70">
                 <div className="flex items-center justify-between gap-2">
                   <div>
@@ -265,26 +360,17 @@ export default function TrialApplicationsPanel() {
                     <p className="text-xs text-muted-foreground">{app.phone}</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge
-                      variant="outline"
-                      className={
-                        app.status === "approved"
-                          ? "bg-green-500/10 text-green-600 border-green-500/20 text-xs"
-                          : "bg-destructive/10 text-destructive border-destructive/20 text-xs"
-                      }
-                    >
-                      {app.status === "approved" ? "Onaylandı" : "Reddedildi"}
+                    <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20 text-xs">
+                      Reddedildi
                     </Badge>
-                    {app.status === "rejected" && (
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="h-7 w-7"
-                        onClick={() => deleteMutation.mutate(app.id)}
-                      >
-                        <XCircle className="w-3.5 h-3.5 text-muted-foreground" />
-                      </Button>
-                    )}
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-7 w-7"
+                      onClick={() => deleteMutation.mutate(app.id)}
+                    >
+                      <XCircle className="w-3.5 h-3.5 text-muted-foreground" />
+                    </Button>
                   </div>
                 </div>
               </Card>
