@@ -16,19 +16,19 @@ Deno.serve(async (req) => {
     }
 
     // Parse QR data - format differs by type
-    const parts = qr_data.split(':');
-    const type = parts[0];
+    const parts = qr_data.split('|');
+    const type = parts[0].toLowerCase();
     
     let name, phone, date, time;
     
     if (type === 'member') {
-      // Format: member:username:date:time
+      // Format: MEMBER|username|date|time
       name = parts[1];
       date = parts[2] || new Date().toISOString().split('T')[0];
       time = parts[3] || '';
       phone = '';
     } else {
-      // Format: trial/daily:name:phone:date:time
+      // Format: TRIAL/DAILY|name|phone|date|time
       name = parts[1];
       phone = parts[2];
       date = parts[3] || new Date().toISOString().split('T')[0];
