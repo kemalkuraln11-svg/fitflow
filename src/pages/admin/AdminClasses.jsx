@@ -36,6 +36,22 @@ export default function AdminClasses() {
     queryFn: () => base44.entities.ClassSchedule.list("-date", 100),
   });
 
+  const { data: reservations = [] } = useQuery({
+    queryKey: ["adminAllReservations"],
+    queryFn: () => base44.entities.Reservation.filter({ status: "confirmed" }),
+  });
+
+  const { data: dailyVisits = [] } = useQuery({
+    queryKey: ["adminAllDailyVisits"],
+    queryFn: () => base44.entities.DailyVisit.list("-visit_date", 500),
+  });
+
+  const getClassCounts = (classId) => {
+    const resCount = reservations.filter((r) => r.class_id === classId).length;
+    const visitCount = dailyVisits.filter((v) => v.class_id === classId).length;
+    return { resCount, visitCount, total: resCount + visitCount };
+  };
+
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.ClassSchedule.create({ ...data, current_count: 0 }),
     onSuccess: () => {
@@ -189,9 +205,21 @@ export default function AdminClasses() {
                    >
                      <Eye className="w-4 h-4" />
                    </Button>
-                   <span className="text-sm font-medium text-muted-foreground mx-1">
-                     {cls.current_count || 0}/{cls.capacity}
-                   </span>
+                   {(() => {
+                      const { resCount, visitCount, total } = getClassCounts(cls.id);
+                      return (
+                        <span className="text-sm font-medium text-muted-foreground mx-1 flex items-center gap-1">
+                          <span className={total >= cls.capacity ? "text-destructive" : ""}>
+                            {total}/{cls.capacity}
+                          </span>
+                          {(resCount > 0 || visitCount > 0) && (
+                            <span className="text-xs text-muted-foreground/70">
+                              ({resCount}ü+{visitCount}g)
+                            </span>
+                          )}
+                        </span>
+                      );
+                    })()}
                    <Button
                      variant="ghost"
                      size="icon"
