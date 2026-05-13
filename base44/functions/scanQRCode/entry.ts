@@ -15,13 +15,25 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'QR data is required' }, { status: 400 });
     }
 
-    // Parse QR data (format: "type:name:phone:date:time" or variations)
+    // Parse QR data - format differs by type
     const parts = qr_data.split(':');
     const type = parts[0];
-    const name = parts[1];
-    const phone = parts[2];
-    const date = parts[3] || new Date().toISOString().split('T')[0];
-    const time = parts[4] || '';
+    
+    let name, phone, date, time;
+    
+    if (type === 'member') {
+      // Format: member:username:date:time
+      name = parts[1];
+      date = parts[2] || new Date().toISOString().split('T')[0];
+      time = parts[3] || '';
+      phone = '';
+    } else {
+      // Format: trial/daily:name:phone:date:time
+      name = parts[1];
+      phone = parts[2];
+      date = parts[3] || new Date().toISOString().split('T')[0];
+      time = parts[4] || '';
+    }
 
     // Normalize name
     const nameParts = name.split(' ');
@@ -83,7 +95,7 @@ Deno.serve(async (req) => {
         result.message = 'Günlük giriş kaydı bulunamadı';
       }
     } else if (type === 'member') {
-      // Search in Membership - name is username, phone is user_name
+      // Search in Membership
       // QR format: member:username:date:time
       const memberships = await base44.asServiceRole.entities.Membership.list();
       const member = memberships.find(m => m.username === name || m.username.toLowerCase() === name.toLowerCase());
@@ -96,10 +108,14 @@ Deno.serve(async (req) => {
         // Find class for this date/time if available
         let className = '';
         if (date && time) {
-          const classes = await base44.asServiceRole.entities.ClassSchedule.filter({ date: date });
-          const matchedClass = classes.find(c => c.start_time === time);
-          if (matchedClass) {
-            className = matchedClass.title;
+          try {
+            const classes = await base44.asServiceRole.entities.ClassSchedule.filter({ date: date });
+            const matchedClass = classes.find(c => c.start_time === time);
+            if (matchedClass) {
+              className = matchedClass.title;
+            }
+          } catch (e) {
+            // Ignore class lookup errors
           }
         }
         
