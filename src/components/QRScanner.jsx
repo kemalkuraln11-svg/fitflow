@@ -207,20 +207,57 @@ export default function QRScanner({ onClose }) {
         </div>
 
         <div className="space-y-4">
-           <div className="flex gap-2">
-             <Input
-               ref={inputRef}
-               value={qrInput}
-               onChange={(e) => setQrInput(e.target.value)}
-               onKeyDown={(e) => e.key === "Enter" && handleScan()}
-               placeholder="QR kodunu tarayın..."
-               autoFocus
-               style={{ fontSize: "16px" }}
-             />
-             <Button onClick={handleScan} disabled={loading || !qrInput.trim()} size="icon">
-               <Zap className="w-4 h-4" />
-             </Button>
-           </div>
+           {!useCamera ? (
+             <div className="flex gap-2">
+               <Input
+                 ref={inputRef}
+                 value={qrInput}
+                 onChange={(e) => setQrInput(e.target.value)}
+                 onKeyDown={(e) => e.key === "Enter" && handleScan()}
+                 placeholder="QR kodunu tarayın..."
+                 autoFocus
+                 style={{ fontSize: "16px" }}
+               />
+               <Button onClick={handleScan} disabled={loading || !qrInput.trim()} size="icon">
+                 <Zap className="w-4 h-4" />
+               </Button>
+               <Button onClick={() => setUseCamera(true)} variant="outline" size="icon">
+                 <Camera className="w-4 h-4" />
+               </Button>
+             </div>
+           ) : (
+             <div className="space-y-2">
+               <video
+                 ref={videoRef}
+                 autoPlay
+                 playsInline
+                 className="w-full rounded-lg bg-black"
+                 style={{ aspectRatio: "16/9" }}
+               />
+
+               <Button
+                 onClick={() => {
+                   stopCamera();
+                   setUseCamera(false);
+                 }}
+                 variant="destructive"
+                 className="w-full"
+               >
+                 İptal Et
+               </Button>
+             </div>
+           )}
+           {useCamera && (
+             <>
+               <canvas ref={canvasRef} style={{ display: "none" }} />
+               {!cameraActive && (
+                 <Button onClick={startCamera} className="w-full gap-2">
+                   <Camera className="w-4 h-4" />
+                   Kamerayı Başlat
+                 </Button>
+               )}
+             </>
+           )}
 
           {scanResult && (
             <Card className="p-4 space-y-3">
