@@ -56,39 +56,18 @@ export default function ClassDetail() {
 
   const reserveMutation = useMutation({
     mutationFn: async () => {
-      // Aynı gün ve saatte başka bir rezervasyon var mı kontrol et
-      const allMyReservations = await base44.entities.Reservation.filter({
-        user_email: user.user_email,
-        status: "confirmed",
+      const res = await base44.functions.invoke("makeReservation", {
+        action: "create",
+        classId: id,
+        userEmail: user.user_email,
+        userName: user.user_name,
       });
-      const existing = allMyReservations.filter(
-        (r) => r.class_date === cls.date && r.class_time === cls.start_time && r.class_id !== id
-      );
-      if (existing.length > 0) {
-        // Çakışan dersin detaylarını getir
-        const conflictClass = await base44.entities.ClassSchedule.filter({ id: existing[0].class_id });
-        const cc = conflictClass[0] || {};
-        setConflictPopup({
-          title: existing[0].class_title,
-          date: existing[0].class_date,
-          time: existing[0].class_time,
-          instructor: cc.instructor || null,
-        });
+      const data = res?.data ?? res;
+      if (data.conflict) {
+        setConflictPopup({ title: data.title, date: data.date, time: data.time, instructor: data.instructor });
         throw new Error("conflict");
       }
-
-      await base44.entities.Reservation.create({
-        class_id: id,
-        class_title: cls.title,
-        class_date: cls.date,
-        class_time: cls.start_time,
-        user_email: user.user_email,
-        user_name: user.user_name,
-        status: "confirmed",
-      });
-      await base44.entities.ClassSchedule.update(cls.id, {
-        current_count: (cls.current_count || 0) + 1,
-      });
+      if (data.error) throw new Error(data.error);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["class", id] });
@@ -109,10 +88,13 @@ export default function ClassDetail() {
 
   const cancelMutation = useMutation({
     mutationFn: async () => {
-      await base44.entities.Reservation.update(myReservation.id, { status: "cancelled" });
-      await base44.entities.ClassSchedule.update(cls.id, {
-        current_count: Math.max(0, (cls.current_count || 0) - 1),
+      const res = await base44.functions.invoke("makeReservation", {
+        action: "cancel",
+        classId: id,
+        reservationId: myReservation.id,
       });
+      const data = res?.data ?? res;
+      if (data.error) throw new Error(data.error);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["class", id] });
