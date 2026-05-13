@@ -43,6 +43,20 @@ export default function ClassCalendar() {
     queryFn: () => base44.entities.ClassSchedule.filter({ date: dateStr }, "start_time"),
   });
 
+  const { data: dayReservations = [] } = useQuery({
+    queryKey: ["dayReservations", dateStr],
+    queryFn: () => base44.entities.Reservation.filter({ class_date: dateStr, status: "confirmed" }),
+  });
+
+  const { data: dayVisits = [] } = useQuery({
+    queryKey: ["dayVisits", dateStr],
+    queryFn: () => base44.entities.DailyVisit.filter({ visit_date: dateStr }),
+  });
+
+  const getCount = (classId) =>
+    dayReservations.filter((r) => r.class_id === classId).length +
+    dayVisits.filter((v) => v.class_id === classId).length;
+
   const handleRefresh = async () => {
     await queryClient.invalidateQueries({ queryKey: ["classes", dateStr] });
   };
@@ -186,7 +200,8 @@ export default function ClassCalendar() {
         <div className="space-y-3">
            {classes.map((cls, idx) => {
              const showMore = classes.length > 3 && idx === 2 && !expandedClasses;
-            const isFull = (cls.current_count || 0) >= cls.capacity;
+            const count = getCount(cls.id);
+            const isFull = count >= cls.capacity;
             const classDateTime = parse(`${cls.date} ${cls.start_time}`, "yyyy-MM-dd HH:mm", new Date());
             const isPastClass = isPast(classDateTime);
 
@@ -221,7 +236,7 @@ export default function ClassCalendar() {
                       </span>
                       <span className="flex items-center gap-0.5">
                         <Users className="w-3 h-3" />
-                        {cls.current_count || 0}/{cls.capacity}
+                        {count}/{cls.capacity}
                       </span>
                     </div>
                   </div>

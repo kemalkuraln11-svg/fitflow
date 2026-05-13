@@ -28,6 +28,20 @@ export default function Home() {
     queryFn: () => base44.entities.ClassSchedule.filter({ date: today }, "start_time"),
   });
 
+  const { data: todayReservations = [] } = useQuery({
+    queryKey: ["todayReservations", today],
+    queryFn: () => base44.entities.Reservation.filter({ class_date: today, status: "confirmed" }),
+  });
+
+  const { data: todayVisits = [] } = useQuery({
+    queryKey: ["todayVisits", today],
+    queryFn: () => base44.entities.DailyVisit.filter({ visit_date: today }),
+  });
+
+  const getTodayCount = (classId) =>
+    todayReservations.filter((r) => r.class_id === classId).length +
+    todayVisits.filter((v) => v.class_id === classId).length;
+
   const { data: myReservations = [] } = useQuery({
     queryKey: ["myReservations", member?.id],
     queryFn: async () => {
@@ -167,7 +181,7 @@ export default function Home() {
                       </span>
                       <span className="flex items-center gap-0.5">
                         <Users className="w-3 h-3 flex-shrink-0" />
-                        {cls.current_count || 0}/{cls.capacity}
+                        {getTodayCount(cls.id)}/{cls.capacity}
                       </span>
                     </div>
                   </div>
