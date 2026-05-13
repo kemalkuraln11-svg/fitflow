@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { LayoutDashboard, Calendar, Users, LogOut, UserCheck } from "lucide-react";
 import { base44 } from "@/api/base44Client";
@@ -14,8 +15,17 @@ export default function AdminLayout() {
   const navigate = useNavigate();
   const { isLoadingAuth } = useAuth();
 
+  // Admin giriş kontrolü
+  useEffect(() => {
+    const adminToken = sessionStorage.getItem("adminToken");
+    if (!adminToken) {
+      navigate("/admin/login");
+    }
+  }, [navigate]);
+
   const handleLogout = async () => {
-    await base44.auth.logout("/");
+    sessionStorage.removeItem("adminToken");
+    navigate("/admin/login");
   };
 
   return (

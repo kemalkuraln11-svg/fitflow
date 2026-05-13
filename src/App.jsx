@@ -14,6 +14,7 @@ import Home from './pages/Home';
 import ClassCalendar from './pages/ClassCalendar';
 import ClassDetail from './pages/ClassDetail';
 import Profile from './pages/Profile';
+import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminClasses from './pages/admin/AdminClasses';
 import AdminMembers from './pages/admin/AdminMembers';
@@ -75,6 +76,7 @@ const AuthenticatedApp = () => {
         <Route path="/class/:id" element={<ClassDetail />} />
         <Route path="/profile" element={<Profile />} />
       </Route>
+      <Route path="/admin/login" element={<AdminLogin />} />
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<AdminDashboard />} />
         <Route path="classes" element={<AdminClasses />} />
