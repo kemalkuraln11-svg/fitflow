@@ -86,47 +86,39 @@ export default function QRScanner({ onClose }) {
 
   const startCamera = async () => {
     try {
-      console.log("[QRScanner] Kamera başlatılıyor...");
-      // Eski stream'i kapat
       if (cameraStreamRef.current) {
         cameraStreamRef.current.getTracks().forEach(track => track.stop());
       }
       
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { 
-          facingMode: "environment",
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
-        }
+        video: { facingMode: "environment" }
       });
-      console.log("[QRScanner] Kamera başarıyla açıldı", stream);
+      
       cameraStreamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        videoRef.current.play().catch(e => console.log("[QRScanner] Play hatası:", e));
-        console.log("[QRScanner] Video element'e stream atandı");
-        cameraActiveRef.current = true;
-        setCameraActive(true);
-        // Video yüklemesi için bekle, sonra taramaya başla
-        setTimeout(() => {
-          if (videoRef.current && canvasRef.current) {
-            console.log("[QRScanner] Video hazır, taramaya başlanıyor");
-            captureAndScanQR();
-          }
-        }, 1000);
+        
+        // Video yüklenince taramaya başla
+        const onLoadedMetadata = () => {
+          cameraActiveRef.current = true;
+          setCameraActive(true);
+          captureAndScanQR();
+          videoRef.current?.removeEventListener('loadedmetadata', onLoadedMetadata);
+        };
+        
+        videoRef.current.addEventListener('loadedmetadata', onLoadedMetadata);
+        videoRef.current.play().catch(e => console.error("[QRScanner] Video play hatası:", e));
       }
     } catch (err) {
-      console.error("[QRScanner] Kamera hatası detayı:", err.name, err.message);
-      let errorMsg = "Kamera erişimi başarısız. Lütfen izin verin ve tekrar deneyin.";
+      console.error("[QRScanner] Kamera hatası:", err.name, err.message);
+      let errorMsg = "Kamera erişimi başarısız";
       
       if (err.name === "NotAllowedError") {
-        errorMsg = "Kamera erişim izni verilmedi. Tarayıcı ayarlarından kamera izni verin.";
+        errorMsg = "Kamera izni reddedildi. Browser ayarlarını kontrol edin.";
       } else if (err.name === "NotFoundError") {
-        errorMsg = "Cihazda kamera bulunamadı.";
+        errorMsg = "Cihazda kamera yok.";
       } else if (err.name === "NotReadableError") {
-        errorMsg = "Kamera başka bir uygulamada kullanılıyor. Kapatıp tekrar deneyin.";
-      } else if (err.name === "SecurityError") {
-        errorMsg = "Güvenlik sebebiyle kamera erişimi reddedildi.";
+        errorMsg = "Kamera başka programda kullanılıyor.";
       }
       
       toast.error(errorMsg);
