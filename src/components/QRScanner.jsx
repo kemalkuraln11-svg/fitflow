@@ -38,12 +38,14 @@ export default function QRScanner({ onClose }) {
   const cameraStreamRef = useRef(null);
   const cameraActiveRef = useRef(false);
 
-  const handleScan = async () => {
-    if (!qrInput.trim()) return;
+  const handleScan = async (qrData) => {
+    const dataToScan = qrData || qrInput;
+    if (!dataToScan.trim()) return;
     
     setLoading(true);
     try {
-      const response = await base44.functions.invoke("scanQRCode", { qr_data: qrInput });
+      const response = await base44.functions.invoke("scanQRCode", { qr_data: dataToScan });
+      console.log("[QRScanner] Tarama fonksiyonu yanıtı:", response.data);
       setScanResult(response.data);
       setQrInput("");
       
@@ -145,10 +147,9 @@ export default function QRScanner({ onClose }) {
           console.log("[QRScanner] Tarama sonucu:", result);
           if (result?.data) {
             console.log("[QRScanner] QR kodu bulundu:", result.data);
-            setQrInput(result.data);
             stopCamera();
             setUseCamera(false);
-            handleScan();
+            handleScan(result.data);
           } else {
             console.log("[QRScanner] QR kodu bulunamadı, tekrar deniyor...");
             setTimeout(captureAndScanQR, 500);
