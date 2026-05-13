@@ -83,14 +83,15 @@ export default function QRScanner({ onClose }) {
 
   const startCamera = async () => {
     try {
+      // Use photo mode instead of video
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment" }
+        video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } }
       });
       cameraStreamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         setCameraActive(true);
-        scanQRFromCamera();
+        captureAndScanQR();
       }
     } catch (err) {
       toast.error("Kamera erişimi reddedildi: " + err.message);
@@ -98,9 +99,6 @@ export default function QRScanner({ onClose }) {
   };
 
   const stopCamera = () => {
-    if (animationRef.current && animationRef.current.stop) {
-      animationRef.current.stop();
-    }
     if (cameraStreamRef.current) {
       cameraStreamRef.current.getTracks().forEach(track => track.stop());
       cameraStreamRef.current = null;
@@ -108,28 +106,37 @@ export default function QRScanner({ onClose }) {
     setCameraActive(false);
   };
 
-  const scanQRFromCamera = () => {
-    if (!cameraActive || !videoRef.current) return;
+  const captureAndScanQR = () => {
+    if (!cameraActive || !videoRef.current || !canvasRef.current) return;
 
-    const scanner = new QrScanner(
-      videoRef.current,
-      (result) => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    const video = videoRef.current;
+
+    // Set canvas size to match video
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    // Capture current frame
+    ctx.drawImage(video, 0, 0);
+
+    // Scan the captured image
+    QrScanner.scanImage(canvas)
+      .then(result => {
         if (result?.data) {
           setQrInput(result.data);
           stopCamera();
           setUseCamera(false);
           handleScan();
+        } else {
+          // Retry scan
+          setTimeout(captureAndScanQR, 500);
         }
-      },
-      {
-        onDecodeError: () => {},
-        preferredCamera: "environment",
-        highlightCodeOutlineColor: "#ff6600",
-      }
-    );
-
-    scanner.start();
-    animationRef.current = scanner;
+      })
+      .catch(() => {
+        // Retry on error
+        setTimeout(captureAndScanQR, 500);
+      });
   };
 
   useEffect(() => {

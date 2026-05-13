@@ -7,10 +7,10 @@ export default function QRCodeDisplay({ data }) {
   const [qrUrl, setQrUrl] = useState("");
 
   useEffect(() => {
-    // Generate QR code data string with maximum error correction for instant scanning
+    // Generate QR code with proper encoding for scanning
     const qrData = encodeURIComponent(data);
-    // Use largest size (500x500), maximum error correction (L), margin for better detection
-    setQrUrl(`https://api.qrserver.com/v1/create-qr-code/?size=500x500&format=png&error_correction=L&margin=2&data=${qrData}`);
+    // Use H error correction (max redundancy), larger size for reliable scanning
+    setQrUrl(`https://api.qrserver.com/v1/create-qr-code/?size=600x600&format=png&error_correction=H&margin=3&data=${qrData}`);
   }, [data]);
 
   const copyToClipboard = () => {
