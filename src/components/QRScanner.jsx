@@ -88,12 +88,13 @@ export default function QRScanner({ onClose }) {
     try {
       console.log("[QRScanner] Kamera başlatılıyor...");
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } }
+        video: { facingMode: "environment" }
       });
       console.log("[QRScanner] Kamera başarıyla açıldı", stream);
       cameraStreamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+        videoRef.current.play().catch(e => console.log("[QRScanner] Play hatası:", e));
         console.log("[QRScanner] Video element'e stream atandı");
         cameraActiveRef.current = true;
         setCameraActive(true);
@@ -107,7 +108,19 @@ export default function QRScanner({ onClose }) {
       }
     } catch (err) {
       console.error("[QRScanner] Kamera hatası:", err);
-      toast.error("Kamera erişimi reddedildi: " + err.message);
+      let errorMsg = "Kamera erişimi başarısız";
+      
+      if (err.name === "NotAllowedError" || err.message?.includes("Permission denied")) {
+        errorMsg = "Kamera erişim izni verilmedi. Lütfen tarayıcı ayarlarından izin verin.";
+      } else if (err.name === "NotFoundError") {
+        errorMsg = "Kamera bulunamadı.";
+      } else if (err.name === "NotReadableError") {
+        errorMsg = "Kamera zaten başka bir uygulamada kullanılıyor.";
+      }
+      
+      toast.error(errorMsg);
+      setCameraActive(false);
+      cameraActiveRef.current = false;
     }
   };
 
