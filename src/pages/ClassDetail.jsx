@@ -10,6 +10,7 @@ import { Clock, Users, User, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
+import QRCodeDisplay from "@/components/QRCodeDisplay";
 
 const categoryEmojis = {
   hyrox: "🏃", crossfit: "🔥", fitness: "🏋️", other: "⭐",
@@ -22,6 +23,7 @@ export default function ClassDetail() {
   const { member: user } = useMemberAuth();
   const [conflictPopup, setConflictPopup] = useState(false);
   const [done, setDone] = useState(false);
+  const [successData, setSuccessData] = useState(null);
 
   const { data: cls, isLoading } = useQuery({
     queryKey: ["class", id],
@@ -89,8 +91,11 @@ export default function ClassDetail() {
         throw new Error("conflict");
       }
       if (data.error) throw new Error(data.error);
+      return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      const qrData = `member:${user.user_name}:${user.username}`;
+      setSuccessData({ qrData });
       queryClient.invalidateQueries({ queryKey: ["class", id] });
       queryClient.invalidateQueries({ queryKey: ["myReservation", id] });
       queryClient.invalidateQueries({ queryKey: ["classReservations", id] });
@@ -99,9 +104,8 @@ export default function ClassDetail() {
       setDone(true);
       toast.success("Başarıyla kayıt yaptırdınız!", {
         position: "top-right",
-        duration: 2000,
+        duration: 3000,
       });
-      setTimeout(() => navigate("/"), 2000);
     },
     onError: (err) => {
       if (err.message !== "conflict") toast.error(err.message);
@@ -156,6 +160,33 @@ export default function ClassDetail() {
   const cancellationDeadline = addMinutes(classDateTime, -(cls.cancellation_deadline_minutes || 30));
   const canCancelReservation = isBefore(new Date(), cancellationDeadline);
   const classStarted = isBefore(classDateTime, new Date());
+
+  // Success screen with QR
+  if (done && successData) {
+    return (
+      <>
+      <ExpiredMembershipModal />
+      <div className="px-4 pt-6 pb-10 min-h-[100dvh] flex flex-col items-center justify-start max-w-md mx-auto">
+        <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mb-4">
+          <span className="text-3xl">✅</span>
+        </div>
+        <h2 className="text-xl font-bold mb-2 text-center">Rezervasyon Başarılı!</h2>
+        <p className="text-muted-foreground text-sm mb-6 text-center">
+          {cls.title} dersine kayıt yaptırdınız.
+        </p>
+
+        <Card className="w-full p-4 mb-6">
+          <p className="text-xs text-muted-foreground mb-3 text-center font-semibold">Derse girerken bu QR kodunuz taranacak:</p>
+          <QRCodeDisplay data={successData.qrData} />
+        </Card>
+
+        <Button className="w-full" onClick={() => navigate("/")}>
+          Anasayfaya Dön
+        </Button>
+      </div>
+      </>
+    );
+  }
 
   return (
     <>
