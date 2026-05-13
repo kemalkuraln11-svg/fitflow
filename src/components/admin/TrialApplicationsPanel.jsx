@@ -91,10 +91,16 @@ export default function TrialApplicationsPanel() {
   });
 
   const rejectMutation = useMutation({
-    mutationFn: (app) => base44.entities.TrialApplication.update(app.id, { status: "rejected" }),
+    mutationFn: async (app) => {
+      await base44.functions.invoke("sendRejectionWhatsApp", {
+        email: app.phone || `${app.first_name}@fitkafa.local`,
+        fullName: capitalizeName(app.first_name + " " + app.last_name),
+      });
+      return base44.entities.TrialApplication.update(app.id, { status: "rejected" });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["trialApplications"] });
-      toast.success("Başvuru reddedildi ve kara listeye alındı.");
+      toast.success("Başvuru reddedildi, bildirim gönderildi.");
     },
     onError: (err) => toast.error("Hata: " + err.message),
   });
