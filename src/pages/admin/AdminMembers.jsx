@@ -74,7 +74,7 @@ export default function AdminMembers() {
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Membership.create(data),
+    mutationFn: ({ _plaintextPassword, ...data }) => base44.entities.Membership.create(data),
     onSuccess: (result, variables) => {
       queryClient.invalidateQueries({ queryKey: ["allMembers"] });
       setShowForm(false);
@@ -107,7 +107,12 @@ export default function AdminMembers() {
     const plaintext = form.password;
     const hashed = await hashPassword(plaintext);
     createMutation.mutate({
-      ...form,
+      user_name: form.user_name,
+      gender: form.gender,
+      start_date: form.start_date,
+      end_date: form.end_date,
+      plan_name: form.plan_name,
+      status: form.status,
       password: hashed,
       username: autoUsername,
       user_email: autoEmail,
