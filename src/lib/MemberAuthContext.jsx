@@ -31,49 +31,20 @@ export const MemberAuthProvider = ({ children }) => {
 
   const login = async (username, password) => {
     const hashed = await hashPassword(password);
-    const results = await base44.entities.Membership.filter({
+    const response = await base44.functions.invoke('memberLogin', {
       username: username.toLowerCase().trim(),
       password: hashed,
     });
 
-    if (!results || results.length === 0) {
-      throw new Error('Kullanıcı adı veya şifre hatalı');
+    const data = response?.data ?? response;
+
+    if (data?.error) {
+      throw new Error(data.error);
     }
 
-    const m = results[0];
-    if (m.status === 'suspended') throw new Error('Üyeliğiniz askıya alınmıştır. Lütfen iletişime geçin.');
-    if (m.status === 'frozen') throw new Error('Üyeliğiniz dondurulmuştur. Lütfen iletişime geçin.');
-
-    // Bitiş tarihi bugünden önceyse giriş yapılamaz
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const endDate = new Date(m.end_date);
-    endDate.setHours(0, 0, 0, 0);
-    if (endDate < today) {
-      // Eğer status hâlâ active ise expired'a çek
-      if (m.status === 'active') {
-        await base44.entities.Membership.update(m.id, { status: 'expired' });
-      }
-      throw new Error('Üyeliğinizin süresi dolmuştur. Lütfen üyeliğinizi yenileyin.');
-    }
-    if (m.status === 'expired') throw new Error('Üyeliğinizin süresi dolmuştur. Lütfen üyeliğinizi yenileyin.');
-
-    const sessionData = {
-      id: m.id,
-      user_name: m.user_name,
-      username: m.username,
-      user_email: m.user_email,
-      gender: m.gender || "male",
-      plan_name: m.plan_name,
-      start_date: m.start_date,
-      end_date: m.end_date,
-      status: m.status,
-      frozen_at: m.frozen_at || null,
-    };
-
-    sessionStorage.setItem(SESSION_KEY, JSON.stringify(sessionData));
-    setMember(sessionData);
-    return sessionData;
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify(data));
+    setMember(data);
+    return data;
   };
 
   const logout = useCallback(() => {
