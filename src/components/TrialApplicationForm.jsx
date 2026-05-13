@@ -209,7 +209,7 @@ export default function TrialApplicationForm({ onBack }) {
             </div>
             <div>
               <Label className="text-xs">Ders Seç (opsiyonel)</Label>
-              <Select value={form.trial_class_id} onValueChange={handleClassSelect} disabled={classes.length === 0}>
+              <Select value={form.trial_class_id} onValueChange={handleClassSelect}>
                 <SelectTrigger className="mt-0.5">
                   <SelectValue placeholder={classes.length === 0 ? "O gün ders yok" : "Ders seçin"} />
                 </SelectTrigger>

@@ -83,39 +83,9 @@ export default function TrialApplicationsPanel() {
        setApprovingApp(null);
 
        // WhatsApp linki aç
+       const classInfo = app.trial_class_title ? ` ${app.trial_class_title} dersine` : "";
        const fullName = capitalizeName(app.first_name + " " + app.last_name);
-       const classDate = app.trial_class_date ? format(parseISO(app.trial_class_date), "d MMMM yyyy", { locale: tr }) : "-";
-       const classTime = app.trial_class_time || "-";
-       const className = app.trial_class_title || "-";
-       const instructorName = classDetails[app.trial_class_id]?.instructor || "-";
-
-       const approvalMessage = `Merhaba ${fullName},
-
-       Tebrikler! Deneme ders başvurunuz onaylanmıştır 🎉
-
-       📅 Ders Tarihi: ${classDate}
-       🕒 Ders Saati: ${classTime}
-       🏋️ Ders Adı: ${className}
-       👤 Eğitmen: ${instructorName}
-
-       Lütfen ders bilgilerinizi kontrol ederek derse zamanında katılım sağlayınız.
-
-       📌 Önemli Bilgiler:
-
-       • Derse katılım sağlamamanız durumunda deneme ders hakkınız sona erecektir.
-       • Deneme dersine katılım sağlayamazsanız, yeniden başvuru oluşturabilmek için spor salonu yönetimiyle iletişime geçmeniz gerekmektedir.
-       • Başvurunuzun geçerli olabilmesi için belirtilen adrese gelmeniz gerekmektedir.
-
-       📍 KRATOS SPOR KULÜBÜ – AYVALIK
-       Mithatpaşa Mah. 15 Eylül Cad. No:282, Ayvalık/Balıkesir
-
-       📌 Konum:
-       https://www.google.com/maps/search/?api=1&query=Kratos+Spor+Kul%C3%BCb%C3%BC+Ayval%C4%B1k
-
-       Sorularınız için salon yönetimiyle iletişime geçebilirsiniz.
-
-       Sağlıklı ve keyifli antrenmanlar dileriz 💪`;
-
+       const approvalMessage = `Merhaba ${fullName},\n\nTebrikler! Başvurunuz onaylanmıştır. Deneme dersine${classInfo} gelmeyi unutmayın.\n\n⚠️ ÖNEMLİ BİLGİLER:\n\n1. Derse gelmezseniz deneme dersi hakkı bitecek ve tekrar başvuru oluşturamazsınız.\n2. Başvuru yapmanız için ilgili adrese gelmeniz gerekmektedir.\n3. Adrese gelmeden ÖNCE mutlaka spor salonu yönetimine bilgi vermeniz gerekmektedir.\n\n📍 KRATOS SPOR KULÜBÜ - AYVALIK\n\nSorularınız için salon yönetimiyle iletişime geçiniz.`;
        const whatsappUrl = `https://wa.me/${app.phone.replace(/[^\d]/g, '')}?text=${encodeURIComponent(approvalMessage)}`;
        window.open(whatsappUrl, '_blank');
        toast.success("Deneme dersi onaylandı!");
@@ -417,26 +387,14 @@ export default function TrialApplicationsPanel() {
                        </div>
                      )}
                     </div>
-                    <div className="flex flex-col gap-1.5 shrink-0">
-                      <Button
-                       size="sm"
-                       className="h-8 text-xs gap-1 bg-green-600 hover:bg-green-700"
-                      onClick={() => { setCreatingMember(app); setPlan("Aylık"); }}
-                    >
-                      <UserPlus className="w-3.5 h-3.5" />
-                      Kayıt Oluştur
-                    </Button>
                     <Button
-                      size="sm"
-                      variant="outline"
-                      className="h-8 text-xs gap-1 border-destructive/30 text-destructive hover:bg-destructive/10"
-                      onClick={() => deleteMutation.mutate(app.id)}
-                      disabled={deleteMutation.isPending}
-                    >
-                      <XCircle className="w-3.5 h-3.5" />
-                      Sil
-                    </Button>
-                    </div>
+                     size="sm"
+                     className="h-8 text-xs gap-1 bg-green-600 hover:bg-green-700 shrink-0"
+                    onClick={() => { setCreatingMember(app); setPlan("Aylık"); }}
+                  >
+                    <UserPlus className="w-3.5 h-3.5" />
+                    Kayıt Oluştur
+                  </Button>
                 </div>
               </Card>
             ))}
