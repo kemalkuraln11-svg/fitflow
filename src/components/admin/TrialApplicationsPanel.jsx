@@ -151,42 +151,50 @@ export default function TrialApplicationsPanel() {
   return (
     <div>
       {/* Deneme dersi onay dialog */}
-       <Dialog open={!!approvingApp} onOpenChange={(o) => { if (!o) setApprovingApp(null); }}>
-         <DialogContent>
-           <DialogHeader>
-             <DialogTitle>Deneme Dersini Onayla</DialogTitle>
-           </DialogHeader>
-           {approvingApp && (
-             <div className="space-y-4 mt-2">
-               <p className="text-sm text-muted-foreground">
-                 <span className="font-semibold text-foreground">
-                   {capitalizeName(approvingApp.first_name + " " + approvingApp.last_name)}
-                 </span>{" "}
-                 için deneme dersini onaylayacak mısınız?
-               </p>
-               <div className="bg-blue-500/10 rounded-lg p-3 text-xs text-muted-foreground border border-blue-500/20">
-                 <p>Derse geldikten sonra kullanıcı isterse kayıt oluşturabilirsiniz.</p>
-               </div>
-               <div className="flex gap-2">
-                 <Button
-                   variant="outline"
-                   className="w-full"
-                   onClick={() => setApprovingApp(null)}
-                 >
-                   İptal
-                 </Button>
-                 <Button
-                   className="w-full"
-                   onClick={() => approveMutation.mutate(approvingApp)}
-                   disabled={approveMutation.isPending}
-                 >
-                   {approveMutation.isPending ? "Onaylanıyor..." : "Onayla"}
-                 </Button>
-               </div>
-             </div>
-           )}
-         </DialogContent>
-       </Dialog>
+        <Dialog open={!!approvingApp} onOpenChange={(o) => { if (!o) setApprovingApp(null); }}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Deneme Dersini Onayla</DialogTitle>
+            </DialogHeader>
+            {approvingApp && (
+              <div className="space-y-4 mt-2">
+                <p className="text-sm text-muted-foreground">
+                  <span className="font-semibold text-foreground">
+                    {capitalizeName(approvingApp.first_name + " " + approvingApp.last_name)}
+                  </span>{" "}
+                  için deneme dersini onaylayacak mısınız?
+                </p>
+                <div className="bg-blue-500/10 rounded-lg p-3 text-xs text-muted-foreground border border-blue-500/20 space-y-1">
+                  <p>Derse geldikten sonra kullanıcı isterse kayıt oluşturabilirsiniz.</p>
+                  {classDetails[approvingApp.trial_class_id] && (
+                    <>
+                      {classDetails[approvingApp.trial_class_id].instructor && (
+                        <p>👨‍🏫 Eğitmen: {classDetails[approvingApp.trial_class_id].instructor}</p>
+                      )}
+                      <p>👥 Kontenjan: {classDetails[approvingApp.trial_class_id].current_count || 0}/{classDetails[approvingApp.trial_class_id].capacity}</p>
+                    </>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => setApprovingApp(null)}
+                  >
+                    İptal
+                  </Button>
+                  <Button
+                    className="w-full"
+                    onClick={() => approveMutation.mutate(approvingApp)}
+                    disabled={approveMutation.isPending}
+                  >
+                    {approveMutation.isPending ? "Onaylanıyor..." : "Onayla"}
+                  </Button>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
 
        {/* Üyelik oluştur dialog */}
        <Dialog open={!!creatingMember} onOpenChange={(o) => { if (!o) setCreatingMember(null); }}>
