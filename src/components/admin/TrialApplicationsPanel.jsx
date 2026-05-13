@@ -78,14 +78,20 @@ export default function TrialApplicationsPanel() {
       // Başvuruyu onayla
       await base44.entities.TrialApplication.update(app.id, { status: "approved" });
 
-      return { memberResult: memberResult?.data || memberResult, username, plainPassword, fullName, planName };
+      return { memberResult: memberResult?.data || memberResult, username, plainPassword, fullName, planName, app };
     },
-    onSuccess: ({ username, plainPassword, fullName, planName }) => {
+    onSuccess: ({ username, plainPassword, fullName, planName, app }) => {
       queryClient.invalidateQueries({ queryKey: ["trialApplications"] });
       queryClient.invalidateQueries({ queryKey: ["allMembers"] });
       setApprovingApp(null);
       setCreatedMember({ username, plainPassword, fullName, planName });
-      toast.success("Üye oluşturuldu!");
+
+      // WhatsApp linki aç
+      const classInfo = app.trial_class_title ? ` ${app.trial_class_title} dersine` : "";
+      const approvalMessage = `Merhaba ${fullName},\n\nTebrikler! Başvurunuz onaylanmıştır. Deneme gersine${classInfo} gelmeyi unutmayın.\n\n⚠️ ÖNEMLİ BİLGİLER:\n\n1. Derse gelmezseniz deneme dersi hakkı bitecek ve tekrar başvuru oluşturamazsınız.\n2. Başvuru yapmanız için ilgili adrese gelmeniz gerekmektedir.\n3. Adrese gelmeden ÖNCE mutlaka spor salonu yönetimine bilgi vermeniz gerekmektedir.\n\n📍 KRATOS SPOR KULÜBÜ - AYVALIK\n\nSorularınız için salon yönetimiyle iletişime geçiniz.`;
+      const whatsappUrl = `https://wa.me/${app.phone.replace(/[^\d]/g, '')}?text=${encodeURIComponent(approvalMessage)}`;
+      window.open(whatsappUrl, '_blank');
+      toast.success("Üye oluşturuldu, WhatsApp açılıyor!");
     },
     onError: (err) => toast.error("Hata: " + err.message),
   });
