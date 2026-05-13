@@ -10,11 +10,13 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
+import QRCodeDisplay from "@/components/QRCodeDisplay";
 
 export default function DailyVisitForm({ onBack }) {
   const today = format(new Date(), "yyyy-MM-dd");
   const [form, setForm] = useState({ full_name: "", phone: "", visit_date: today, class_id: "", class_title: "", class_time: "" });
   const [success, setSuccess] = useState(false);
+  const [successData, setSuccessData] = useState(null);
 
   const { data: classes = [] } = useQuery({
     queryKey: ["dailyVisitClasses", form.visit_date],
@@ -24,7 +26,11 @@ export default function DailyVisitForm({ onBack }) {
 
   const mutation = useMutation({
     mutationFn: (data) => base44.entities.DailyVisit.create(data),
-    onSuccess: () => setSuccess(true),
+    onSuccess: (result) => {
+      const qrData = `daily:${form.full_name}:${form.phone}`;
+      setSuccessData({ ...result, qrData });
+      setSuccess(true);
+    },
     onError: () => toast.error("Kayıt başarısız, tekrar deneyin."),
   });
 
@@ -39,26 +45,33 @@ export default function DailyVisitForm({ onBack }) {
     mutation.mutate(form);
   };
 
-  if (success) {
+  if (success && successData) {
     return (
-      <div className="min-h-[100dvh] flex flex-col items-center justify-center px-6 text-center">
+      <div className="min-h-[100dvh] flex flex-col items-center justify-start px-6 pt-6 pb-10 max-w-md mx-auto overflow-y-auto">
         <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mb-4">
           <CheckCircle2 className="w-8 h-8 text-green-600" />
         </div>
-        <h2 className="text-xl font-bold mb-2">Kayıt Tamamlandı!</h2>
-        <p className="text-muted-foreground text-sm mb-6">
+        <h2 className="text-xl font-bold mb-2 text-center">Kayıt Tamamlandı!</h2>
+        <p className="text-muted-foreground text-sm mb-4 text-center">
           {form.class_title ? `${form.class_title} dersine günlük kaydınız alındı.` : "Günlük ziyaret kaydınız alındı."}
         </p>
+
+        <Card className="w-full p-4 mb-6">
+          <p className="text-xs text-muted-foreground mb-3 text-center font-semibold">Giriş yapırken bu QR kodunuz taranacak:</p>
+          <QRCodeDisplay data={successData.qrData} />
+        </Card>
+
         <Button
-          variant="outline"
+          className="w-full mb-2"
           onClick={() => {
             setSuccess(false);
+            setSuccessData(null);
             setForm({ full_name: "", phone: "", visit_date: today, class_id: "", class_title: "", class_time: "" });
           }}
         >
           Yeni Kayıt
         </Button>
-        <Button variant="ghost" className="mt-2" onClick={onBack}>
+        <Button variant="ghost" onClick={onBack}>
           Geri Dön
         </Button>
       </div>
