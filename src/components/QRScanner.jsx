@@ -132,19 +132,22 @@ export default function QRScanner({ onClose }) {
                   )}
 
                   {scanResult.person.type === 'member' && (
-                    <div className="bg-muted rounded-lg p-3 text-sm space-y-1">
-                      <p><span className="font-semibold">Kullanıcı Adı:</span> {scanResult.person.username}</p>
-                      <p><span className="font-semibold">Durum:</span> {scanResult.person.status === 'active' ? '✅ Aktif' : scanResult.person.status}</p>
-                      <p><span className="font-semibold">Plan:</span> {scanResult.person.planName}</p>
-                      <p><span className="font-semibold">Bitiş:</span> {scanResult.person.endDate ? format(parseISO(scanResult.person.endDate), "d MMMM yyyy", { locale: tr }) : '-'}</p>
+                    <>
+                      <div className="bg-muted rounded-lg p-3 text-sm space-y-1">
+                        <p><span className="font-semibold">Kullanıcı Adı:</span> {scanResult.person.username}</p>
+                        <p><span className="font-semibold">Durum:</span> {scanResult.person.status === 'active' ? '✅ Aktif' : scanResult.person.status}</p>
+                        <p><span className="font-semibold">Plan:</span> {scanResult.person.planName}</p>
+                        <p><span className="font-semibold">Bitiş:</span> {scanResult.person.endDate ? format(parseISO(scanResult.person.endDate), "d MMMM yyyy", { locale: tr }) : '-'}</p>
+                      </div>
                       {scanResult.classDate && (
-                        <>
+                        <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3 text-sm space-y-1">
+                          <p className="font-semibold text-blue-700">Bu Ders İçin:</p>
                           {scanResult.person.className && <p><span className="font-semibold">Ders:</span> {scanResult.person.className}</p>}
                           <p><span className="font-semibold">Tarih:</span> {format(parseISO(scanResult.classDate), "d MMMM", { locale: tr })}</p>
                           {scanResult.classTime && <p><span className="font-semibold">Saat:</span> {scanResult.classTime}</p>}
-                        </>
+                        </div>
                       )}
-                    </div>
+                    </>
                   )}
 
                   <div className="flex gap-2 pt-2">
