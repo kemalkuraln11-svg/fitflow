@@ -24,7 +24,7 @@ export default function AdminLayout() {
       <aside className="hidden md:flex flex-col w-56 bg-sidebar text-sidebar-foreground border-r border-sidebar-border shrink-0">
         <div className="flex items-center gap-2 px-5 py-5 border-b border-sidebar-border">
           <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white font-bold text-lg">F</div>
-          <span className="font-bold text-base">FitFlow Admin</span>
+          <span className="font-bold text-base">FitKafa-Kratos</span>
         </div>
         <nav className="flex-1 overflow-y-auto p-3 space-y-1">
           {navItems.map(({ to, label, icon: Icon, end }) => (
@@ -62,7 +62,7 @@ export default function AdminLayout() {
         <header className="md:hidden flex items-center justify-between px-4 py-3 border-b bg-card">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-md bg-primary flex items-center justify-center text-white font-bold">F</div>
-            <span className="font-bold">FitFlow Admin</span>
+            <span className="font-bold">FitKafa-Kratos</span>
           </div>
           <button onClick={handleLogout} className="p-2 rounded-md hover:bg-muted">
             <LogOut className="w-4 h-4" />
