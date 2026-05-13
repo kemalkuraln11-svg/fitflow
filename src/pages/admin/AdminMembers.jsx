@@ -89,7 +89,7 @@ export default function AdminMembers() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Membership.update(id, data),
+    mutationFn: ({ id, data }) => base44.functions.invoke("updateMembership", { id, data }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["allMembers"] });
       setEditingMember(null);
@@ -98,7 +98,7 @@ export default function AdminMembers() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Membership.delete(id),
+    mutationFn: (id) => base44.functions.invoke("deleteMembership", { id }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["allMembers"] });
       toast.success("Üyelik silindi");
