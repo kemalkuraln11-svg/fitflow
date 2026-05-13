@@ -75,9 +75,10 @@ export default function AdminMembers() {
 
   const createMutation = useMutation({
     mutationFn: ({ _plaintextPassword, ...data }) => base44.functions.invoke("createMembership", data),
-    onSuccess: (result, variables) => {
+    onSuccess: (response, variables) => {
       queryClient.invalidateQueries({ queryKey: ["allMembers"] });
       setShowForm(false);
+      const result = response?.data ?? response;
       setCreatedMember({ ...result, plaintextPassword: variables._plaintextPassword });
       setForm(emptyForm);
     },
