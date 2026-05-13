@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useMemberAuth } from "@/lib/MemberAuthContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -54,6 +54,27 @@ export default function ClassDetail() {
     enabled: !!user?.user_email,
   });
 
+  // Real-time: ClassSchedule veya Reservation değişince yeniden çek
+  useEffect(() => {
+    const unsubClass = base44.entities.ClassSchedule.subscribe((event) => {
+      if (event.id === id) {
+        queryClient.invalidateQueries({ queryKey: ["class", id] });
+      }
+    });
+
+    const unsubRes = base44.entities.Reservation.subscribe((event) => {
+      if (event.data?.class_id === id || event.id) {
+        queryClient.invalidateQueries({ queryKey: ["classReservations", id] });
+        queryClient.invalidateQueries({ queryKey: ["myReservation", id, user?.user_email] });
+      }
+    });
+
+    return () => {
+      unsubClass();
+      unsubRes();
+    };
+  }, [id, queryClient, user?.user_email]);
+
   const reserveMutation = useMutation({
     mutationFn: async () => {
       const res = await base44.functions.invoke("makeReservation", {
@@ -72,6 +93,7 @@ export default function ClassDetail() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["class", id] });
       queryClient.invalidateQueries({ queryKey: ["myReservation", id] });
+      queryClient.invalidateQueries({ queryKey: ["classReservations", id] });
       queryClient.invalidateQueries({ queryKey: ["myReservations"] });
       queryClient.invalidateQueries({ queryKey: ["todayClasses"] });
       setDone(true);
@@ -99,6 +121,7 @@ export default function ClassDetail() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["class", id] });
       queryClient.invalidateQueries({ queryKey: ["myReservation", id] });
+      queryClient.invalidateQueries({ queryKey: ["classReservations", id] });
       queryClient.invalidateQueries({ queryKey: ["myReservations"] });
       queryClient.invalidateQueries({ queryKey: ["todayClasses"] });
       setDone(true);
