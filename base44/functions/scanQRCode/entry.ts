@@ -96,9 +96,9 @@ Deno.serve(async (req) => {
       }
     } else if (type === 'member') {
       // Search in Membership
-      // QR format: member:username:date:time
+      // QR format: MEMBER|username|date|time
       const memberships = await base44.asServiceRole.entities.Membership.list();
-      const member = memberships.find(m => m.username === name || m.username.toLowerCase() === name.toLowerCase());
+      const member = memberships.find(m => m.username.toLowerCase() === name.toLowerCase());
 
       if (member) {
         result.found = true;
