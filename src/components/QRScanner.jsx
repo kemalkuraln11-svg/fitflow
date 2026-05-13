@@ -87,8 +87,17 @@ export default function QRScanner({ onClose }) {
   const startCamera = async () => {
     try {
       console.log("[QRScanner] Kamera başlatılıyor...");
+      // Eski stream'i kapat
+      if (cameraStreamRef.current) {
+        cameraStreamRef.current.getTracks().forEach(track => track.stop());
+      }
+      
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment" }
+        video: { 
+          facingMode: "environment",
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        }
       });
       console.log("[QRScanner] Kamera başarıyla açıldı", stream);
       cameraStreamRef.current = stream;
@@ -107,15 +116,17 @@ export default function QRScanner({ onClose }) {
         }, 1000);
       }
     } catch (err) {
-      console.error("[QRScanner] Kamera hatası:", err);
-      let errorMsg = "Kamera erişimi başarısız";
+      console.error("[QRScanner] Kamera hatası detayı:", err.name, err.message);
+      let errorMsg = "Kamera erişimi başarısız. Lütfen izin verin ve tekrar deneyin.";
       
-      if (err.name === "NotAllowedError" || err.message?.includes("Permission denied")) {
-        errorMsg = "Kamera erişim izni verilmedi. Lütfen tarayıcı ayarlarından izin verin.";
+      if (err.name === "NotAllowedError") {
+        errorMsg = "Kamera erişim izni verilmedi. Tarayıcı ayarlarından kamera izni verin.";
       } else if (err.name === "NotFoundError") {
-        errorMsg = "Kamera bulunamadı.";
+        errorMsg = "Cihazda kamera bulunamadı.";
       } else if (err.name === "NotReadableError") {
-        errorMsg = "Kamera zaten başka bir uygulamada kullanılıyor.";
+        errorMsg = "Kamera başka bir uygulamada kullanılıyor. Kapatıp tekrar deneyin.";
+      } else if (err.name === "SecurityError") {
+        errorMsg = "Güvenlik sebebiyle kamera erişimi reddedildi.";
       }
       
       toast.error(errorMsg);

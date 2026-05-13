@@ -74,31 +74,9 @@
     "end_date"
   ],
   "rls": {
-    "create": {
-      "role": "admin"
-    },
-    "read": {
-      "$or": [
-        {
-          "role": "admin"
-        },
-        {
-          "user_email": "{{user.email}}"
-        }
-      ]
-    },
-    "update": {
-      "role": "admin"
-    },
-    "delete": {
-      "$or": [
-        {
-          "role": "admin"
-        },
-        {
-          "user_email": "{{user.email}}"
-        }
-      ]
-    }
+    "create": {},
+    "read": {},
+    "update": {},
+    "delete": {}
   }
 }
