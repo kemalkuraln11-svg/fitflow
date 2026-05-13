@@ -83,17 +83,21 @@ export default function QRScanner({ onClose }) {
 
   const startCamera = async () => {
     try {
-      // Use photo mode instead of video
+      console.log("[QRScanner] Kamera başlatılıyor...");
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } }
       });
+      console.log("[QRScanner] Kamera başarıyla açıldı", stream);
       cameraStreamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+        console.log("[QRScanner] Video element'e stream atandı");
         setCameraActive(true);
-        captureAndScanQR();
+        // Biraz bekleme, video yüklemesi için
+        setTimeout(() => captureAndScanQR(), 500);
       }
     } catch (err) {
+      console.error("[QRScanner] Kamera hatası:", err);
       toast.error("Kamera erişimi reddedildi: " + err.message);
     }
   };
@@ -107,36 +111,49 @@ export default function QRScanner({ onClose }) {
   };
 
   const captureAndScanQR = () => {
-    if (!cameraActive || !videoRef.current || !canvasRef.current) return;
+    if (!cameraActive || !videoRef.current || !canvasRef.current) {
+      console.log("[QRScanner] Kamera hazır değil", { cameraActive, video: !!videoRef.current, canvas: !!canvasRef.current });
+      return;
+    }
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     const video = videoRef.current;
 
+    console.log("[QRScanner] Video boyutları:", { videoWidth: video.videoWidth, videoHeight: video.videoHeight });
+
     // Set canvas size to match video
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
 
-    // Capture current frame
-    ctx.drawImage(video, 0, 0);
+    try {
+      // Capture current frame
+      ctx.drawImage(video, 0, 0);
+      console.log("[QRScanner] Frame yakalandı, taranıyor...");
 
-    // Scan the captured image
-    QrScanner.scanImage(canvas)
-      .then(result => {
-        if (result?.data) {
-          setQrInput(result.data);
-          stopCamera();
-          setUseCamera(false);
-          handleScan();
-        } else {
-          // Retry scan
+      // Scan the captured image
+      QrScanner.scanImage(canvas)
+        .then(result => {
+          console.log("[QRScanner] Tarama sonucu:", result);
+          if (result?.data) {
+            console.log("[QRScanner] QR kodu bulundu:", result.data);
+            setQrInput(result.data);
+            stopCamera();
+            setUseCamera(false);
+            handleScan();
+          } else {
+            console.log("[QRScanner] QR kodu bulunamadı, tekrar deniyor...");
+            setTimeout(captureAndScanQR, 500);
+          }
+        })
+        .catch(err => {
+          console.error("[QRScanner] Tarama hatası:", err);
           setTimeout(captureAndScanQR, 500);
-        }
-      })
-      .catch(() => {
-        // Retry on error
-        setTimeout(captureAndScanQR, 500);
-      });
+        });
+    } catch (err) {
+      console.error("[QRScanner] Frame yakalanamadı:", err);
+      setTimeout(captureAndScanQR, 500);
+    }
   };
 
   useEffect(() => {
