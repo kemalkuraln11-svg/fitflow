@@ -106,21 +106,23 @@ export default function DailyVisitForm({ onBack }) {
               onChange={(e) => setForm({ ...form, visit_date: e.target.value, class_id: "", class_title: "", class_time: "" })}
             />
           </div>
-          <div>
-            <Label className="text-xs">Ders Seç (opsiyonel)</Label>
-            <Select value={form.class_id} onValueChange={handleClassSelect}>
-              <SelectTrigger className="mt-0.5">
-                <SelectValue placeholder={classes.length === 0 ? "O gün ders yok" : "Ders seçin"} />
-              </SelectTrigger>
-              <SelectContent>
-                {classes.map((cls) => (
-                  <SelectItem key={cls.id} value={cls.id}>
-                    {cls.title} — {cls.start_time}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          {classes.length > 0 && (
+            <div>
+              <Label className="text-xs">Ders Seç (opsiyonel)</Label>
+              <Select value={form.class_id} onValueChange={handleClassSelect}>
+                <SelectTrigger className="mt-0.5">
+                  <SelectValue placeholder="Ders seçin" />
+                </SelectTrigger>
+                <SelectContent>
+                  {classes.map((cls) => (
+                    <SelectItem key={cls.id} value={cls.id}>
+                      {cls.title} — {cls.start_time}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           <Button
             type="submit"
