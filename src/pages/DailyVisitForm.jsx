@@ -27,10 +27,11 @@ export default function DailyVisitForm({ onBack }) {
   const mutation = useMutation({
    mutationFn: (data) => base44.entities.DailyVisit.create(data),
    onSuccess: (result) => {
-      const qrData = `daily:${form.full_name.trim()}:${form.phone.trim()}:${form.visit_date}:${form.class_time}`;
-      setSuccessData({ ...result, qrData });
-      setSuccess(true);
-    },
+       // Simple format for fast scanning
+       const qrData = `DAILY|${form.full_name.trim().toUpperCase()}|${form.phone.trim()}`;
+       setSuccessData({ ...result, qrData });
+       setSuccess(true);
+     },
    onError: () => toast.error("Kayıt başarısız, tekrar deneyin."),
   });
 
