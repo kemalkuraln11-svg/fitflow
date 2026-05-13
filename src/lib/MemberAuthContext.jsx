@@ -20,7 +20,9 @@ export const MemberAuthProvider = ({ children }) => {
       today.setHours(0, 0, 0, 0);
       const endDate = new Date(parsed.end_date);
       endDate.setHours(0, 0, 0, 0);
-      if (parsed.status === 'frozen' || endDate <= today) {
+      const isExpired = endDate < today;
+      const isInvalid = parsed.status === 'frozen' || parsed.status === 'suspended' || isExpired;
+      if (isInvalid || !parsed.status) {
         sessionStorage.removeItem(SESSION_KEY);
       } else {
         setMember(parsed);

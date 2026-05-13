@@ -14,7 +14,7 @@ import ReservationsBottomSheet from "@/components/ReservationsBottomSheet";
 
 export default function Profile() {
   const { member, logout } = useMemberAuth();
-  const membership = member?.status === "active" ? member : null;
+  const membership = (member?.status === "active" && member?.end_date) ? member : null;
 
   const { data: reservations = [] } = useQuery({
     queryKey: ["myAllReservations", member?.id],

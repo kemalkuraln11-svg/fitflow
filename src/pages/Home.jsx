@@ -83,7 +83,7 @@ export default function Home() {
     enabled: !!member?.user_email,
   });
 
-  const membership = member?.status === "active" ? member : null;
+  const membership = (member?.status === "active" && member?.end_date) ? member : null;
 
   const daysLeft = membership
     ? Math.max(0, differenceInDays(parseISO(membership.end_date), new Date()))
