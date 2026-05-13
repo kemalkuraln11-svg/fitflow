@@ -168,7 +168,7 @@ export default function TrialApplicationForm({ onBack }) {
               <Input
                 className="mt-0.5"
                 style={{ fontSize: "16px" }}
-                placeholder="05xx xxx xx xx"
+                placeholder="+90 5xx xxx xx xx"
                 type="tel"
                 value={form.phone}
                 onChange={(e) => setForm({ ...form, phone: e.target.value })}
