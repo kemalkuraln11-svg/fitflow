@@ -113,7 +113,7 @@ export default function QRScanner({ onClose }) {
 
     const video = videoRef.current;
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
 
     if (video.readyState === video.HAVE_ENOUGH_DATA) {
       canvas.width = video.videoWidth;
@@ -121,14 +121,21 @@ export default function QRScanner({ onClose }) {
       ctx.drawImage(video, 0, 0);
 
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const qrCode = jsQR(imageData.data, imageData.width, imageData.height);
 
-      if (qrCode) {
-        setQrInput(qrCode.data);
-        stopCamera();
-        setUseCamera(false);
-        handleScan();
-        return;
+      try {
+        const qrCode = jsQR(imageData.data, imageData.width, imageData.height, {
+          inversionAttempts: "dontInvert"
+        });
+
+        if (qrCode && qrCode.data) {
+          setQrInput(qrCode.data);
+          stopCamera();
+          setUseCamera(false);
+          handleScan();
+          return;
+        }
+      } catch (err) {
+        console.error("QR scan error:", err);
       }
     }
 
