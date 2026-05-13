@@ -24,13 +24,19 @@ export default function AdminDashboard() {
     queryFn: () => base44.entities.Reservation.filter({ class_date: today, status: "confirmed" }),
   });
 
+  const { data: todayVisits = [] } = useQuery({
+    queryKey: ["adminTodayVisits", today],
+    queryFn: () => base44.entities.DailyVisit.filter({ visit_date: today }),
+  });
+
   const activeMembers = members.filter((m) => m.status === "active").length;
+  const totalTodayAttendees = todayReservations.length + todayVisits.length;
 
   const stats = [
     { label: "Toplam Üye", value: members.length, icon: Users, color: "text-primary bg-primary/10", href: "/admin/members" },
     { label: "Aktif Üye", value: activeMembers, icon: TrendingUp, color: "text-accent bg-accent/10", href: "/admin/members" },
     { label: "Bugün Ders", value: todayClasses.length, icon: Calendar, color: "text-chart-3 bg-chart-3/10", href: "/admin/classes" },
-    { label: "Bugün Rez.", value: todayReservations.length, icon: BookOpen, color: "text-chart-4 bg-chart-4/10", href: "/admin/classes" },
+    { label: "Bugün Rez.", value: totalTodayAttendees, icon: BookOpen, color: "text-chart-4 bg-chart-4/10", href: "/admin/daily-visits" },
   ];
 
   return (
@@ -73,7 +79,16 @@ export default function AdminDashboard() {
                 </div>
                 <div className="text-left sm:text-right flex-shrink-0">
                   <p className="font-bold text-primary">{cls.current_count || 0}/{cls.capacity}</p>
-                  <p className="text-xs text-muted-foreground">kişi</p>
+                  <p className="text-xs text-muted-foreground">
+                    {(() => {
+                      const rezCount = todayReservations.filter(r => r.class_id === cls.id).length;
+                      const visitCount = todayVisits.filter(v => v.class_id === cls.id).length;
+                      const parts = [];
+                      if (rezCount > 0) parts.push(`${rezCount} rez.`);
+                      if (visitCount > 0) parts.push(`${visitCount} günlük`);
+                      return parts.length > 0 ? parts.join(" + ") : "kişi";
+                    })()}
+                  </p>
                 </div>
               </Card>
             ))}
