@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -56,6 +56,20 @@ export default function ClassCalendar() {
   const getCount = (classId) =>
     dayReservations.filter((r) => r.class_id === classId).length +
     dayVisits.filter((v) => v.class_id === classId).length;
+
+  // Real-time: rezervasyon veya ders değişince anlık güncelle
+  useEffect(() => {
+    const unsubRes = base44.entities.Reservation.subscribe(() => {
+      queryClient.invalidateQueries({ queryKey: ["dayReservations", dateStr] });
+    });
+    const unsubClass = base44.entities.ClassSchedule.subscribe(() => {
+      queryClient.invalidateQueries({ queryKey: ["classes", dateStr] });
+    });
+    return () => {
+      unsubRes();
+      unsubClass();
+    };
+  }, [dateStr, queryClient]);
 
   const handleRefresh = async () => {
     await queryClient.invalidateQueries({ queryKey: ["classes", dateStr] });
