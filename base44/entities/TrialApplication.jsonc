@@ -1,0 +1,81 @@
+{
+  "name": "TrialApplication",
+  "type": "object",
+  "properties": {
+    "first_name": {
+      "type": "string",
+      "description": "Ad\u0131"
+    },
+    "last_name": {
+      "type": "string",
+      "description": "Soyad\u0131"
+    },
+    "phone": {
+      "type": "string",
+      "description": "Telefon numaras\u0131"
+    },
+    "trial_class_id": {
+      "type": "string",
+      "description": "Se\u00e7ilen deneme dersinin ID'si"
+    },
+    "trial_class_title": {
+      "type": "string",
+      "description": "Se\u00e7ilen deneme dersinin ad\u0131"
+    },
+    "trial_class_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Deneme dersinin tarihi"
+    },
+    "trial_class_time": {
+      "type": "string",
+      "description": "Deneme dersinin saati"
+    },
+    "payment_type": {
+      "type": "string",
+      "enum": [
+        "nakit",
+        "kredi_karti",
+        "havale"
+      ],
+      "description": "\u00d6deme t\u00fcr\u00fc"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "approved",
+        "rejected"
+      ],
+      "default": "pending",
+      "description": "Ba\u015fvuru durumu"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Admin notu"
+    }
+  },
+  "required": [
+    "first_name",
+    "last_name",
+    "phone"
+  ],
+  "rls": {
+    "create": {},
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

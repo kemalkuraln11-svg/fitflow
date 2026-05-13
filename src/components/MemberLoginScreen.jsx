@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import DailyVisitForm from "@/pages/DailyVisitForm";
+import TrialApplicationForm from "@/components/TrialApplicationForm";
 
 export default function MemberLoginScreen() {
   const { login } = useMemberAuth();
@@ -14,9 +15,14 @@ export default function MemberLoginScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showDailyVisit, setShowDailyVisit] = useState(false);
+  const [showTrialApp, setShowTrialApp] = useState(false);
 
   if (showDailyVisit) {
     return <DailyVisitForm onBack={() => setShowDailyVisit(false)} />;
+  }
+
+  if (showTrialApp) {
+    return <TrialApplicationForm onBack={() => setShowTrialApp(false)} />;
   }
 
   const handleLogin = async (e) => {
@@ -95,11 +101,18 @@ export default function MemberLoginScreen() {
          </Button>
       </form>
 
-      <div className="w-full border-t pt-4 mt-2 text-center">
-        <p className="text-xs text-muted-foreground mb-2">Üye değil misiniz?</p>
+      <div className="w-full border-t pt-4 mt-2 space-y-2">
+        <p className="text-xs text-muted-foreground text-center mb-1">Üye değil misiniz?</p>
         <Button
           variant="outline"
           className="w-full h-10 font-medium"
+          onClick={() => setShowTrialApp(true)}
+        >
+          Üyelik Başvurusu
+        </Button>
+        <Button
+          variant="ghost"
+          className="w-full h-10 font-medium text-muted-foreground"
           onClick={() => setShowDailyVisit(true)}
         >
           Günlük Giriş Yap

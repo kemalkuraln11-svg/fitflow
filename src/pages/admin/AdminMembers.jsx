@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import TrialApplicationsPanel from "@/components/admin/TrialApplicationsPanel";
 
 function generateUsername(fullName) {
   return fullName
@@ -51,7 +52,13 @@ const getPlanDuration = (planName) => {
 
 export default function AdminMembers() {
   const queryClient = useQueryClient();
+  const [activeTab, setActiveTab] = useState("members");
   const [showForm, setShowForm] = useState(false);
+
+  const { data: pendingApps = [] } = useQuery({
+    queryKey: ["trialApplicationsPending"],
+    queryFn: () => base44.entities.TrialApplication.filter({ status: "pending" }),
+  });
   const [createdMember, setCreatedMember] = useState(null); // { ...memberResult, plaintextPassword }
 
   const [editingMember, setEditingMember] = useState(null);
@@ -173,6 +180,31 @@ export default function AdminMembers() {
 
   return (
     <div>
+      {/* Sekmeler */}
+      <div className="flex gap-1 mb-5 bg-muted rounded-xl p-1">
+        <button
+          className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${activeTab === "members" ? "bg-card shadow text-foreground" : "text-muted-foreground"}`}
+          onClick={() => setActiveTab("members")}
+        >
+          Üyeler
+        </button>
+        <button
+          className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all flex items-center justify-center gap-1.5 ${activeTab === "applications" ? "bg-card shadow text-foreground" : "text-muted-foreground"}`}
+          onClick={() => setActiveTab("applications")}
+        >
+          Başvurular
+          {pendingApps.length > 0 && (
+            <span className="bg-orange-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+              {pendingApps.length}
+            </span>
+          )}
+        </button>
+      </div>
+
+      {activeTab === "applications" && <TrialApplicationsPanel />}
+
+      {activeTab === "members" && (
+      <div>
       <div className="flex items-center justify-between mb-5">
         <h2 className="text-xl font-bold">Üyeler</h2>
         <Dialog open={showForm} onOpenChange={setShowForm}>
@@ -424,6 +456,8 @@ export default function AdminMembers() {
             );
           })}
         </div>
+      )}
+      </div>
       )}
     </div>
   );
