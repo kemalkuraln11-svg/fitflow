@@ -43,21 +43,20 @@ export default function TrialApplicationForm({ onBack }) {
 
   const mutation = useMutation({
     mutationFn: async (data) => {
-      // Blacklist kontrolü: aynı ad+soyad+telefon kombinasyonu rejected başvurularda var mı?
+      // Kontrolü: aynı ad+soyad+telefon kombinasyonu ile daha önce başvuru var mı?
       const existing = await base44.entities.TrialApplication.filter({
         first_name: data.first_name,
         last_name: data.last_name,
         phone: data.phone,
-        status: "rejected",
       });
       if (existing && existing.length > 0) {
-        throw new Error("BLACKLISTED");
+        throw new Error("ALREADY_APPLIED");
       }
       return base44.entities.TrialApplication.create(data);
     },
     onSuccess: () => setSuccess(true),
     onError: (err) => {
-      if (err.message === "BLACKLISTED") {
+      if (err.message === "ALREADY_APPLIED") {
         setBlacklisted(true);
       } else {
         toast.error("Başvuru gönderilemedi, tekrar deneyin.");
@@ -103,7 +102,7 @@ export default function TrialApplicationForm({ onBack }) {
         </div>
         <h2 className="text-xl font-bold mb-2">Başvuru Kabul Edilemedi</h2>
         <p className="text-muted-foreground text-sm mb-6 leading-relaxed">
-          Bu bilgilerle daha önce başvuru yapılmış ve reddedilmiştir. Detaylı bilgi için lütfen salon yönetimiyle iletişime geçin.
+          Bu bilgilerle zaten bir başvurunuz var. Detaylı bilgi için lütfen salon yönetimiyle iletişime geçin.
         </p>
         <Button variant="ghost" onClick={onBack}>
           Geri Dön
