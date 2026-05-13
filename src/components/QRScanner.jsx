@@ -93,8 +93,13 @@ export default function QRScanner({ onClose }) {
         videoRef.current.srcObject = stream;
         console.log("[QRScanner] Video element'e stream atandı");
         setCameraActive(true);
-        // Biraz bekleme, video yüklemesi için
-        setTimeout(() => captureAndScanQR(), 500);
+        // Video yüklemesi için bekle, sonra taramaya başla
+        setTimeout(() => {
+          if (videoRef.current && canvasRef.current) {
+            console.log("[QRScanner] Video hazır, taramaya başlanıyor");
+            captureAndScanQR();
+          }
+        }, 1000);
       }
     } catch (err) {
       console.error("[QRScanner] Kamera hatası:", err);
