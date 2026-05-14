@@ -23,7 +23,15 @@ Deno.serve(async (req) => {
     const safe = (value) => String(value || '').trim();
     const safeLower = (value) => safe(value).toLowerCase();
 
-    const parts = qr_data.split('|').map((p) => safe(p));
+    // SUPPORT BOTH "|" AND ":" QR FORMATS
+    let parts = [];
+
+    if (qr_data.includes('|')) {
+      parts = qr_data.split('|').map((p) => safe(p));
+    } else {
+      parts = qr_data.split(':').map((p) => safe(p));
+    }
+
     const type = safeLower(parts[0]);
 
     console.log('[scanQRCode] body:', body);
@@ -39,16 +47,37 @@ Deno.serve(async (req) => {
     const today = new Date().toISOString().split('T')[0];
 
     if (type === 'member') {
+      // member:username:2026-05-19:09:00
+      // MEMBER|username|2026-05-19|09:00
+
       name = parts[1] || '';
       date = parts[2] || today;
-      time = parts[3] || '';
+
+      if (qr_data.includes(':')) {
+        time = parts.length >= 5 ? `${parts[3]}:${parts[4]}` : '';
+      } else {
+        time = parts[3] || '';
+      }
+
       phone = '';
-    } else if (type === 'trial' || type === 'daily') {
+    }
+
+    else if (type === 'trial' || type === 'daily') {
+      // trial:name:phone:2026-05-19:09:00
+      // TRIAL|name|phone|2026-05-19|09:00
+
       name = parts[1] || '';
       phone = parts[2] || '';
       date = parts[3] || today;
-      time = parts[4] || '';
-    } else {
+
+      if (qr_data.includes(':')) {
+        time = parts.length >= 6 ? `${parts[4]}:${parts[5]}` : '';
+      } else {
+        time = parts[4] || '';
+      }
+    }
+
+    else {
       return Response.json(
         {
           error: 'Invalid QR type',
@@ -82,6 +111,10 @@ Deno.serve(async (req) => {
       found: false,
     };
 
+    // =========================
+    // TRIAL
+    // =========================
+
     if (type === 'trial') {
       const apps = await base44.asServiceRole.entities.TrialApplication.list();
 
@@ -97,6 +130,7 @@ Deno.serve(async (req) => {
 
       if (app) {
         result.found = true;
+
         result.person = {
           id: app.id,
           fullName: `${safe(app.first_name)} ${safe(app.last_name)}`.trim(),
@@ -113,6 +147,10 @@ Deno.serve(async (req) => {
       }
     }
 
+    // =========================
+    // DAILY
+    // =========================
+
     if (type === 'daily') {
       const visits = await base44.asServiceRole.entities.DailyVisit.list();
 
@@ -127,6 +165,7 @@ Deno.serve(async (req) => {
 
       if (visit) {
         result.found = true;
+
         result.person = {
           id: visit.id,
           fullName: visit.full_name || '',
@@ -141,6 +180,10 @@ Deno.serve(async (req) => {
         result.message = 'Günlük giriş kaydı bulunamadı';
       }
     }
+
+    // =========================
+    // MEMBER
+    // =========================
 
     if (type === 'member') {
       const memberships = await base44.asServiceRole.entities.Membership.list();
@@ -157,14 +200,20 @@ Deno.serve(async (req) => {
             const classes = await base44.asServiceRole.entities.ClassSchedule.list();
 
             const matchedClass = classes.find((c) => {
-              return safe(c.date) === safe(date) && safe(c.start_time) === safe(time);
+              return (
+                safe(c.date) === safe(date) &&
+                safe(c.start_time) === safe(time)
+              );
             });
 
             if (matchedClass) {
               className = matchedClass.title || '';
             }
           } catch (classError) {
-            console.log('[scanQRCode] Class lookup error:', classError.message);
+            console.log(
+              '[scanQRCode] Class lookup error:',
+              classError.message
+            );
           }
         }
 
