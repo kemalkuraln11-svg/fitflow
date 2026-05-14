@@ -84,48 +84,62 @@ export default function QRScanner({ onClose }) {
     }
   };
 
-  const startCamera = async () => {
-    try {
-      if (cameraStreamRef.current) {
-        cameraStreamRef.current.getTracks().forEach(track => track.stop());
-      }
-      
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment" }
-      });
-      
-      cameraStreamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        
-        // Video yüklenince taramaya başla
-        const onLoadedMetadata = () => {
-          cameraActiveRef.current = true;
-          setCameraActive(true);
-          captureAndScanQR();
-          videoRef.current?.removeEventListener('loadedmetadata', onLoadedMetadata);
-        };
-        
-        videoRef.current.addEventListener('loadedmetadata', onLoadedMetadata);
-        videoRef.current.play().catch(e => console.error("[QRScanner] Video play hatası:", e));
-      }
-    } catch (err) {
-      console.error("[QRScanner] Kamera hatası:", err.name, err.message);
-      let errorMsg = "Kamera erişimi başarısız";
-      
-      if (err.name === "NotAllowedError") {
-        errorMsg = "Kamera izni reddedildi. Browser ayarlarını kontrol edin.";
-      } else if (err.name === "NotFoundError") {
-        errorMsg = "Cihazda kamera yok.";
-      } else if (err.name === "NotReadableError") {
-        errorMsg = "Kamera başka programda kullanılıyor.";
-      }
-      
-      toast.error(errorMsg);
-      setCameraActive(false);
-      cameraActiveRef.current = false;
+const startCamera = async () => {
+  try {
+    if (!navigator.mediaDevices?.getUserMedia) {
+      toast.error("Bu tarayıcı kamera erişimini desteklemiyor.");
+      return;
     }
-  };
+
+    if (window.location.protocol !== "https:" && window.location.hostname !== "localhost") {
+      toast.error("Kamera için uygulamayı HTTPS üzerinden açmanız gerekiyor.");
+      return;
+    }
+
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: { ideal: "environment" },
+        width: { ideal: 1280 },
+        height: { ideal: 720 }
+      },
+      audio: false
+    });
+
+    cameraStreamRef.current = stream;
+
+    if (videoRef.current) {
+      videoRef.current.srcObject = stream;
+
+      const onLoadedMetadata = () => {
+        cameraActiveRef.current = true;
+        setCameraActive(true);
+        captureAndScanQR();
+        videoRef.current?.removeEventListener("loadedmetadata", onLoadedMetadata);
+      };
+
+      videoRef.current.addEventListener("loadedmetadata", onLoadedMetadata);
+      await videoRef.current.play();
+    }
+  } catch (err) {
+    console.error("[QRScanner] Kamera hatası:", err.name, err.message);
+
+    let errorMsg = "Kamera erişimi başarısız.";
+
+    if (err.name === "NotAllowedError") {
+      errorMsg = "Kamera izni reddedildi. Tarayıcı/site ayarlarından kameraya izin verin.";
+    } else if (err.name === "NotFoundError") {
+      errorMsg = "Cihazda kullanılabilir kamera bulunamadı.";
+    } else if (err.name === "NotReadableError") {
+      errorMsg = "Kamera başka bir uygulama tarafından kullanılıyor olabilir.";
+    } else if (err.name === "OverconstrainedError") {
+      errorMsg = "İstenen kamera ayarları desteklenmiyor.";
+    }
+
+    toast.error(errorMsg);
+    stopCamera();
+    setUseCamera(false);
+  }
+};
 
   const stopCamera = () => {
     if (cameraStreamRef.current) {
