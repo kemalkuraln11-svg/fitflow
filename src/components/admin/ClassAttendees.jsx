@@ -28,6 +28,12 @@ export default function ClassAttendees({ classItem, onClose }) {
     enabled: !!classItem?.id,
   });
 
+  const { data: trialApps = [], isLoading: isLoadingTrials } = useQuery({
+    queryKey: ["classTrials", classItem?.id],
+    queryFn: () => base44.entities.TrialApplication.filter({ trial_class_id: classItem.id }),
+    enabled: !!classItem?.id,
+  });
+
   const markReservationMutation = useMutation({
     mutationFn: ({ id, attended }) => base44.entities.Reservation.update(id, { attended }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["attendees", classItem?.id] }),
@@ -37,6 +43,12 @@ export default function ClassAttendees({ classItem, onClose }) {
   const markVisitMutation = useMutation({
     mutationFn: ({ id, attended }) => base44.entities.DailyVisit.update(id, { attended }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["classVisits", classItem?.id] }),
+    onError: () => toast.error("Güncelleme başarısız"),
+  });
+
+  const markTrialMutation = useMutation({
+    mutationFn: ({ id, attended }) => base44.entities.TrialApplication.update(id, { attended }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["classTrials", classItem?.id] }),
     onError: () => toast.error("Güncelleme başarısız"),
   });
 
@@ -54,8 +66,13 @@ export default function ClassAttendees({ classItem, onClose }) {
   const visitAbsent = dailyVisits.filter((v) => v.attended === false).length;
   const visitUnmarked = dailyVisits.filter((v) => v.attended === null || v.attended === undefined).length;
 
-  const totalAttended = resAttended + visitAttended;
-  const totalAbsent = resAbsent + visitAbsent;
+  // Trial app stats
+  const trialAttended = trialApps.filter((t) => t.attended === true).length;
+  const trialAbsent = trialApps.filter((t) => t.attended === false).length;
+  const trialUnmarked = trialApps.filter((t) => t.attended === null || t.attended === undefined).length;
+
+  const totalAttended = resAttended + visitAttended + trialAttended;
+  const totalAbsent = resAbsent + visitAbsent + trialAbsent;
 
   return (
     <Dialog open={!!classItem} onOpenChange={(open) => !open && onClose()}>
@@ -78,14 +95,14 @@ export default function ClassAttendees({ classItem, onClose }) {
           <span className="flex items-center gap-1 text-destructive font-medium">
             <XCircle className="w-3.5 h-3.5" /> {totalAbsent} gelmedi
           </span>
-          {(resUnmarked + visitUnmarked) > 0 && (
+          {(resUnmarked + visitUnmarked + trialUnmarked) > 0 && (
             <span className="flex items-center gap-1 text-muted-foreground font-medium">
-              <MinusCircle className="w-3.5 h-3.5" /> {resUnmarked + visitUnmarked} belirsiz
+              <MinusCircle className="w-3.5 h-3.5" /> {resUnmarked + visitUnmarked + trialUnmarked} belirsiz
             </span>
           )}
         </div>
 
-        {(isLoading || isLoadingVisits) ? (
+        {(isLoading || isLoadingVisits || isLoadingTrials) ? (
           <div className="space-y-2">
             {[1, 2, 3].map((i) => (
               <div key={i} className="h-10 bg-muted rounded animate-pulse" />
@@ -208,7 +225,64 @@ export default function ClassAttendees({ classItem, onClose }) {
               </div>
             )}
 
-            {attendees.length === 0 && dailyVisits.length === 0 && (
+            {/* Deneme Dersi Başvuruları */}
+            {trialApps.length > 0 && (
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                    Deneme Dersi ({trialApps.length})
+                  </p>
+                  <span className="text-xs text-muted-foreground">
+                    · {trialAttended} geldi · {trialAbsent} gelmedi {trialUnmarked > 0 ? `· ${trialUnmarked} belirsiz` : ""}
+                  </span>
+                </div>
+                <div className="space-y-2">
+                  {trialApps.map((t) => (
+                    <div
+                      key={t.id}
+                      className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
+                        t.attended === true
+                          ? "bg-green-50 border border-green-200"
+                          : t.attended === false
+                          ? "bg-red-50 border border-red-200"
+                          : "bg-purple-50 border border-purple-200"
+                      }`}
+                    >
+                      <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
+                        <User className="w-4 h-4 text-purple-500" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{t.first_name} {t.last_name}</p>
+                        <p className="text-xs text-muted-foreground truncate">{t.phone}</p>
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <AttendanceBadge attended={t.attended} />
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className={`h-7 w-7 ${t.attended === true ? "text-green-600 bg-green-100" : "text-muted-foreground"}`}
+                          onClick={() => markTrialMutation.mutate({ id: t.id, attended: t.attended === true ? null : true })}
+                          title="Geldi"
+                        >
+                          <CheckCircle2 className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className={`h-7 w-7 ${t.attended === false ? "text-destructive bg-red-100" : "text-muted-foreground"}`}
+                          onClick={() => markTrialMutation.mutate({ id: t.id, attended: t.attended === false ? null : false })}
+                          title="Gelmedi"
+                        >
+                          <XCircle className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {attendees.length === 0 && dailyVisits.length === 0 && trialApps.length === 0 && (
               <div className="text-center py-8 text-muted-foreground text-sm">
                 Henüz katılımcı yok
               </div>
