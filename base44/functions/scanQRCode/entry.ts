@@ -6,17 +6,30 @@ Deno.serve(async (req) => {
 
     const body = await req.json().catch(() => null);
 
-    if (!body || !body.qr_data) {
-      return Response.json({ error: 'QR data is required' }, { status: 400 });
+    const rawQrData = body?.qr_data || body?.qrData || body?.data;
+
+    if (!rawQrData) {
+      return Response.json(
+        {
+          error: 'QR data is required',
+          receivedBody: body,
+        },
+        { status: 400 }
+      );
     }
 
-    const qr_data = String(body.qr_data || '').trim();
+    const qr_data = String(rawQrData).trim();
 
     const safe = (value) => String(value || '').trim();
     const safeLower = (value) => safe(value).toLowerCase();
 
     const parts = qr_data.split('|').map((p) => safe(p));
     const type = safeLower(parts[0]);
+
+    console.log('[scanQRCode] body:', body);
+    console.log('[scanQRCode] qr_data:', qr_data);
+    console.log('[scanQRCode] parts:', parts);
+    console.log('[scanQRCode] type:', type);
 
     let name = '';
     let phone = '';
@@ -26,13 +39,11 @@ Deno.serve(async (req) => {
     const today = new Date().toISOString().split('T')[0];
 
     if (type === 'member') {
-      // Format: MEMBER|username|date|time
       name = parts[1] || '';
       date = parts[2] || today;
       time = parts[3] || '';
       phone = '';
     } else if (type === 'trial' || type === 'daily') {
-      // Format: TRIAL/DAILY|name|phone|date|time
       name = parts[1] || '';
       phone = parts[2] || '';
       date = parts[3] || today;
@@ -102,7 +113,7 @@ Deno.serve(async (req) => {
       }
     }
 
-    else if (type === 'daily') {
+    if (type === 'daily') {
       const visits = await base44.asServiceRole.entities.DailyVisit.list();
 
       const visit = visits.find((v) => {
@@ -131,7 +142,7 @@ Deno.serve(async (req) => {
       }
     }
 
-    else if (type === 'member') {
+    if (type === 'member') {
       const memberships = await base44.asServiceRole.entities.Membership.list();
 
       const member = memberships.find((m) => {
@@ -160,6 +171,7 @@ Deno.serve(async (req) => {
         result.found = true;
         result.classDate = date;
         result.classTime = time;
+
         result.person = {
           id: member.id,
           fullName: member.user_name || '',
