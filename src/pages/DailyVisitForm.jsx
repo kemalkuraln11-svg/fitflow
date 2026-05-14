@@ -3,7 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
-import { CheckCircle2, ArrowLeft } from "lucide-react";
+import { CheckCircle2, ArrowLeft, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -113,24 +113,31 @@ export default function DailyVisitForm({ onBack }) {
           </div>
           <div>
             <Label className="text-xs">Tarih</Label>
-            <Input
-              className="mt-0.5"
-              type="date"
-              value={form.visit_date}
-              onChange={(e) => setForm({ ...form, visit_date: e.target.value, class_id: "", class_title: "", class_time: "" })}
-            />
+            <div className="relative mt-0.5">
+              <Input
+                type="date"
+                value={form.visit_date}
+                onChange={(e) => setForm({ ...form, visit_date: e.target.value, class_id: "", class_title: "", class_time: "" })}
+                className="pl-3 pr-10"
+                style={{ fontSize: "16px", colorScheme: "light" }}
+              />
+              <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+            </div>
+            <p className="text-xs text-muted-foreground mt-1 ml-0.5">
+              {form.visit_date ? format(new Date(form.visit_date + "T12:00:00"), "d MMMM yyyy, EEEE", { locale: tr }) : ""}
+            </p>
           </div>
           {classes.length > 0 && (
             <div>
               <Label className="text-xs">Ders Seç (opsiyonel)</Label>
               <Select value={form.class_id} onValueChange={handleClassSelect}>
-                <SelectTrigger className="mt-0.5">
+                <SelectTrigger className="mt-0.5" style={{ fontSize: "16px" }}>
                   <SelectValue placeholder="Ders seçin" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="max-h-60">
                   {classes.map((cls) => (
                     <SelectItem key={cls.id} value={cls.id}>
-                      {cls.title} — {cls.start_time}
+                      <span className="block truncate max-w-[220px]">{cls.title} — {cls.start_time}</span>
                     </SelectItem>
                   ))}
                 </SelectContent>
