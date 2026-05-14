@@ -3,17 +3,13 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-
     const body = await req.json().catch(() => null);
 
     const rawQrData = body?.qr_data || body?.qrData || body?.data;
 
     if (!rawQrData) {
       return Response.json(
-        {
-          error: 'QR data is required',
-          receivedBody: body,
-        },
+        { error: 'QR data is required', receivedBody: body },
         { status: 400 }
       );
     }
@@ -21,16 +17,22 @@ Deno.serve(async (req) => {
     const qr_data = String(rawQrData).trim();
 
     const safe = (value) => String(value || '').trim();
-    const safeLower = (value) => safe(value).toLowerCase();
+    const safeLower = (value) => safe(value).toLocaleLowerCase('tr-TR');
 
-    // SUPPORT BOTH "|" AND ":" QR FORMATS
-    let parts = [];
+    const normalizePhone = (value) => safe(value).replace(/[^\d+]/g, '');
+    const samePhone = (a, b) => normalizePhone(a) === normalizePhone(b);
 
-    if (qr_data.includes('|')) {
-      parts = qr_data.split('|').map((p) => safe(p));
-    } else {
-      parts = qr_data.split(':').map((p) => safe(p));
-    }
+    const isPhone = (value) => {
+      const normalized = normalizePhone(value);
+      return /^(\+90|90|0)?5\d{9}$/.test(normalized);
+    };
+
+    const isDate = (value) => /^\d{4}-\d{2}-\d{2}$/.test(safe(value));
+    const isTime = (value) => /^\d{1,2}:\d{2}$/.test(safe(value));
+
+    const parts = qr_data.includes('|')
+      ? qr_data.split('|').map(safe).filter(Boolean)
+      : qr_data.split(':').map(safe).filter(Boolean);
 
     const type = safeLower(parts[0]);
 
@@ -39,45 +41,7 @@ Deno.serve(async (req) => {
     console.log('[scanQRCode] parts:', parts);
     console.log('[scanQRCode] type:', type);
 
-    let name = '';
-    let phone = '';
-    let date = '';
-    let time = '';
-
-    const today = new Date().toISOString().split('T')[0];
-
-    if (type === 'member') {
-      // member:username:2026-05-19:09:00
-      // MEMBER|username|2026-05-19|09:00
-
-      name = parts[1] || '';
-      date = parts[2] || today;
-
-      if (qr_data.includes(':')) {
-        time = parts.length >= 5 ? `${parts[3]}:${parts[4]}` : '';
-      } else {
-        time = parts[3] || '';
-      }
-
-      phone = '';
-    }
-
-    else if (type === 'trial' || type === 'daily') {
-      // trial:name:phone:2026-05-19:09:00
-      // TRIAL|name|phone|2026-05-19|09:00
-
-      name = parts[1] || '';
-      phone = parts[2] || '';
-      date = parts[3] || today;
-
-      if (qr_data.includes(':')) {
-        time = parts.length >= 6 ? `${parts[4]}:${parts[5]}` : '';
-      } else {
-        time = parts[4] || '';
-      }
-    }
-
-    else {
+    if (!['trial', 'daily', 'member'].includes(type)) {
       return Response.json(
         {
           error: 'Invalid QR type',
@@ -88,19 +52,45 @@ Deno.serve(async (req) => {
       );
     }
 
+    let name = '';
+    let phone = '';
+    let date = '';
+    let time = '';
+
+    const payload = parts.slice(1);
+
+    if (type === 'member') {
+      name = payload[0] || '';
+      date = payload.find(isDate) || '';
+      time = payload.find(isTime) || '';
+    } else {
+      const phoneIndex = payload.findIndex(isPhone);
+      const dateIndex = payload.findIndex(isDate);
+      const timeIndex = payload.findIndex(isTime);
+
+      if (phoneIndex >= 0) {
+        phone = payload[phoneIndex];
+
+        const nameParts = payload.slice(0, phoneIndex);
+        name = nameParts.join(' ').trim();
+
+        date = dateIndex >= 0 ? payload[dateIndex] : '';
+        time = timeIndex >= 0 ? payload[timeIndex] : '';
+      } else {
+        // Fallback for old format: trial:name:phone:date:time
+        name = payload[0] || '';
+        phone = payload[1] || '';
+        date = payload.find(isDate) || payload[2] || '';
+        time = payload.find(isTime) || '';
+      }
+    }
+
     if (!name) {
       return Response.json(
-        {
-          error: 'Name is required in QR data',
-          qr_data,
-        },
+        { error: 'Name is required in QR data', qr_data, parts },
         { status: 400 }
       );
     }
-
-    const nameParts = name.split(' ').filter(Boolean);
-    const firstName = nameParts[0] || '';
-    const lastName = nameParts.slice(1).join(' ') || '';
 
     const result = {
       type,
@@ -111,26 +101,22 @@ Deno.serve(async (req) => {
       found: false,
     };
 
-    // =========================
-    // TRIAL
-    // =========================
-
     if (type === 'trial') {
       const apps = await base44.asServiceRole.entities.TrialApplication.list();
 
       const app = apps.find((a) => {
+        const fullName = `${safe(a.first_name)} ${safe(a.last_name)}`.trim();
+
         return (
-          safeLower(a.first_name) === safeLower(firstName) &&
-          safeLower(a.last_name) === safeLower(lastName) &&
-          safe(a.phone) === safe(phone) &&
-          safe(a.trial_class_date) === safe(date) &&
-          (time === '' || safe(a.trial_class_time) === safe(time))
+          safeLower(fullName) === safeLower(name) &&
+          (!phone || samePhone(a.phone, phone)) &&
+          (!date || safe(a.trial_class_date) === safe(date)) &&
+          (!time || safe(a.trial_class_time) === safe(time))
         );
       });
 
       if (app) {
         result.found = true;
-
         result.person = {
           id: app.id,
           fullName: `${safe(app.first_name)} ${safe(app.last_name)}`.trim(),
@@ -147,25 +133,20 @@ Deno.serve(async (req) => {
       }
     }
 
-    // =========================
-    // DAILY
-    // =========================
-
     if (type === 'daily') {
       const visits = await base44.asServiceRole.entities.DailyVisit.list();
 
       const visit = visits.find((v) => {
         return (
           safeLower(v.full_name) === safeLower(name) &&
-          safe(v.phone) === safe(phone) &&
-          safe(v.visit_date) === safe(date) &&
-          (time === '' || safe(v.class_time) === safe(time))
+          (!phone || samePhone(v.phone, phone)) &&
+          (!date || safe(v.visit_date) === safe(date)) &&
+          (!time || safe(v.class_time) === safe(time))
         );
       });
 
       if (visit) {
         result.found = true;
-
         result.person = {
           id: visit.id,
           fullName: visit.full_name || '',
@@ -180,10 +161,6 @@ Deno.serve(async (req) => {
         result.message = 'Günlük giriş kaydı bulunamadı';
       }
     }
-
-    // =========================
-    // MEMBER
-    // =========================
 
     if (type === 'member') {
       const memberships = await base44.asServiceRole.entities.Membership.list();
@@ -200,27 +177,20 @@ Deno.serve(async (req) => {
             const classes = await base44.asServiceRole.entities.ClassSchedule.list();
 
             const matchedClass = classes.find((c) => {
-              return (
-                safe(c.date) === safe(date) &&
-                safe(c.start_time) === safe(time)
-              );
+              return safe(c.date) === safe(date) && safe(c.start_time) === safe(time);
             });
 
             if (matchedClass) {
               className = matchedClass.title || '';
             }
           } catch (classError) {
-            console.log(
-              '[scanQRCode] Class lookup error:',
-              classError.message
-            );
+            console.log('[scanQRCode] Class lookup error:', classError.message);
           }
         }
 
         result.found = true;
         result.classDate = date;
         result.classTime = time;
-
         result.person = {
           id: member.id,
           fullName: member.user_name || '',
@@ -243,9 +213,7 @@ Deno.serve(async (req) => {
     console.error('[scanQRCode] error:', error);
 
     return Response.json(
-      {
-        error: error.message || 'Internal Server Error',
-      },
+      { error: error.message || 'Internal Server Error' },
       { status: 500 }
     );
   }
