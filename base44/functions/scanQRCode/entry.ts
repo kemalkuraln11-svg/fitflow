@@ -3,19 +3,6 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    let user = null;
-    
-    try {
-      user = await base44.auth.me();
-    } catch (e) {
-      // Continue as service role if auth fails
-    }
-
-    if (!user) {
-      // Use service role for scanning if user auth fails
-    } else if (user.role !== 'admin') {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 });
-    }
 
     const { qr_data } = await req.json();
 
