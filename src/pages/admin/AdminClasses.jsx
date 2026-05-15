@@ -46,10 +46,16 @@ export default function AdminClasses() {
     queryFn: () => base44.entities.DailyVisit.list("-visit_date", 500),
   });
 
+  const { data: trialApps = [] } = useQuery({
+    queryKey: ["adminAllTrialApps"],
+    queryFn: () => base44.entities.TrialApplication.list(),
+  });
+
   const getClassCounts = (classId) => {
     const resCount = reservations.filter((r) => r.class_id === classId).length;
     const visitCount = dailyVisits.filter((v) => v.class_id === classId).length;
-    return { resCount, visitCount, total: resCount + visitCount };
+    const trialCount = trialApps.filter((t) => t.trial_class_id === classId).length;
+    return { resCount, visitCount, trialCount, total: resCount + visitCount + trialCount };
   };
 
   const createMutation = useMutation({
@@ -206,20 +212,24 @@ export default function AdminClasses() {
                      <Eye className="w-4 h-4" />
                    </Button>
                    {(() => {
-                      const { resCount, visitCount, total } = getClassCounts(cls.id);
-                      return (
-                        <span className="text-sm font-medium text-muted-foreground mx-1 flex items-center gap-1">
-                          <span className={total >= cls.capacity ? "text-destructive" : ""}>
-                            {total}/{cls.capacity}
-                          </span>
-                          {(resCount > 0 || visitCount > 0) && (
-                            <span className="text-xs text-muted-foreground/70">
-                              ({resCount}ü+{visitCount}g)
-                            </span>
-                          )}
-                        </span>
-                      );
-                    })()}
+                       const { resCount, visitCount, trialCount, total } = getClassCounts(cls.id);
+                       const parts = [];
+                       if (resCount > 0) parts.push(`${resCount}ü`);
+                       if (visitCount > 0) parts.push(`${visitCount}g`);
+                       if (trialCount > 0) parts.push(`${trialCount}d`);
+                       return (
+                         <span className="text-sm font-medium text-muted-foreground mx-1 flex items-center gap-1">
+                           <span className={total >= cls.capacity ? "text-destructive" : ""}>
+                             {total}/{cls.capacity}
+                           </span>
+                           {parts.length > 0 && (
+                             <span className="text-xs text-muted-foreground/70">
+                               ({parts.join("+")})
+                             </span>
+                           )}
+                         </span>
+                       );
+                     })()}
                    <Button
                      variant="ghost"
                      size="icon"
