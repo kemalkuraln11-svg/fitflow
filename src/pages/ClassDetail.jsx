@@ -43,6 +43,11 @@ export default function ClassDetail() {
     queryFn: () => base44.entities.DailyVisit.filter({ class_id: id }),
   });
 
+  const { data: classTrials = [] } = useQuery({
+    queryKey: ["classTrials", id],
+    queryFn: () => base44.entities.TrialApplication.filter({ trial_class_id: id }),
+  });
+
   const { data: myReservation } = useQuery({
     queryKey: ["myReservation", id, user?.user_email],
     queryFn: async () => {
@@ -144,7 +149,7 @@ export default function ClassDetail() {
     );
   }
 
-  const totalCount = classReservations.length + classVisits.length;
+  const totalCount = classReservations.length + classVisits.length + classTrials.length;
   const isFull = totalCount >= cls.capacity;
   const hasReservation = !!myReservation;
 

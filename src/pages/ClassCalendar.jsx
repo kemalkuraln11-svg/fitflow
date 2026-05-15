@@ -53,9 +53,15 @@ export default function ClassCalendar() {
     queryFn: () => base44.entities.DailyVisit.filter({ visit_date: dateStr }),
   });
 
+  const { data: dayTrials = [] } = useQuery({
+    queryKey: ["dayTrials", dateStr],
+    queryFn: () => base44.entities.TrialApplication.filter({ trial_class_date: dateStr }),
+  });
+
   const getCount = (classId) =>
     dayReservations.filter((r) => r.class_id === classId).length +
-    dayVisits.filter((v) => v.class_id === classId).length;
+    dayVisits.filter((v) => v.class_id === classId).length +
+    dayTrials.filter((t) => t.trial_class_id === classId).length;
 
   // Real-time: rezervasyon veya ders değişince anlık güncelle
   useEffect(() => {
