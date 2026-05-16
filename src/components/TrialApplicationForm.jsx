@@ -264,7 +264,7 @@ export default function TrialApplicationForm({ onBack }) {
                />
              </div>
              <div>
-               <Label className="text-xs">Ders Seç (opsiyonel)</Label>
+               <Label className="text-xs">Ders Seç</Label>
                <Select value={form.trial_class_id} onValueChange={handleClassSelect} disabled={classes.length === 0}>
                  <SelectTrigger className="mt-0.5">
                    <SelectValue placeholder={classes.length === 0 ? "O gün ders yok" : "Ders seçin"} />
@@ -279,6 +279,9 @@ export default function TrialApplicationForm({ onBack }) {
                    </SelectContent>
                  )}
                </Select>
+               {classes.length === 0 && form.trial_class_date && (
+                 <p className="text-xs text-destructive mt-1">Bu tarihte ders bulunmuyor. Lütfen başka bir gün seçin.</p>
+               )}
              </div>
             <div className="flex gap-2">
               <Button
@@ -292,7 +295,7 @@ export default function TrialApplicationForm({ onBack }) {
               <Button
                 type="submit"
                 className="w-full h-10 font-semibold shadow-lg shadow-primary/25 mt-1"
-                disabled={mutation.isPending}
+                disabled={mutation.isPending || !form.trial_class_id}
               >
                 {mutation.isPending ? "Gönderiliyor..." : "Başvuruyu Gönder"}
               </Button>
