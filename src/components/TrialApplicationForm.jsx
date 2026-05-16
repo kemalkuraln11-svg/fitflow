@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { format, addDays } from "date-fns";
+import { format, addDays, startOfMonth, endOfMonth, startOfWeek, endOfWeek, isSameDay, isSameMonth } from "date-fns";
 import { tr } from "date-fns/locale";
-import { ArrowLeft, CheckCircle2, UserPlus } from "lucide-react";
+import { ArrowLeft, CheckCircle2, ChevronLeft, ChevronRight, CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,7 +21,11 @@ function capitalizeName(str) {
 }
 
 export default function TrialApplicationForm({ onBack }) {
-  const today = format(new Date(), "yyyy-MM-dd");
+  const todayDate = new Date();
+  const today = format(todayDate, "yyyy-MM-dd");
+  const [selectedDate, setSelectedDate] = useState(todayDate);
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  const [calendarMonth, setCalendarMonth] = useState(new Date(todayDate.getFullYear(), todayDate.getMonth(), 1));
   const [form, setForm] = useState({
     first_name: "",
     last_name: "",
@@ -36,6 +40,13 @@ export default function TrialApplicationForm({ onBack }) {
   const [blacklisted, setBlacklisted] = useState(false);
   const [step, setStep] = useState(1);
   const [approvedApp, setApprovedApp] = useState(null);
+
+  const { data: allSchedules = [] } = useQuery({
+    queryKey: ["allSchedules"],
+    queryFn: () => base44.entities.ClassSchedule.list(),
+  });
+
+  const classDates = new Set(allSchedules.map((s) => s.date));
 
   const { data: classes = [] } = useQuery({
     queryKey: ["classSchedule", form.trial_class_date],
@@ -84,6 +95,67 @@ export default function TrialApplicationForm({ onBack }) {
       trial_class_title: selectedClass?.title || "",
       trial_class_time: selectedClass?.start_time || "",
     });
+  };
+
+  const handleDateChange = (newDate) => {
+    const ds = format(newDate, "yyyy-MM-dd");
+    if (!classDates.has(ds)) return;
+    setSelectedDate(newDate);
+    setForm({ ...form, trial_class_date: ds, trial_class_id: "", trial_class_title: "", trial_class_time: "" });
+    setCalendarOpen(false);
+  };
+
+  const renderCalendar = () => {
+    const monthStart = startOfMonth(calendarMonth);
+    const monthEnd = endOfMonth(calendarMonth);
+    const gridStart = startOfWeek(monthStart, { weekStartsOn: 1 });
+    const gridEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
+    const days = [];
+    let d = gridStart;
+    while (d <= gridEnd) { days.push(new Date(d)); d = addDays(d, 1); }
+    const weekDays = ["Pt", "Sa", "Ça", "Pe", "Cu", "Ct", "Pz"];
+    return (
+      <div className="absolute left-0 right-0 z-50 mt-2 bg-card border border-border rounded-xl shadow-xl p-4">
+        <div className="flex items-center justify-between mb-3">
+          <button type="button" onClick={() => setCalendarMonth(m => new Date(m.getFullYear(), m.getMonth() - 1, 1))} className="p-1 rounded hover:bg-muted">
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <span className="text-sm font-semibold">{format(calendarMonth, "MMMM yyyy", { locale: tr })}</span>
+          <button type="button" onClick={() => setCalendarMonth(m => new Date(m.getFullYear(), m.getMonth() + 1, 1))} className="p-1 rounded hover:bg-muted">
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+        <div className="grid grid-cols-7 mb-1">
+          {weekDays.map(w => <div key={w} className="text-center text-xs text-muted-foreground font-medium py-1">{w}</div>)}
+        </div>
+        <div className="grid grid-cols-7 gap-y-1">
+          {days.map((day, i) => {
+            const ds = format(day, "yyyy-MM-dd");
+            const hasClass = classDates.has(ds);
+            const isSelected = isSameDay(day, selectedDate);
+            const isToday = isSameDay(day, todayDate);
+            const inMonth = isSameMonth(day, calendarMonth);
+            return (
+              <button key={i} type="button" disabled={!hasClass}
+                onClick={() => handleDateChange(day)}
+                className={[
+                  "relative flex flex-col items-center justify-center h-9 w-full rounded-lg text-sm transition-colors",
+                  !inMonth ? "opacity-30" : "",
+                  !hasClass ? "text-muted-foreground cursor-not-allowed opacity-40" : "cursor-pointer",
+                  isSelected ? "bg-primary text-primary-foreground font-bold" : hasClass ? "hover:bg-muted font-medium" : "",
+                  isToday && !isSelected ? "ring-1 ring-primary text-primary" : "",
+                ].join(" ")}
+              >
+                {day.getDate()}
+                {hasClass && !isSelected && (
+                  <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary" />
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    );
   };
 
 
@@ -250,18 +322,17 @@ export default function TrialApplicationForm({ onBack }) {
              <p className="text-sm text-muted-foreground mb-2">
                Merhaba <span className="font-semibold text-foreground">{capitalizeName(form.first_name + " " + form.last_name)}</span>, deneme dersinizi seçin.
              </p>
-             <div>
+             <div className="relative">
                <Label className="text-xs">Tarih</Label>
-               <Input
-                 className="mt-0.5"
-                 type="date"
-                 min={today}
-                 max={format(addDays(new Date(), 14), "yyyy-MM-dd")}
-                 value={form.trial_class_date}
-                 onChange={(e) =>
-                   setForm({ ...form, trial_class_date: e.target.value, trial_class_id: "", trial_class_title: "", trial_class_time: "" })
-                 }
-               />
+               <button
+                 type="button"
+                 className="mt-0.5 w-full flex items-center gap-2 bg-muted rounded-lg px-3 py-2.5 text-sm font-medium"
+                 onClick={() => { setCalendarMonth(new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1)); setCalendarOpen(o => !o); }}
+               >
+                 <CalendarDays className="w-4 h-4 text-primary shrink-0" />
+                 {format(selectedDate, "d MMMM yyyy, EEEE", { locale: tr })}
+               </button>
+               {calendarOpen && renderCalendar()}
              </div>
              <div>
                <Label className="text-xs">Ders Seç</Label>
