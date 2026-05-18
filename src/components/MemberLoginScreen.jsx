@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useMemberAuth } from "@/lib/MemberAuthContext";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, LogIn, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -101,22 +101,26 @@ export default function MemberLoginScreen() {
          </Button>
       </form>
 
-      <div className="w-full border-t pt-4 mt-2 space-y-2">
-        <p className="text-xs text-muted-foreground text-center mb-1">Üye değil misiniz?</p>
-        <Button
-          variant="outline"
-          className="w-full h-10 font-medium"
-          onClick={() => setShowTrialApp(true)}
-        >
-          Üyelik Başvurusu
-        </Button>
-        <Button
-          variant="ghost"
-          className="w-full h-10 font-medium text-muted-foreground"
-          onClick={() => setShowDailyVisit(true)}
-        >
-          Günlük Giriş Yap
-        </Button>
+      <div className="w-full border-t pt-4 mt-2">
+        <p className="text-xs text-muted-foreground text-center mb-3">Üye değil misiniz?</p>
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            onClick={() => setShowDailyVisit(true)}
+            className="flex flex-col items-center gap-1.5 rounded-xl border-2 border-primary bg-primary/5 px-3 py-4 text-primary hover:bg-primary/10 transition-colors"
+          >
+            <LogIn className="w-6 h-6" />
+            <span className="text-xs font-semibold leading-tight text-center">Günlük<br/>Giriş Yap</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowTrialApp(true)}
+            className="flex flex-col items-center gap-1.5 rounded-xl border-2 border-border bg-muted/40 px-3 py-4 text-foreground hover:bg-muted transition-colors"
+          >
+            <UserPlus className="w-6 h-6" />
+            <span className="text-xs font-semibold leading-tight text-center">Üyelik<br/>Başvurusu</span>
+          </button>
+        </div>
       </div>
     </div>
   );
