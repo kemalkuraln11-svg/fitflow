@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { format, addDays, startOfMonth, endOfMonth, startOfWeek, endOfWeek, isSameDay, isSameMonth } from "date-fns";
+import { format, addDays, startOfMonth, endOfMonth, startOfWeek, endOfWeek, isSameDay, isSameMonth, isPast, parse } from "date-fns";
 import { tr } from "date-fns/locale";
 import { ArrowLeft, CheckCircle2, ChevronLeft, ChevronRight, CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -46,7 +46,16 @@ export default function TrialApplicationForm({ onBack }) {
     queryFn: () => base44.entities.ClassSchedule.list(),
   });
 
-  const classDates = new Set(allSchedules.map((s) => s.date));
+  const now = new Date();
+  // Only include dates that have at least one future class
+  const classDates = new Set(
+    allSchedules
+      .filter((s) => {
+        const classDateTime = parse(`${s.date} ${s.start_time}`, "yyyy-MM-dd HH:mm", new Date());
+        return !isPast(classDateTime);
+      })
+      .map((s) => s.date)
+  );
 
   const { data: classes = [] } = useQuery({
     queryKey: ["classSchedule", form.trial_class_date],
@@ -336,23 +345,30 @@ export default function TrialApplicationForm({ onBack }) {
              </div>
              <div>
                <Label className="text-xs">Ders Seç</Label>
-               <Select value={form.trial_class_id} onValueChange={handleClassSelect} disabled={classes.length === 0}>
-                 <SelectTrigger className="mt-0.5">
-                   <SelectValue placeholder={classes.length === 0 ? "O gün ders yok" : "Ders seçin"} />
-                 </SelectTrigger>
-                 {classes.length > 0 && (
-                   <SelectContent>
-                     {classes.map((cls) => (
-                       <SelectItem key={cls.id} value={cls.id}>
-                         {cls.title} — {cls.start_time}
-                       </SelectItem>
-                     ))}
-                   </SelectContent>
-                 )}
-               </Select>
-               {classes.length === 0 && form.trial_class_date && (
-                 <p className="text-xs text-destructive mt-1">Bu tarihte ders bulunmuyor. Lütfen başka bir gün seçin.</p>
-               )}
+               {(() => {
+                 const futureClasses = classes.filter(c => !isPast(parse(`${c.date} ${c.start_time}`, "yyyy-MM-dd HH:mm", new Date())));
+                 return (
+                   <>
+                     <Select value={form.trial_class_id} onValueChange={handleClassSelect} disabled={futureClasses.length === 0}>
+                       <SelectTrigger className="mt-0.5">
+                         <SelectValue placeholder={futureClasses.length === 0 ? "O gün ders yok" : "Ders seçin"} />
+                       </SelectTrigger>
+                       {futureClasses.length > 0 && (
+                         <SelectContent>
+                           {futureClasses.map((cls) => (
+                             <SelectItem key={cls.id} value={cls.id}>
+                               {cls.title} — {cls.start_time}
+                             </SelectItem>
+                           ))}
+                         </SelectContent>
+                       )}
+                     </Select>
+                     {futureClasses.length === 0 && form.trial_class_date && (
+                       <p className="text-xs text-destructive mt-1">Bu tarihte geçerli ders bulunmuyor. Lütfen başka bir gün seçin.</p>
+                     )}
+                   </>
+                 );
+               })()}
              </div>
             <div className="flex gap-2">
               <Button
