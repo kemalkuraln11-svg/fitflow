@@ -16,7 +16,11 @@
     },
     "password": {
       "type": "string",
-      "description": "Password set by admin"
+      "description": "Password set by admin (hashed)"
+    },
+    "password_plain": {
+      "type": "string",
+      "description": "Plaintext password (visible to admin)"
     },
     "phone": {
       "type": "string",

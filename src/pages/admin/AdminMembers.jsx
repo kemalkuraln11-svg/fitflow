@@ -125,6 +125,7 @@ export default function AdminMembers() {
       plan_name: form.plan_name,
       status: form.status,
       password: hashed,
+      password_plain: plaintext,
       username: autoUsername,
       user_email: autoEmail,
       _plaintextPassword: plaintext,
@@ -429,7 +430,7 @@ export default function AdminMembers() {
                       <span>👤 {member.username}</span>
                       <span className="flex items-center gap-1 text-muted-foreground text-xs">
                         <Eye className="w-3.5 h-3.5" />
-                        ••••••
+                        {member.password_plain || "••••••"}
                       </span>
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">

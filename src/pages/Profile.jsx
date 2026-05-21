@@ -1,9 +1,13 @@
+import { useState } from "react";
 import { base44 } from "@/api/base44Client";
+import { hashPassword } from "@/lib/crypto";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { useMemberAuth } from "@/lib/MemberAuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { format, parseISO, differenceInDays, parse, isBefore, isPast } from "date-fns";
 import { tr } from "date-fns/locale";
-import { Calendar, LogOut, Clock, CheckCircle2, History } from "lucide-react";
+import { Calendar, LogOut, Clock, CheckCircle2, History, KeyRound } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -14,6 +18,31 @@ import ReservationsBottomSheet from "@/components/ReservationsBottomSheet";
 
 export default function Profile() {
   const { member, logout } = useMemberAuth();
+  const [pwForm, setPwForm] = useState({ current: "", next: "", confirm: "" });
+  const [pwError, setPwError] = useState("");
+
+  const changePwMutation = useMutation({
+    mutationFn: async ({ next }) => {
+      const hashed = await hashPassword(next);
+      await base44.entities.Membership.update(member.id, { password: hashed, password_plain: next });
+    },
+    onSuccess: () => {
+      setPwForm({ current: "", next: "", confirm: "" });
+      setPwError("");
+      toast.success("Şifreniz başarıyla güncellendi!");
+    },
+    onError: () => toast.error("Şifre güncellenemedi, tekrar deneyin."),
+  });
+
+  const handleChangePw = async (e) => {
+    e.preventDefault();
+    setPwError("");
+    const currentHashed = await hashPassword(pwForm.current);
+    if (currentHashed !== member.password) { setPwError("Mevcut şifreniz yanlış."); return; }
+    if (pwForm.next.length < 4) { setPwError("Yeni şifre en az 4 karakter olmalı."); return; }
+    if (pwForm.next !== pwForm.confirm) { setPwError("Şifreler eşleşmiyor."); return; }
+    changePwMutation.mutate({ next: pwForm.next });
+  };
   const membership = (member?.status === "active" && member?.end_date) ? member : null;
 
   const { data: reservations = [] } = useQuery({
@@ -183,6 +212,48 @@ export default function Profile() {
               ))}
             </div>
           )}
+        </Card>
+
+        {/* Change Password */}
+        <Card className="p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <KeyRound className="w-4 h-4 text-primary flex-shrink-0" />
+            <h3 className="font-semibold text-sm">Şifre Değiştir</h3>
+          </div>
+          <form onSubmit={handleChangePw} className="space-y-3">
+            <input
+              type="password"
+              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              placeholder="Mevcut şifre"
+              value={pwForm.current}
+              onChange={(e) => setPwForm({ ...pwForm, current: e.target.value })}
+              style={{ fontSize: "16px" }}
+            />
+            <input
+              type="password"
+              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              placeholder="Yeni şifre"
+              value={pwForm.next}
+              onChange={(e) => setPwForm({ ...pwForm, next: e.target.value })}
+              style={{ fontSize: "16px" }}
+            />
+            <input
+              type="password"
+              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              placeholder="Yeni şifre (tekrar)"
+              value={pwForm.confirm}
+              onChange={(e) => setPwForm({ ...pwForm, confirm: e.target.value })}
+              style={{ fontSize: "16px" }}
+            />
+            {pwError && <p className="text-xs text-destructive">{pwError}</p>}
+            <Button
+              type="submit"
+              className="w-full h-9"
+              disabled={!pwForm.current || !pwForm.next || !pwForm.confirm || changePwMutation.isPending}
+            >
+              {changePwMutation.isPending ? "Güncelleniyor..." : "Şifreyi Güncelle"}
+            </Button>
+          </form>
         </Card>
 
         {/* Actions */}
