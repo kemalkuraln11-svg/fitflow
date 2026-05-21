@@ -18,6 +18,7 @@ import ReservationsBottomSheet from "@/components/ReservationsBottomSheet";
 
 export default function Profile() {
   const { member, logout } = useMemberAuth();
+  const [pwOpen, setPwOpen] = useState(false);
   const [pwForm, setPwForm] = useState({ current: "", next: "", confirm: "" });
   const [pwError, setPwError] = useState("");
 
@@ -37,8 +38,11 @@ export default function Profile() {
   const handleChangePw = async (e) => {
     e.preventDefault();
     setPwError("");
+    // Fetch the actual membership record to get the stored hash
+    const records = await base44.entities.Membership.filter({ id: member.id });
+    const storedHash = records?.[0]?.password;
     const currentHashed = await hashPassword(pwForm.current);
-    if (currentHashed !== member.password) { setPwError("Mevcut şifreniz yanlış."); return; }
+    if (currentHashed !== storedHash) { setPwError("Mevcut şifreniz yanlış."); return; }
     if (pwForm.next.length < 4) { setPwError("Yeni şifre en az 4 karakter olmalı."); return; }
     if (pwForm.next !== pwForm.confirm) { setPwError("Şifreler eşleşmiyor."); return; }
     changePwMutation.mutate({ next: pwForm.next });
@@ -216,11 +220,17 @@ export default function Profile() {
 
         {/* Change Password */}
         <Card className="p-5">
-          <div className="flex items-center gap-2 mb-4">
+          <button
+            type="button"
+            className="w-full flex items-center gap-2"
+            onClick={() => { setPwOpen(o => !o); setPwError(""); setPwForm({ current: "", next: "", confirm: "" }); }}
+          >
             <KeyRound className="w-4 h-4 text-primary flex-shrink-0" />
-            <h3 className="font-semibold text-sm">Şifre Değiştir</h3>
-          </div>
-          <form onSubmit={handleChangePw} className="space-y-3">
+            <h3 className="font-semibold text-sm flex-1 text-left">Şifre Değiştir</h3>
+            <span className="text-muted-foreground text-xs">{pwOpen ? "▲" : "▼"}</span>
+          </button>
+          {pwOpen && (
+          <form onSubmit={handleChangePw} className="space-y-3 mt-4">
             <input
               type="password"
               className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
@@ -254,6 +264,7 @@ export default function Profile() {
               {changePwMutation.isPending ? "Güncelleniyor..." : "Şifreyi Güncelle"}
             </Button>
           </form>
+          )}
         </Card>
 
         {/* Actions */}
