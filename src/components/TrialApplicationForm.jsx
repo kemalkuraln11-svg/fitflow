@@ -316,12 +316,12 @@ export default function TrialApplicationForm({ onBack }) {
                   }}
                 />
               </div>
-            {phoneError && <p className="text-xs text-destructive -mt-1">{phoneError}</p>}
+            {phoneError && <p className="text-xs text-destructive mt-1 px-1">{phoneError}</p>}
             </div>
             <Button
               type="submit"
               className="w-full h-10 font-semibold shadow-lg shadow-primary/25 mt-1"
-              disabled={!form.first_name || !form.last_name || !form.phone || !!existingTrialApp}
+              disabled={!form.first_name || !form.last_name || !form.phone || form.phone.replace(/^\+90/, '').replace(/\D/g, '').length !== 10 || !!existingTrialApp}
             >
               {existingTrialApp ? "Başvurunuz Var" : "Devam Et"}
             </Button>
