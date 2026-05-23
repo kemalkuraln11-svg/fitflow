@@ -40,6 +40,13 @@ export default function TrialApplicationForm({ onBack }) {
   const [blacklisted, setBlacklisted] = useState(false);
   const [step, setStep] = useState(1);
   const [approvedApp, setApprovedApp] = useState(null);
+  const [phoneError, setPhoneError] = useState("");
+
+  const validatePhone = (phone) => {
+    const digits = phone.replace(/^\+90/, "").replace(/\D/g, "");
+    if (digits.length !== 10 || !digits.startsWith("5")) return "+90 ile başlayan 10 haneli geçerli bir numara girin (ör: +90 554 896 56 59)";
+    return "";
+  };
 
   const { data: allSchedules = [] } = useQuery({
     queryKey: ["allSchedules"],
@@ -269,7 +276,7 @@ export default function TrialApplicationForm({ onBack }) {
 
       <Card className="w-full p-5">
         {step === 1 ? (
-          <form onSubmit={(e) => { e.preventDefault(); setStep(2); }} className="space-y-4">
+          <form onSubmit={(e) => { e.preventDefault(); const err = validatePhone(form.phone); setPhoneError(err); if (err) return; setStep(2); }} className="space-y-4">
             <p className="text-sm text-muted-foreground mb-2">Kişisel bilgilerinizi girin.</p>
             <div>
               <Label className="text-xs">Ad</Label>
@@ -303,11 +310,13 @@ export default function TrialApplicationForm({ onBack }) {
                   maxLength="10"
                   value={form.phone.replace(/^\+90/, "")}
                   onChange={(e) => {
-                    const digits = e.target.value.replace(/[^\d]/g, "").slice(0, 10);
-                    setForm({ ...form, phone: digits ? "+90" + digits : "" });
+                   const digits = e.target.value.replace(/[^\d]/g, "").slice(0, 10);
+                   setForm({ ...form, phone: digits ? "+90" + digits : "" });
+                   setPhoneError("");
                   }}
                 />
               </div>
+            {phoneError && <p className="text-xs text-destructive -mt-1">{phoneError}</p>}
             </div>
             <Button
               type="submit"

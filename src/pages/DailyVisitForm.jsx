@@ -17,6 +17,13 @@ export default function DailyVisitForm({ onBack }) {
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [calendarMonth, setCalendarMonth] = useState(new Date(todayDate.getFullYear(), todayDate.getMonth(), 1));
   const [form, setForm] = useState({ full_name: "", phone: "", class_id: "", class_title: "", class_time: "" });
+  const [phoneError, setPhoneError] = useState("");
+
+  const validatePhone = (phone) => {
+    const digits = phone.replace(/^\+90/, "").replace(/\D/g, "");
+    if (digits.length !== 10 || !digits.startsWith("5")) return "+90 ile başlayan 10 haneli geçerli bir numara girin (ör: +90 554 896 56 59)";
+    return "";
+  };
   const [success, setSuccess] = useState(false);
   const [successData, setSuccessData] = useState(null);
 
@@ -78,11 +85,15 @@ export default function DailyVisitForm({ onBack }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!form.full_name || !form.phone || !form.class_id) return;
+    const err = validatePhone(form.phone);
+    if (err) { setPhoneError(err); return; }
     mutation.mutate({ ...form, visit_date: dateStr });
   };
 
   const noClasses = !loadingClasses && classes.length === 0;
-  const canSubmit = form.full_name && form.phone && form.class_id;
+  const phoneDigits = form.phone.replace(/^\+90/, "").replace(/\D/g, "");
+  const phoneValid = phoneDigits.length === 10 && phoneDigits.startsWith("5");
+  const canSubmit = form.full_name && form.phone && form.class_id && phoneValid;
 
   // Takvim grid
   const renderCalendar = () => {
@@ -204,8 +215,23 @@ export default function DailyVisitForm({ onBack }) {
           {/* Telefon */}
           <div>
             <Label className="text-xs font-semibold text-muted-foreground">Telefon</Label>
-            <Input className="mt-1" style={{ fontSize: "16px" }} placeholder="05xx xxx xx xx" type="tel"
-              value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+            <div className="flex items-center mt-1 border border-input rounded-md bg-white overflow-hidden">
+              <span className="text-sm text-muted-foreground px-2.5 py-2 bg-muted/50 font-medium">+90</span>
+              <Input
+                className="border-0 rounded-none focus-visible:ring-0 focus-visible:ring-offset-0 text-sm"
+                placeholder="(5xx) xxx xx xx"
+                type="tel"
+                style={{ fontSize: "16px" }}
+                maxLength="10"
+                value={form.phone.replace(/^\+90/, "")}
+                onChange={(e) => {
+                  const digits = e.target.value.replace(/[^\d]/g, "").slice(0, 10);
+                  setForm({ ...form, phone: digits ? "+90" + digits : "" });
+                  setPhoneError("");
+                }}
+              />
+            </div>
+            {phoneError && <p className="text-xs text-destructive mt-1">{phoneError}</p>}
           </div>
 
           {/* Tarih */}
