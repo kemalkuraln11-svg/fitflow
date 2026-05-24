@@ -111,18 +111,20 @@ export default function MemberLoginScreen() {
         </Button>
       </form>
 
-      {trialEnabled && (
-        <div className="w-full border-t pt-4 mt-2">
+      <div className="w-full border-t pt-4 mt-2">
+        {trialEnabled && (
           <p className="text-xs text-muted-foreground text-center mb-3">Üye değil misiniz?</p>
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={() => setShowDailyVisit(true)}
-              className="flex flex-col items-center gap-1.5 rounded-xl border-2 border-primary bg-primary/5 px-3 py-4 text-primary hover:bg-primary/10 transition-colors"
-            >
-              <LogIn className="w-6 h-6" />
-              <span className="text-xs font-semibold leading-tight text-center">Günlük<br/>Giriş Yap</span>
-            </button>
+        )}
+        <div className={trialEnabled ? "grid grid-cols-2 gap-2" : "flex justify-center"}>
+          <button
+            type="button"
+            onClick={() => setShowDailyVisit(true)}
+            className="flex flex-col items-center gap-1.5 rounded-xl border-2 border-primary bg-primary/5 px-3 py-4 text-primary hover:bg-primary/10 transition-colors"
+          >
+            <LogIn className="w-6 h-6" />
+            <span className="text-xs font-semibold leading-tight text-center">Günlük<br/>Giriş Yap</span>
+          </button>
+          {trialEnabled && (
             <button
               type="button"
               onClick={() => setShowTrialApp(true)}
@@ -131,9 +133,9 @@ export default function MemberLoginScreen() {
               <UserPlus className="w-6 h-6" />
               <span className="text-xs font-semibold leading-tight text-center">Üyelik<br/>Başvurusu</span>
             </button>
-          </div>
+          )}
         </div>
-      )}
+      </div>
 
       {/* İletişim - Instagram */}
       <a
