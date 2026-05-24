@@ -64,79 +64,76 @@ export default function MemberLoginScreen() {
 
       <form onSubmit={handleLogin} className="w-full space-y-3 mb-4">
         <div>
-             <Label className="text-xs">Kullanıcı Adı</Label>
-             <Input
-               className="h-10 mt-0.5 text-xs"
-               style={{ fontSize: '16px' }}
-               placeholder="kullanıcı adınız"
-               value={username}
-               onChange={(e) => setUsername(e.target.value)}
-               autoCapitalize="none"
-               autoCorrect="off"
-             />
-           </div>
-           <div>
-             <Label className="text-xs">Şifre</Label>
-             <div className="relative mt-0.5">
-               <Input
-                 className="h-10 pr-10"
-                 style={{ fontSize: '16px' }}
-                 type={showPassword ? "text" : "password"}
-                 placeholder="••••••••"
-                 value={password}
-                 onChange={(e) => setPassword(e.target.value)}
-               />
-             <button
-               type="button"
-               className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground"
-               onClick={() => setShowPassword(!showPassword)}
-             >
-               {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-             </button>
-           </div>
-         </div>
+          <Label className="text-xs">Kullanıcı Adı</Label>
+          <Input
+            className="h-10 mt-0.5 text-xs"
+            style={{ fontSize: '16px' }}
+            placeholder="kullanıcı adınız"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            autoCapitalize="none"
+            autoCorrect="off"
+          />
+        </div>
+        <div>
+          <Label className="text-xs">Şifre</Label>
+          <div className="relative mt-0.5">
+            <Input
+              className="h-10 pr-10"
+              style={{ fontSize: '16px' }}
+              type={showPassword ? "text" : "password"}
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <button
+              type="button"
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
+          </div>
+        </div>
 
-         {error && (
-           <div className="bg-destructive/10 text-destructive text-xs rounded-lg px-3 py-2">
-             {error}
-           </div>
-         )}
+        {error && (
+          <div className="bg-destructive/10 text-destructive text-xs rounded-lg px-3 py-2">
+            {error}
+          </div>
+        )}
 
-         <Button
-           type="submit"
-           className="w-full h-10 text-base font-semibold shadow-lg shadow-primary/25 mt-1"
-           disabled={loading || !username || !password}
-         >
-           {loading ? "Giriş yapılıyor..." : "Giriş Yap"}
-         </Button>
+        <Button
+          type="submit"
+          className="w-full h-10 text-base font-semibold shadow-lg shadow-primary/25 mt-1"
+          disabled={loading || !username || !password}
+        >
+          {loading ? "Giriş yapılıyor..." : "Giriş Yap"}
+        </Button>
       </form>
 
-      <div className="w-full border-t pt-4 mt-2">
-        <p className="text-xs text-muted-foreground text-center mb-3">Üye değil misiniz?</p>
-        <div className="grid grid-cols-2 gap-2">
-          <button
-            type="button"
-            onClick={() => setShowDailyVisit(true)}
-            className="flex flex-col items-center gap-1.5 rounded-xl border-2 border-primary bg-primary/5 px-3 py-4 text-primary hover:bg-primary/10 transition-colors"
-          >
-            <LogIn className="w-6 h-6" />
-            <span className="text-xs font-semibold leading-tight text-center">Günlük<br/>Giriş Yap</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setShowTrialApp(true)}
-            className={`flex flex-col items-center gap-1.5 rounded-xl border-2 px-3 py-4 transition-colors ${
-              trialEnabled
-                ? "border-border bg-muted/40 text-foreground hover:bg-muted"
-                : "border-border/30 bg-muted/20 text-muted-foreground cursor-not-allowed opacity-50"
-            }`}
-            disabled={!trialEnabled}
-          >
-            <UserPlus className="w-6 h-6" />
-            <span className="text-xs font-semibold leading-tight text-center">Üyelik<br/>Başvurusu</span>
-          </button>
+      {trialEnabled && (
+        <div className="w-full border-t pt-4 mt-2">
+          <p className="text-xs text-muted-foreground text-center mb-3">Üye değil misiniz?</p>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => setShowDailyVisit(true)}
+              className="flex flex-col items-center gap-1.5 rounded-xl border-2 border-primary bg-primary/5 px-3 py-4 text-primary hover:bg-primary/10 transition-colors"
+            >
+              <LogIn className="w-6 h-6" />
+              <span className="text-xs font-semibold leading-tight text-center">Günlük<br/>Giriş Yap</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowTrialApp(true)}
+              className="flex flex-col items-center gap-1.5 rounded-xl border-2 border-border bg-muted/40 px-3 py-4 text-foreground hover:bg-muted transition-colors"
+            >
+              <UserPlus className="w-6 h-6" />
+              <span className="text-xs font-semibold leading-tight text-center">Üyelik<br/>Başvurusu</span>
+            </button>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* İletişim - Instagram */}
       <a
@@ -153,7 +150,7 @@ export default function MemberLoginScreen() {
       <button
         type="button"
         onClick={() => setShowInfo(true)}
-        className="mt-4 flex items-center gap-1.5 text-xs text-primary underline underline-offset-2 font-medium"
+        className="mt-2 flex items-center gap-1.5 text-xs text-primary underline underline-offset-2 font-medium"
       >
         <Clock className="w-3.5 h-3.5" />
         Ders Saatleri & Ücret Listesi
@@ -170,7 +167,6 @@ export default function MemberLoginScreen() {
               </button>
             </div>
 
-            {/* Ders Saatleri */}
             <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">Ders Saatleri</p>
             <div className="rounded-xl border overflow-hidden mb-5">
               <div className="grid grid-cols-3 bg-secondary text-secondary-foreground text-xs font-bold">
@@ -195,7 +191,6 @@ export default function MemberLoginScreen() {
               ))}
             </div>
 
-            {/* Fiyat Listesi */}
             <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">Fiyat Listesi</p>
             <div className="rounded-xl border overflow-hidden mb-4">
               {[
