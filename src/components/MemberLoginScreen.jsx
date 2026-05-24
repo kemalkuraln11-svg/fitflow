@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useMemberAuth } from "@/lib/MemberAuthContext";
+import { useQuery } from "@tanstack/react-query";
+import { base44 } from "@/api/base44Client";
 import { Eye, EyeOff, LogIn, UserPlus, Clock, X, Instagram } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,6 +19,13 @@ export default function MemberLoginScreen() {
   const [showDailyVisit, setShowDailyVisit] = useState(false);
   const [showTrialApp, setShowTrialApp] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
+
+  const { data: appSettings = [] } = useQuery({
+    queryKey: ["appSettings"],
+    queryFn: () => base44.entities.AppSettings.list(),
+  });
+  const trialSetting = appSettings.find(s => s.key === "trial_application_enabled");
+  const trialEnabled = trialSetting ? trialSetting.value : true;
 
   if (showDailyVisit) {
     return <DailyVisitForm onBack={() => setShowDailyVisit(false)} />;
@@ -116,7 +125,12 @@ export default function MemberLoginScreen() {
           <button
             type="button"
             onClick={() => setShowTrialApp(true)}
-            className="flex flex-col items-center gap-1.5 rounded-xl border-2 border-border bg-muted/40 px-3 py-4 text-foreground hover:bg-muted transition-colors"
+            className={`flex flex-col items-center gap-1.5 rounded-xl border-2 px-3 py-4 transition-colors ${
+              trialEnabled
+                ? "border-border bg-muted/40 text-foreground hover:bg-muted"
+                : "border-border/30 bg-muted/20 text-muted-foreground cursor-not-allowed opacity-50"
+            }`}
+            disabled={!trialEnabled}
           >
             <UserPlus className="w-6 h-6" />
             <span className="text-xs font-semibold leading-tight text-center">Üyelik<br/>Başvurusu</span>

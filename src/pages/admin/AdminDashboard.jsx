@@ -1,7 +1,7 @@
 import { base44 } from "@/api/base44Client";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { Users, Calendar, BookOpen, TrendingUp } from "lucide-react";
+import { Users, Calendar, BookOpen, TrendingUp, UserPlus } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 
@@ -27,6 +27,27 @@ export default function AdminDashboard() {
   const { data: todayVisits = [] } = useQuery({
     queryKey: ["adminTodayVisits", today],
     queryFn: () => base44.entities.DailyVisit.filter({ visit_date: today }),
+  });
+
+  const queryClient = useQueryClient();
+
+  const { data: appSettings = [] } = useQuery({
+    queryKey: ["appSettings"],
+    queryFn: () => base44.entities.AppSettings.list(),
+  });
+
+  const trialSetting = appSettings.find(s => s.key === "trial_application_enabled");
+  const trialEnabled = trialSetting ? trialSetting.value : true;
+
+  const toggleTrialMutation = useMutation({
+    mutationFn: async (newVal) => {
+      if (trialSetting) {
+        return base44.entities.AppSettings.update(trialSetting.id, { value: newVal });
+      } else {
+        return base44.entities.AppSettings.create({ key: "trial_application_enabled", value: newVal });
+      }
+    },
+    onSuccess: () => queryClient.invalidateQueries(["appSettings"]),
   });
 
   const activeMembers = members.filter((m) => m.status === "active").length;
@@ -57,6 +78,33 @@ export default function AdminDashboard() {
             <p className="text-sm text-muted-foreground mt-1">{stat.label}</p>
           </Card>
         ))}
+      </div>
+
+      {/* Üyelik Başvurusu Ayarı */}
+      <div className="mb-8">
+        <h3 className="font-semibold text-lg mb-4">Uygulama Ayarları</h3>
+        <Card className="p-5 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <UserPlus className="w-5 h-5 text-primary" />
+            </div>
+            <div>
+              <p className="font-semibold text-sm">Üyelik Başvurusu</p>
+              <p className="text-xs text-muted-foreground">Kullanıcı giriş ekranında üyelik başvuru butonu</p>
+            </div>
+          </div>
+          <button
+            onClick={() => toggleTrialMutation.mutate(!trialEnabled)}
+            disabled={toggleTrialMutation.isPending}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
+              trialEnabled ? "bg-primary" : "bg-muted-foreground/30"
+            }`}
+          >
+            <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+              trialEnabled ? "translate-x-6" : "translate-x-1"
+            }`} />
+          </button>
+        </Card>
       </div>
 
       {/* Today's Classes with attendance */}
