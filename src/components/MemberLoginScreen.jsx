@@ -115,14 +115,14 @@ export default function MemberLoginScreen() {
         {trialEnabled && (
           <p className="text-xs text-muted-foreground text-center mb-3">Üye değil misiniz?</p>
         )}
-        <div className={trialEnabled ? "grid grid-cols-2 gap-2" : "flex justify-center"}>
+        <div className={trialEnabled ? "grid grid-cols-2 gap-2" : "w-full"}>
           <button
             type="button"
             onClick={() => setShowDailyVisit(true)}
-            className="flex flex-col items-center gap-1.5 rounded-xl border-2 border-primary bg-primary/5 px-3 py-4 text-primary hover:bg-primary/10 transition-colors"
+            className="w-full flex flex-row items-center justify-center gap-2 rounded-xl border-2 border-primary bg-primary/5 px-4 py-3.5 text-primary hover:bg-primary/10 transition-colors"
           >
-            <LogIn className="w-6 h-6" />
-            <span className="text-xs font-semibold leading-tight text-center">Günlük<br/>Giriş Yap</span>
+            <LogIn className="w-5 h-5" />
+            <span className="text-sm font-semibold">Günlük Giriş Yap</span>
           </button>
           {trialEnabled && (
             <button
