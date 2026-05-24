@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useMemberAuth } from "@/lib/MemberAuthContext";
-import { Eye, EyeOff, LogIn, UserPlus, Clock, X } from "lucide-react";
+import { Eye, EyeOff, LogIn, UserPlus, Clock, X, Instagram } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -123,6 +123,17 @@ export default function MemberLoginScreen() {
           </button>
         </div>
       </div>
+
+      {/* İletişim - Instagram */}
+      <a
+        href="https://www.instagram.com/fitkafalar/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-3 flex items-center gap-1.5 text-xs text-pink-500 underline underline-offset-2 font-medium"
+      >
+        <Instagram className="w-3.5 h-3.5" />
+        İletişim için Instagram'da DM atın: @fitkafalar
+      </a>
 
       {/* Ders saatleri & ücret linki */}
       <button
