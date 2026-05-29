@@ -82,6 +82,7 @@ export const MemberAuthProvider = ({ children }) => {
           user_email: updated.user_email,
           gender: updated.gender || "male",
           plan_name: updated.plan_name,
+          plan_type: updated.plan_type || 'unlimited',
           start_date: updated.start_date,
           end_date: updated.end_date,
           status: updated.status,

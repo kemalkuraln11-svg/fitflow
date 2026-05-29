@@ -47,6 +47,7 @@ Deno.serve(async (req) => {
       user_email: m.user_email,
       gender: m.gender || 'male',
       plan_name: m.plan_name,
+      plan_type: m.plan_type || 'unlimited',
       start_date: m.start_date,
       end_date: m.end_date,
       status: m.status,
