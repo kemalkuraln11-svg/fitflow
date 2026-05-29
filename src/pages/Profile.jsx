@@ -47,7 +47,13 @@ export default function Profile() {
     if (pwForm.next !== pwForm.confirm) { setPwError("Şifreler eşleşmiyor."); return; }
     changePwMutation.mutate({ next: pwForm.next });
   };
-  const membership = (member?.status === "active" && member?.end_date) ? member : null;
+  const { data: freshMembership } = useQuery({
+    queryKey: ["myMembership", member?.id],
+    queryFn: () => base44.entities.Membership.filter({ id: member.id }).then(r => r[0] || null),
+    enabled: !!member?.id,
+  });
+
+  const membership = (member?.status === "active" && member?.end_date) ? (freshMembership || member) : null;
 
   const { data: reservations = [] } = useQuery({
     queryKey: ["myAllReservations", member?.id],
@@ -97,7 +103,7 @@ export default function Profile() {
     : 0;
   const progress = totalDays > 0 ? ((totalDays - daysLeft) / totalDays) * 100 : 0;
 
-  const planType = member?.plan_type || 'unlimited';
+  const planType = (freshMembership?.plan_type) || member?.plan_type || 'unlimited';
   const now2 = new Date();
   const monthStart = `${now2.getFullYear()}-${String(now2.getMonth() + 1).padStart(2, '0')}-01`;
   const nextMonthDate = new Date(now2.getFullYear(), now2.getMonth() + 1, 1);
