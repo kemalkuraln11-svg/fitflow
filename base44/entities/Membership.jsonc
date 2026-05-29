@@ -59,6 +59,16 @@
       "type": "string",
       "description": "Name of the membership plan"
     },
+    "plan_type": {
+      "type": "string",
+      "enum": [
+        "4",
+        "8",
+        "unlimited"
+      ],
+      "default": "unlimited",
+      "description": "Monthly session limit: 4, 8, or unlimited"
+    },
     "frozen_at": {
       "type": "string",
       "format": "date",

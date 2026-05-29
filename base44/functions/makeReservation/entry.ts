@@ -6,6 +6,37 @@ Deno.serve(async (req) => {
     const { action, classId, userEmail, userName, reservationId } = await req.json();
 
     if (action === 'create') {
+      // Get member to check plan_type
+      const members = await base44.asServiceRole.entities.Membership.filter({ user_email: userEmail });
+      const member = members[0];
+      const planType = member?.plan_type || 'unlimited';
+
+      // Check monthly session limit for 4 or 8 plan
+      if (planType === '4' || planType === '8') {
+        const limit = parseInt(planType);
+        const now = new Date();
+        const monthStart = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
+        const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+        const monthEnd = `${nextMonth.getFullYear()}-${String(nextMonth.getMonth() + 1).padStart(2, '0')}-01`;
+
+        const allConfirmed = await base44.asServiceRole.entities.Reservation.filter({
+          user_email: userEmail,
+          status: 'confirmed',
+        });
+
+        const thisMonthCount = allConfirmed.filter(
+          (r) => r.class_date >= monthStart && r.class_date < monthEnd
+        ).length;
+
+        if (thisMonthCount >= limit) {
+          return Response.json({
+            limitExceeded: true,
+            limit,
+            used: thisMonthCount,
+          });
+        }
+      }
+
       // Conflict check
       const allMyReservations = await base44.asServiceRole.entities.Reservation.filter({
         user_email: userEmail,

@@ -97,6 +97,18 @@ export default function Profile() {
     : 0;
   const progress = totalDays > 0 ? ((totalDays - daysLeft) / totalDays) * 100 : 0;
 
+  const planType = member?.plan_type || 'unlimited';
+  const now2 = new Date();
+  const monthStart = `${now2.getFullYear()}-${String(now2.getMonth() + 1).padStart(2, '0')}-01`;
+  const nextMonthDate = new Date(now2.getFullYear(), now2.getMonth() + 1, 1);
+  const monthEnd = `${nextMonthDate.getFullYear()}-${String(nextMonthDate.getMonth() + 1).padStart(2, '0')}-01`;
+  const thisMonthReservations = reservations.filter(
+    (r) => r.class_date >= monthStart && r.class_date < monthEnd
+  );
+  const sessionLimit = planType === '4' ? 4 : planType === '8' ? 8 : null;
+  const sessionsUsed = thisMonthReservations.length;
+  const sessionsLeft = sessionLimit !== null ? Math.max(0, sessionLimit - sessionsUsed) : null;
+
   const now = new Date();
   const pastReservations = reservations.filter((r) => {
     const dt = parse(`${r.class_date} ${r.class_time}`, "yyyy-MM-dd HH:mm", new Date());
@@ -142,10 +154,24 @@ export default function Profile() {
 
           {membership ? (
             <div className="space-y-3 text-sm">
-              <div>
-                <span className="text-xs text-muted-foreground block">Plan</span>
-                <span className="font-medium">{membership.plan_name || "Standart"}</span>
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-xs text-muted-foreground block">Plan</span>
+                  <span className="font-medium">{membership.plan_name || "Standart"}</span>
+                </div>
+                <Badge variant="outline" className="text-xs">
+                  {planType === '4' ? "4'lü Paket" : planType === '8' ? "8'li Paket" : "Sınırsız"}
+                </Badge>
               </div>
+              {sessionLimit !== null && (
+                <div className="bg-primary/5 rounded-xl p-3 border border-primary/10">
+                  <div className="flex justify-between items-center mb-1.5">
+                    <span className="text-xs text-muted-foreground">Bu ay kalan ders hakkı</span>
+                    <span className="text-sm font-bold text-primary">{sessionsLeft} / {sessionLimit}</span>
+                  </div>
+                  <Progress value={(sessionsUsed / sessionLimit) * 100} className="h-1.5" />
+                </div>
+              )}
               <div>
                 <span className="text-xs text-muted-foreground block">Başlangıç</span>
                 <span className="font-medium text-xs">{format(parseISO(membership.start_date), "d MMM yyyy", { locale: tr })}</span>

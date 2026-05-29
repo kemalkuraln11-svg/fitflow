@@ -69,7 +69,7 @@ export default function AdminMembers() {
     user_name: "", password: "", gender: "male",
     start_date: format(new Date(), "yyyy-MM-dd"),
     end_date: format(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), "yyyy-MM-dd"),
-    plan_name: "Aylık", status: "active",
+    plan_name: "Aylık", plan_type: "unlimited", status: "active",
   };
   const [form, setForm] = useState(emptyForm);
   const [editForm, setEditForm] = useState(null);
@@ -123,6 +123,7 @@ export default function AdminMembers() {
       start_date: form.start_date,
       end_date: form.end_date,
       plan_name: form.plan_name,
+      plan_type: form.plan_type,
       status: form.status,
       password: hashed,
       password_plain: plaintext,
@@ -141,6 +142,7 @@ export default function AdminMembers() {
       start_date: member.start_date,
       end_date: member.end_date,
       plan_name: member.plan_name || "Aylık",
+      plan_type: member.plan_type || "unlimited",
       status: member.status,
     });
     setEditingMember(member);
@@ -257,7 +259,7 @@ export default function AdminMembers() {
                 <Input type="text" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} placeholder="Şifre belirleyin" />
               </div>
               <div>
-                <Label>Plan</Label>
+                <Label>Plan (Süre)</Label>
                 <Select value={form.plan_name} onValueChange={(v) => {
                   const months = getPlanDuration(v);
                   const startDate = new Date();
@@ -275,6 +277,17 @@ export default function AdminMembers() {
                     <SelectItem value="3 Aylık">3 Aylık</SelectItem>
                     <SelectItem value="6 Aylık">6 Aylık</SelectItem>
                     <SelectItem value="Yıllık">Yıllık</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Ders Paketi</Label>
+                <Select value={form.plan_type} onValueChange={(v) => setForm({ ...form, plan_type: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="4">Aylık 4'lü</SelectItem>
+                    <SelectItem value="8">Aylık 8'li</SelectItem>
+                    <SelectItem value="unlimited">Sınırsız</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -361,7 +374,7 @@ export default function AdminMembers() {
                 <Input type="text" value={editForm.password} onChange={(e) => setEditForm({ ...editForm, password: e.target.value })} />
               </div>
               <div>
-                <Label>Plan</Label>
+                <Label>Plan (Süre)</Label>
                 <Select value={editForm.plan_name} onValueChange={(v) => {
                   const months = getPlanDuration(v);
                   const newEnd = format(addDays(parseISO(editForm.start_date), months * 30 + 1), "yyyy-MM-dd");
@@ -373,6 +386,17 @@ export default function AdminMembers() {
                     <SelectItem value="3 Aylık">3 Aylık</SelectItem>
                     <SelectItem value="6 Aylık">6 Aylık</SelectItem>
                     <SelectItem value="Yıllık">Yıllık</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Ders Paketi</Label>
+                <Select value={editForm.plan_type} onValueChange={(v) => setEditForm({ ...editForm, plan_type: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="4">Aylık 4'lü</SelectItem>
+                    <SelectItem value="8">Aylık 8'li</SelectItem>
+                    <SelectItem value="unlimited">Sınırsız</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -434,7 +458,7 @@ export default function AdminMembers() {
                       </span>
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">
-                      {member.plan_name} •{" "}
+                      {member.plan_name} • {member.plan_type === "4" ? "4'lü" : member.plan_type === "8" ? "8'li" : "Sınırsız"} •{" "}
                       {isFrozen
                         ? `Donduruldu: ${format(parseISO(member.frozen_at), "d MMM yyyy", { locale: tr })}`
                         : `${daysLeft} gün kaldı • ${format(parseISO(member.end_date), "d MMM yyyy", { locale: tr })}`}
