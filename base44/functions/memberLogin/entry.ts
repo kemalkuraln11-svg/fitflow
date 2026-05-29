@@ -4,6 +4,7 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const { username, password } = await req.json();
+    console.log(`[Giriş] Deneme: ${username}`);
 
     const results = await base44.asServiceRole.entities.Membership.filter({
       username: username.toLowerCase().trim(),
@@ -11,15 +12,18 @@ Deno.serve(async (req) => {
     });
 
     if (!results || results.length === 0) {
+      console.log(`[Giriş] BAŞARISIZ: Kullanıcı bulunamadı → ${username}`);
       return Response.json({ error: 'Kullanıcı adı veya şifre hatalı' }, { status: 401 });
     }
 
     const m = results[0];
 
     if (m.status === 'suspended') {
+      console.log(`[Giriş] REDDEDİLDİ: Hesap askıya alınmış → ${username}`);
       return Response.json({ error: 'Üyeliğiniz askıya alınmıştır. Lütfen iletişime geçin.' }, { status: 403 });
     }
     if (m.status === 'frozen') {
+      console.log(`[Giriş] REDDEDİLDİ: Hesap dondurulmuş → ${username}`);
       return Response.json({ error: 'Üyeliğiniz dondurulmuştur. Lütfen iletişime geçin.' }, { status: 403 });
     }
 
@@ -40,6 +44,7 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Üyeliğinizin süresi dolmuştur. Lütfen üyeliğinizi yenileyin.' }, { status: 403 });
     }
 
+    console.log(`[Giriş] BAŞARILI: ${m.user_name} (${m.username}) - Plan: ${m.plan_type || 'unlimited'} - Bitiş: ${m.end_date}`);
     return Response.json({
       id: m.id,
       user_name: m.user_name,

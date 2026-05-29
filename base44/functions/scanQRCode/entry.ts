@@ -37,8 +37,8 @@ Deno.serve(async (req) => {
 
     const type = lower(parts[0]);
 
-    console.log('[scanQRCode] qr_data:', qr_data);
-    console.log('[scanQRCode] parts:', parts);
+    console.log(`[QR Tarama] Gelen veri: ${qr_data}`);
+    console.log(`[QR Tarama] Tip: ${type} | Parçalar: [${parts.join(' | ')}]`);
 
     if (!['trial', 'daily', 'member'].includes(type)) {
       return Response.json({
@@ -109,12 +109,14 @@ Deno.serve(async (req) => {
       });
 
       if (!app) {
+        console.log(`[QR Tarama] Deneme dersi kaydı bulunamadı: ${name}`);
         return Response.json({
           ...result,
           message: 'Deneme dersi kaydı bulunamadı',
         });
       }
 
+      console.log(`[QR Tarama] BULUNDU (deneme): ${name} - ${app.trial_class_title} (${app.trial_class_date})`);
       return Response.json({
         ...result,
         found: true,
@@ -145,12 +147,14 @@ Deno.serve(async (req) => {
       });
 
       if (!visit) {
+        console.log(`[QR Tarama] Günlük giriş kaydı bulunamadı: ${name}`);
         return Response.json({
           ...result,
           message: 'Günlük giriş kaydı bulunamadı',
         });
       }
 
+      console.log(`[QR Tarama] BULUNDU (günlük): ${name} - ${visit.class_title} (${visit.visit_date})`);
       return Response.json({
         ...result,
         found: true,
@@ -173,12 +177,14 @@ Deno.serve(async (req) => {
       const member = memberships.find((m) => lower(m.username) === lower(name));
 
       if (!member) {
+        console.log(`[QR Tarama] Üyelik kaydı bulunamadı: ${name}`);
         return Response.json({
           ...result,
           message: 'Üyelik kaydı bulunamadı',
         });
       }
 
+      console.log(`[QR Tarama] BULUNDU (üye): ${member.user_name} - Plan: ${member.plan_type || 'unlimited'} - Durum: ${member.status}`);
       return Response.json({
         ...result,
         found: true,

@@ -4,12 +4,14 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const { action, classId, userEmail, userName, reservationId } = await req.json();
+    console.log(`[Rezervasyon] İşlem: ${action} | Kullanıcı: ${userEmail} | Ders ID: ${classId}`);
 
     if (action === 'create') {
       // Get member to check plan_type
       const members = await base44.asServiceRole.entities.Membership.filter({ user_email: userEmail });
       const member = members[0];
       const planType = member?.plan_type || 'unlimited';
+      console.log(`[Rezervasyon] Kullanıcı planı: ${planType} | Üye: ${userName}`);
 
       // Check monthly session limit for 4 or 8 plan
       if (planType === '4' || planType === '8') {
@@ -28,7 +30,9 @@ Deno.serve(async (req) => {
           (r) => r.class_date >= monthStart && r.class_date < monthEnd
         ).length;
 
+        console.log(`[Rezervasyon] Bu ay kullanılan: ${thisMonthCount}/${limit}`);
         if (thisMonthCount >= limit) {
+          console.log(`[Rezervasyon] LIMIT AŞILDI: ${userEmail} - ${thisMonthCount}/${limit}`);
           return Response.json({
             limitExceeded: true,
             limit,
@@ -61,6 +65,7 @@ Deno.serve(async (req) => {
         });
       }
 
+      console.log(`[Rezervasyon] Oluşturuluyor: ${userName} → ${cls.title} (${cls.date} ${cls.start_time})`);
       await base44.asServiceRole.entities.Reservation.create({
         class_id: classId,
         class_title: cls.title,
@@ -75,12 +80,14 @@ Deno.serve(async (req) => {
         current_count: (cls.current_count || 0) + 1,
       });
 
+      console.log(`[Rezervasyon] BAŞARILI: Rezervasyon oluşturuldu`);
       return Response.json({ success: true });
 
     } else if (action === 'cancel') {
       const cls = (await base44.asServiceRole.entities.ClassSchedule.filter({ id: classId }))[0];
       if (!cls) return Response.json({ error: 'Ders bulunamadı' }, { status: 404 });
 
+      console.log(`[Rezervasyon] İPTAL: ${userEmail} - Rezervasyon ${reservationId}`);
       await base44.asServiceRole.entities.Reservation.update(reservationId, { status: 'cancelled' });
 
       await base44.asServiceRole.entities.ClassSchedule.update(classId, {
